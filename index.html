@@ -23,44 +23,55 @@
     <script src="controller.js"></script>
 </head>
 <body ng-app="allsky" ng-controller="AppCtrl">
-<div class="header">
-    <div class=title>All Sky Camera</div>
-    <div class="menu">
-        <i class="fa fa-2x fa-info-circle" title="Information about the camera" ng-click="toggleInfo()" ng-class="{'active': showInfo}"></i>
-        <a href="./videos" title="Archived Videos"><i class="fa fa-2x fa-youtube-play" style="color:red"></i></a>
-    </div>
-    <div ng-show="forecast" class="forecast pull-right">
-        <span>Aurora activity: </span>
-        <span class="forecast-day" ng-repeat="(key,val) in forecast">{{key}}:
-            <span ng-class="getScale(val)"
-                  title="{{val}}/9">{{getScale(val)}}</span> </span>
-    </div>
-    <div style="clear:both;"></div>
-</div>
-<div class="info animated slideInLeft" ng-show="showInfo==true">
-    <ul>
-        <li><i class="fa fa-fw fa-map"></i>Location: Whitehorse, YT</li>
-        <li><i class="fa fa-fw fa-map-marker"></i>Latitude: 60.71N</li>
-        <li><i class="fa fa-fw fa-map-marker"></i>Longitude: 135.05W</li>
-    </ul>
-</div>
-<span class="notification" compile="notification"></span>
-<div id="imageContainer">
-	<div id="starmap_container">
-		<div id="starmap"></div>
+	<div class="header">
+		<div class=title>All Sky Camera</div>
+		<div class="menu">
+			<i class="fa fa-2x fa-info-circle" title="Information about the camera" ng-click="toggleInfo()" ng-class="{'active': showInfo}"></i>
+			<a href="./videos" title="Archived Videos"><i class="fa fa-2x fa-youtube-play" style="color:red"></i></a>
+			<i class="fa fa-2x fa-star-o" id="overlayBtn"></i>
+		</div>
+		<div ng-show="forecast" class="forecast pull-right">
+			<span>Aurora activity: </span>
+			<span class="forecast-day" ng-repeat="(key,val) in forecast">{{key}}:
+				<span ng-class="getScale(val)"
+					  title="{{val}}/9">{{getScale(val)}}</span> </span>
+		</div>
+		<div style="clear:both;"></div>
 	</div>
-    <img id="current" class="current" src="image.jpg">
-</div>
+	<div class="info animated slideInLeft" ng-show="showInfo==true">
+		<ul>
+			<li><i class="fa fa-fw fa-map"></i>Location: Whitehorse, YT</li>
+			<li><i class="fa fa-fw fa-map-marker"></i>Latitude: 60.71N</li>
+			<li><i class="fa fa-fw fa-map-marker"></i>Longitude: 135.05W</li>
+		</ul>
+	</div>
+	<span class="notification" compile="notification"></span>
+	<div class="options">
+		<div class="date-picker-container">
+			<input type="number" id="year" class="date-picker" min="0" max="9999">
+			<input type="number" id="month" class="date-picker" min="1" max="12">
+			<input type="number" id="day" class="date-picker" min="1" max="31">
+			<input type="number" id="hour" class="date-picker" min="0" max="23">
+			<input type="number" id="minute" class="date-picker" min="0" max="59">
+		</div>
+	</div>
+
+	<div id="imageContainer">
+		<div id="starmap_container">
+			<div id="starmap"></div>
+		</div>
+		<img id="current" class="current" src="image.jpg">
+	</div>
 
 	<script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+	  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-  ga('create', 'UA-46384016-1', 'auto');
-  ga('send', 'pageview');
+	  ga('create', 'UA-46384016-1', 'auto');
+	  ga('send', 'pageview');
 
-</script>
+	</script>
 </body>
 </html>

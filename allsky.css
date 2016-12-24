@@ -67,6 +67,19 @@ body {
 	margin-left: 10px;
 }
 
+.date-picker-container{
+	position: fixed;
+	bottom: 0px;
+	width: 400px;
+	left: 50%;
+	margin-left: -200px;
+	margin-bottom: 40px;
+}
+
+input, select {
+	color: black;
+}
+
 #imageContainer {
 	text-align: center;
 }
@@ -80,12 +93,11 @@ img.current {
 	position: absolute;
 	opacity: 0.45;
 	overflow: hidden;
+	height: 720px;
 }
 
 #starmap_container #starmap{
-	margin-top: -99px;
-    margin-left: 38px;
-    transform: rotate(135deg);
+	margin-top: -133px;
 }
 
 .starmap_credit {

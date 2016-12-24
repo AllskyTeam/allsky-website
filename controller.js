@@ -1,25 +1,53 @@
 var app = angular.module('allsky', ['ngLodash']);
 
 $(document).ready(function(){
-    planetarium = $.virtualsky({
-		id:'starmap',
-		projection:'polar',
-		width: 960,
-		height: 960,
-		constellations: true,
-		latitude: 60.7,
-		longitude: 135,
-		clock: new Date(2016, 03, 08, 02, 10, 30, 000),
-		mouse: false,
-		gridlines_eq: true,
-		keyboard: false,
-		showdate: false,
-		showposition: false,
-		constellationlabels: true,
-		transparent: true,
-		objects: "M42;M45;M31"
+		
+    $('#overlayBtn').on("click", function(){
+		$('.options').fadeToggle();
+		$('#starmap_container').fadeToggle();
 	});
+	
+	$(function(){
+		$('.date-picker').on("change", function(e){
+			
+			if (e.target.value.length < 2){
+				$("#" + e.target.id).val("0" + e.target.value);
+			}
+			var dateString = $('#year').val()  + "-" + $('#month').val() + "-" + $('#day').val() + " " + $('#hour').val() + ":" + $('#minute').val() + "-08:00";
+			console.log(dateString);
+		  if (moment(dateString).isValid())
+			buildOverlay(dateString);
+		  else 
+			buildOverlay();
+		});  
+	});
+	
+	// Init date picker
+	var now = moment();
+	$('#year').val(now.year());
+	$('#month').val(now.month());
+	$('#day').val(now.date());
+	$('#hour').val(now.hour());
+	$('#minute').val(now.minute());
 });
+
+function buildOverlay(_clock){
+	$.ajax({
+		url: "virtualsky.json" + '?_ts=' + new Date().getTime(),
+		cache: false
+	}).done(
+		function (data) {
+			var clock = null;
+			if (_clock) {
+				clock = moment(_clock);
+			} else {
+				clock = moment();
+			}
+			data.clock = clock.toDate();
+			planetarium = $.virtualsky(data);
+		}
+	);
+};
 
 function compile($compile) {
     // directive factory creates a link function
@@ -45,7 +73,9 @@ function compile($compile) {
 }
 
 function AppCtrl($scope, $timeout, $http, _) {
-
+	
+	buildOverlay();
+	
     var imageName = "image.jpg";
     $scope.imageURL = "loading.jpg";
     $scope.showInfo = false;

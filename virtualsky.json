@@ -1,0 +1,20 @@
+{
+	"id":"starmap",
+	"projection":"fisheye",
+	"width": 960,
+	"height": 960,
+	"constellations": true,
+	"latitude": 60.7,
+	"longitude": 135,
+	"az": 321,
+	"mouse": false,
+	"gridlines_eq": true,
+	"keyboard": false,
+	"showdate": false,
+	"showposition": false,
+	"constellationlabels": true,
+	"sky_gradient": false,
+	"gradient": false,
+	"transparent": true,
+	"objects": "M42;M45;M31"
+}
