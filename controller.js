@@ -1,22 +1,17 @@
 var app = angular.module('allsky', ['ngLodash']);
 
 $(document).ready(function(){
-		
-    $('#overlayBtn').on("click", function(){
-		$('.options').fadeToggle();
-		$('#starmap_container').fadeToggle();
-	});
 	
 	$(function(){
-		$('.date-picker').on("change", function(e){
+		$('.date-picker').on("input", function(e){
 			
 			if (e.target.value.length < 2){
 				$("#" + e.target.id).val("0" + e.target.value);
 			}
 			var dateString = $('#year').val()  + "-" + $('#month').val() + "-" + $('#day').val() + " " + $('#hour').val() + ":" + $('#minute').val() + "-08:00";
-			console.log(dateString);
+			//console.log(dateString);
 		  if (moment(dateString).isValid())
-			buildOverlay(dateString);
+			buildOverlay({"clock":dateString});
 		  else 
 			buildOverlay();
 		});  
@@ -25,25 +20,35 @@ $(document).ready(function(){
 	// Init date picker
 	var now = moment();
 	$('#year').val(now.year());
-	$('#month').val(now.month());
-	$('#day').val(now.date());
-	$('#hour').val(now.hour());
-	$('#minute').val(now.minute());
+	$('#month').val(padNumber(now.month() + 1));
+	$('#day').val(padNumber(now.date()));
+	$('#hour').val(padNumber(now.hour()));
+	$('#minute').val(padNumber(now.minute()));
 });
 
-function buildOverlay(_clock){
+$(window).resize(function () {
+	buildOverlay();
+});
+
+function padNumber(n){
+	return n.toString().length < 2 ? "0" + n : n;
+}
+
+function buildOverlay(params){
 	$.ajax({
 		url: "virtualsky.json" + '?_ts=' + new Date().getTime(),
 		cache: false
 	}).done(
 		function (data) {
 			var clock = null;
-			if (_clock) {
+			if (params && params.clock) {
 				clock = moment(_clock);
 			} else {
 				clock = moment();
 			}
 			data.clock = clock.toDate();
+			data.width = window.innerWidth < 960 ? window.innerWidth : 960;
+			data.height = data.width;
 			planetarium = $.virtualsky(data);
 		}
 	);
@@ -79,6 +84,7 @@ function AppCtrl($scope, $timeout, $http, _) {
     var imageName = "image.jpg";
     $scope.imageURL = "loading.jpg";
     $scope.showInfo = false;
+    $scope.showOverlay = false;
     $scope.notification = "";
 
     function getHiddenProp() {
@@ -166,6 +172,12 @@ function AppCtrl($scope, $timeout, $http, _) {
 
     $scope.toggleInfo = function () {
         $scope.showInfo = !$scope.showInfo;
+    };
+	
+	$scope.toggleOverlay = function () {
+        $scope.showOverlay = !$scope.showOverlay;
+		$('.options').fadeToggle();
+		$('#starmap_container').fadeToggle();
     };
 
     $scope.getScale = function (index) {

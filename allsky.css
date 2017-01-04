@@ -15,17 +15,17 @@ body {
 	float: left;
 	color: #DDD;
 	font-size: 26px;
-	padding-left: 42px;
+	padding-left: 54px;
     margin-left: 5px;
     margin-top: 2px;
-	background: url('allsky-logo.png') left center;
-	background-size: 35px;
+	background: url('aurora-logo.png') left center;
+	background-size: 57px;
     background-repeat: no-repeat;
     font-family: 'Ubuntu', sans-serif;
     font-weight: 400;
 }
 
-.menu {
+/*.menu {
 	float: left;
 	margin: 6px 5px 5px 12px;
 }
@@ -39,28 +39,57 @@ body {
 .menu i:hover,
 .menu i.active {
 	color: orange;
-}
+}*/
 
 .info {
 	padding: 8px;
 	position: fixed;
 	top: 80px;
-	left: 0px;
-	border-top-right-radius: 5px;
-	border-bottom-right-radius: 5px;
+	right: 0px;
+	border-top-left-radius: 5px;
+	border-bottom-left-radius: 5px;
 	background-color: #333;
 	border: 2px solid #555;
-	border-left: none;
+	border-right: none;
 }
 
 .info ul {
 	list-style: none;
 	padding-left: 10px;
-    	margin-bottom: 0;
+    margin-bottom: 0;
 }
 
 .info ul li i {
 	margin-right: 3px;
+}
+
+#sidebar {
+	position: fixed;
+    left: 0;
+    top: 150px;
+    padding: 0;
+    padding: 5px;
+	border-top-right-radius: 5px;
+	border-bottom-right-radius: 5px;
+	background-color: #333;
+	border: 2px solid #888;
+	border-left: none;
+	z-index: 2;
+}
+
+#sidebar li {
+	list-style: none;
+}
+
+#sidebar li i {
+	cursor: pointer;
+	color: #888;
+	margin: 2px 0;
+}
+
+#sidebar li i:hover,
+#sidebar li i.active {
+	color: orange;
 }
 
 .notification {
@@ -70,14 +99,20 @@ body {
 .date-picker-container{
 	position: fixed;
 	bottom: 0px;
-	width: 400px;
+	width: 450px;
 	left: 50%;
-	margin-left: -200px;
+	margin-left: -225px;
 	margin-bottom: 40px;
 }
 
-input, select {
-	color: black;
+input {
+	color: white;
+    background-color: gray;
+    border: none;
+    border-radius: 4px;
+    padding: 3px;
+    text-align: center;
+    font-weight: bold;
 }
 
 #imageContainer {
