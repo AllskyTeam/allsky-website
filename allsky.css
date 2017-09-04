@@ -44,12 +44,12 @@ body {
 .info {
 	padding: 8px;
 	position: fixed;
-	top: 80px;
+	top: 150px;
 	right: 0px;
 	border-top-left-radius: 5px;
 	border-bottom-left-radius: 5px;
 	background-color: #333;
-	border: 2px solid #555;
+    border: 2px solid #888;
 	border-right: none;
 }
 
@@ -98,11 +98,37 @@ body {
 
 .date-picker-container{
 	position: fixed;
-	bottom: 0px;
-	width: 450px;
-	left: 50%;
-	margin-left: -225px;
-	margin-bottom: 40px;
+    bottom: 0px;
+    width: 414px;
+    left: 50%;
+    margin-left: -207px;
+    margin-bottom: 10px;
+    background-color: #333;
+    border: 2px solid #888;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.settings {
+	position: fixed;
+    bottom: 0;
+    left: 0;
+    margin-left: 10px;
+    margin-bottom: 10px;
+    background-color: #333;
+    border: 2px solid #888;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.settings .input-label {
+	width: 160px;
+	display: inline-block;
+	margin-right: 5px;
+}
+
+.settings div.form-row {
+	margin: 5px 0;
 }
 
 input {
@@ -132,11 +158,22 @@ img.current {
 }
 
 #starmap_container #starmap{
-	margin-top: -133px;
+	margin-top: -94px;
+	margin-left: 40px;
 }
 
 .starmap_credit {
 	display: none !important;
+}
+
+.diy {
+	position: fixed;
+	bottom: 10px;
+	right: 10px;
+}
+
+.diy a {
+	color: white;
 }
 
 .back-button {

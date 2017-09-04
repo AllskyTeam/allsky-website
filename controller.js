@@ -3,7 +3,7 @@ var app = angular.module('allsky', ['ngLodash']);
 $(document).ready(function(){
 	
 	$(function(){
-		$('.date-picker').on("input", function(e){
+		$('.date-picker, .position').on("input", function(e){
 			
 			if (e.target.value.length < 2){
 				$("#" + e.target.id).val("0" + e.target.value);
@@ -42,13 +42,25 @@ function buildOverlay(params){
 		function (data) {
 			var clock = null;
 			if (params && params.clock) {
-				clock = moment(_clock);
+				clock = moment(params.clock);
 			} else {
 				clock = moment();
 			}
-			data.clock = clock.toDate();
-			data.width = window.innerWidth < 960 ? window.innerWidth : 960;
+			
+			
+			if ($('#top').val() != ""){
+				$("#starmap").css("margin-top", $('#top').val() + "px");
+			}
+			if ($('#left').val() != ""){
+				$("#starmap").css("margin-left", $('#left').val() + "px");
+			}
+			data.clock = clock.add(7, 'hours').subtract(40, 'minutes').toDate();
+			data.width = window.innerWidth < 900 ? window.innerWidth : 900;
 			data.height = data.width;
+			if ($('#width').val() != ""){
+				data.width = parseInt($('#width').val());
+				data.height = parseInt($('#width').val());
+			}
 			planetarium = $.virtualsky(data);
 		}
 	);
@@ -81,10 +93,12 @@ function AppCtrl($scope, $timeout, $http, _) {
 	
 	buildOverlay();
 	
-    var imageName = "image.jpg";
+    var imageName = "gibbons-resize.jpg";
     $scope.imageURL = "loading.jpg";
     $scope.showInfo = false;
     $scope.showOverlay = false;
+    $scope.showDatePicker = false;
+    $scope.showSettings = false;
     $scope.notification = "";
 
     function getHiddenProp() {
@@ -111,16 +125,16 @@ function AppCtrl($scope, $timeout, $http, _) {
     }
 
     $scope.getImage = function () {
-        /*var url= "";
+        var url= "";
         var imageClass= "";
         if (!isHidden() && $scope.sunset) {
             var now = moment.utc(new Date());
-            /*if (moment($scope.sunset).isBefore(now)) {
+            if (moment($scope.sunset).isBefore(now)) {
                 console.log("It's night time... Live stream is on");
                 url = imageName;
                 imageClass = 'current';
-            } else {*/
-               /* console.log("It's still pretty bright outside. We'll resume live stream at sunset");
+            } else {
+                console.log("It's still pretty bright outside. We'll resume live stream at sunset");
                 url = "http://services.swpc.noaa.gov/images/animations/ovation-north/latest.png";
                 imageClass = 'forecast-map';
                 //Countdown calculation
@@ -131,9 +145,9 @@ function AppCtrl($scope, $timeout, $http, _) {
                 var h = hours != 0 ? hours + "h" : "";
                 var m = hours != 0 ? minutes : minutes + " minutes";
                 var s = h + m;
-                //$scope.notification = "It's not dark yet in Whitehorse. Come back in " + s;
-				$scope.notification = "The camera is in maintenance mode... no live view available, but you can check the <a href='./videos'>archives</a>";
-           // }
+                $scope.notification = "It's not dark yet in Whitehorse. Come back in " + s;
+				//$scope.notification = "The camera is in maintenance mode... no live view available, but you can check the <a href='./videos'>archives</a>";
+            }
             var img = $("<img />").attr('src', url + '?_ts=' + new Date().getTime()).addClass(imageClass)
                 .on('load', function() {
                     if (!this.complete || typeof this.naturalWidth == "undefined" || this.naturalWidth == 0) {
@@ -143,10 +157,10 @@ function AppCtrl($scope, $timeout, $http, _) {
                         }, 500);
                     } else {
                         $scope.notification = "";
-                        $("#imageContainer").empty().append(img);
+                        $("#live_container").empty().append(img);
                     }
                 });
-        }*/
+        }
     };
 
     $scope.getSunset = function () {
@@ -172,6 +186,17 @@ function AppCtrl($scope, $timeout, $http, _) {
 
     $scope.toggleInfo = function () {
         $scope.showInfo = !$scope.showInfo;
+    };
+	
+	$scope.toggleDatePicker = function () {
+        $scope.showDatePicker = !$scope.showDatePicker;
+		if ($scope.showDatePicker){
+			$scope.showOverlay = true;
+		};
+    };
+	
+	$scope.toggleSettings = function () {
+        $scope.showSettings = !$scope.showSettings;
     };
 	
 	$scope.toggleOverlay = function () {
