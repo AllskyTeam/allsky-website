@@ -1,29 +1,7 @@
 var app = angular.module('allsky', ['ngLodash']);
 
 $(document).ready(function(){
-	
-	$(function(){
-		$('.date-picker, .position').on("input", function(e){
-			
-			if (e.target.value.length < 2){
-				$("#" + e.target.id).val("0" + e.target.value);
-			}
-			var dateString = $('#year').val()  + "-" + $('#month').val() + "-" + $('#day').val() + " " + $('#hour').val() + ":" + $('#minute').val() + "-08:00";
-			//console.log(dateString);
-		  if (moment(dateString).isValid())
-			buildOverlay({"clock":dateString});
-		  else 
-			buildOverlay();
-		});  
-	});
-	
-	// Init date picker
-	var now = moment();
-	$('#year').val(now.year());
-	$('#month').val(padNumber(now.month() + 1));
-	$('#day').val(padNumber(now.date()));
-	$('#hour').val(padNumber(now.hour()));
-	$('#minute').val(padNumber(now.minute()));
+
 });
 
 $(window).resize(function () {
@@ -57,10 +35,6 @@ function buildOverlay(params){
 			data.clock = clock.add(7, 'hours').subtract(40, 'minutes').toDate();
 			data.width = window.innerWidth < 900 ? window.innerWidth : 900;
 			data.height = data.width;
-			if ($('#width').val() != ""){
-				data.width = parseInt($('#width').val());
-				data.height = parseInt($('#width').val());
-			}
 			planetarium = $.virtualsky(data);
 		}
 	);
@@ -97,8 +71,6 @@ function AppCtrl($scope, $timeout, $http, _) {
     $scope.imageURL = "loading.jpg";
     $scope.showInfo = false;
     $scope.showOverlay = false;
-    $scope.showDatePicker = false;
-    $scope.showSettings = false;
     $scope.notification = "";
 
     function getHiddenProp() {
@@ -135,7 +107,7 @@ function AppCtrl($scope, $timeout, $http, _) {
                 imageClass = 'current';
             } else {
                 console.log("It's still pretty bright outside. We'll resume live stream at sunset");
-                url = "http://services.swpc.noaa.gov/images/animations/ovation-north/latest.png";
+                url = "http://services.swpc.noaa.gov/images/animations/ovation-north/latest.jpg";
                 imageClass = 'forecast-map';
                 //Countdown calculation
                 var ms = moment($scope.sunset,"DD/MM/YYYY HH:mm:ss").diff(moment(now,"DD/MM/YYYY HH:mm:ss"));
@@ -168,7 +140,9 @@ function AppCtrl($scope, $timeout, $http, _) {
             cache: false
         }).then(
             function (data) {
-                $scope.sunset = moment(data.data.sunset.replace("-0800", "-0700"));
+                //$scope.sunset = moment(data.data.sunset.replace("-0800", "-0700"));
+                $scope.sunset = moment(data.data.sunset);
+				$scope.getImage()
             }
         );
     };
@@ -186,17 +160,6 @@ function AppCtrl($scope, $timeout, $http, _) {
 
     $scope.toggleInfo = function () {
         $scope.showInfo = !$scope.showInfo;
-    };
-	
-	$scope.toggleDatePicker = function () {
-        $scope.showDatePicker = !$scope.showDatePicker;
-		if ($scope.showDatePicker){
-			$scope.showOverlay = true;
-		};
-    };
-	
-	$scope.toggleSettings = function () {
-        $scope.showSettings = !$scope.showSettings;
     };
 	
 	$scope.toggleOverlay = function () {

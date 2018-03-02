@@ -25,22 +25,6 @@ body {
     font-weight: 400;
 }
 
-/*.menu {
-	float: left;
-	margin: 6px 5px 5px 12px;
-}
-
-.menu i {
-	cursor: pointer;
-	color: #6C58D0;
-	margin: 0 4px;
-}
-
-.menu i:hover,
-.menu i.active {
-	color: orange;
-}*/
-
 .info {
 	padding: 8px;
 	position: fixed;
@@ -79,6 +63,7 @@ body {
 
 #sidebar li {
 	list-style: none;
+	padding: 2px 0
 }
 
 #sidebar li i {
@@ -158,8 +143,8 @@ img.current {
 }
 
 #starmap_container #starmap{
-	margin-top: -94px;
-	margin-left: 40px;
+	margin-top: -92px;
+	margin-left: -11px;
 }
 
 .starmap_credit {
@@ -193,15 +178,19 @@ img.current {
 .archived-videos {
 }
 
-.archived-videos div{
+.archived-videos .day-container{
 	width: 10%;
 	min-width: 100px;
 	float: left;
 	padding: 10px;
 }
 
-.archived-videos div img{
-	width: 100%;
+.archived-videos .day-container .image-container {
+	height: 90px;
+}
+
+.archived-videos .day-container .image-container img{
+	width: 100%; 
 }
 
 .forecast {

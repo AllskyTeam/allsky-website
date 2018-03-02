@@ -45,7 +45,7 @@
 			<li><i class="fa fa-fw fa-map-marker"></i>Latitude: 60.71N</li>
 			<li><i class="fa fa-fw fa-map-marker"></i>Longitude: 135.05W</li>
 			<li><i class="fa fa-fw fa-camera"></i>Camera: ASI224MC</li>
-			<li><i class="fa fa-fw fa-gears"></i>Computer: Raspberry Pi 2</li>
+			<li><i class="fa fa-fw fa-gears"></i>Computer: Raspberry Pi 3</li>
 			<li><i class="fa fa-fw fa-user"></i>Owner: Thomas Jacquin</li>
 		</ul>
 	</div>
@@ -53,26 +53,11 @@
 
 	<ul id="sidebar" class="animated slideInLeft">
 		<li><i class="fa fa-2x fa-fw allsky-constellation" id="overlayBtn" title="Show constellations overlay" ng-click="toggleOverlay()" ng-class="{'active': showOverlay}"></i></li>
-		<li><a href="../allsky/videos" title="Archived Videos"><i class="fa fa-2x fa-fw fa-play-circle"></i></a></li>
-		<li><i class="fa fa-2x fa-fw fa-camera" title="Information about the camera" ng-click="toggleInfo()" ng-class="{'active': showInfo}" style="margin-top: 5px font-size: 1.9em"></i></li>	
-		<li><i class="fa fa-2x fa-fw fa-clock-o" title="Change overlay time and date" ng-click="toggleDatePicker()" ng-class="{'active': showDatePicker}" style="margin-top: 5px"></i></li>	
-		<li><i class="fa fa-2x fa-fw fa-sliders" title="Overlay Settings" ng-click="toggleSettings()" ng-class="{'active': showSettings}" style="margin-top: 5px"></i></li>	
+		<li><a href="../allsky/videos" title="Archived Timelapses"><i class="fa fa-2x fa-fw fa-play-circle"></i></a></li>
+		<li><a href="../allsky/keograms" title="Archived Keograms"><i class="fa fa-2x fa-fw fa-barcode"></i></a></li>
+		<li><a href="../allsky/startrails" title="Archived Startrails"><i class="fa fa-2x fa-fw fa-circle-o-notch"></i></a></li>
+		<li><i class="fa fa-2x fa-fw fa-camera" title="Information about the camera" ng-click="toggleInfo()" ng-class="{'active': showInfo}" style="margin-top: 5px; font-size: 1.9em"></i></li>	
 	</ul>
-
-	<div class="date-picker-container" ng-show="showDatePicker==true">
-		Date <input type="number" id="year" class="date-picker" min="0" max="9999" style="width:70px"> /
-		<input type="number" id="month" class="date-picker" min="1" max="12" style="width:50px"> /
-		<input type="number" id="day" class="date-picker" min="1" max="31" style="margin-right: 10px; width:50px">
-		Time <input type="number" id="hour" class="date-picker" min="0" max="23" style="width:50px"> :
-		<input type="number" id="minute" class="date-picker" min="0" max="59" style="width:50px">
-	</div>
-
-	<div class="settings" ng-show="showSettings==true">
-			<h4>Settings</h4>
-			<div class="form-row"><div class="input-label">Overlay Width:</div><input class="position" type="number" id="width" style="width:50px"></div>
-			<div class="form-row"><div class="input-label">Margin Top:</div><input class="position" type="number" id="top" style="width:50px"></div>
-			<div class="form-row"><div class="input-label">Margin Left:</div><input class="position" type="number" id="left" style="width:50px"></div>
-		</div>
 
 	<div id="imageContainer">
 		<div id="starmap_container" ng-show="showOverlay==true">
