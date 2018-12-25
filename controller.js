@@ -1,18 +1,26 @@
 var app = angular.module('allsky', ['ngLodash']);
 
-$(document).ready(function(){
-
-});
+var config = {
+    title: "Whitehorse, YT",
+    imageName: "gibbons-resize.jpg",
+    location: "Whitehorse",
+    latitude: 60.7,
+    longitude: -135.05,
+    az: 325,
+    camera: "ASI224MC",
+    computer: "Raspberry Pi 3",
+    owner: "Thomas Jacquin",
+    offsetHoursGMT: 7,
+    offsetMinutesGMT: 40,
+    auroraMap: "north",
+}
 
 $(window).resize(function () {
 	buildOverlay();
 });
 
-function padNumber(n){
-	return n.toString().length < 2 ? "0" + n : n;
-}
-
 function buildOverlay(params){
+    var planetarium;
 	$.ajax({
 		url: "virtualsky.json" + '?_ts=' + new Date().getTime(),
 		cache: false
@@ -24,15 +32,8 @@ function buildOverlay(params){
 			} else {
 				clock = moment();
 			}
-			
-			
-			if ($('#top').val() != ""){
-				$("#starmap").css("margin-top", $('#top').val() + "px");
-			}
-			if ($('#left').val() != ""){
-				$("#starmap").css("margin-left", $('#left').val() + "px");
-			}
-			data.clock = clock.add(7, 'hours').subtract(40, 'minutes').toDate();
+
+			data.clock = clock.add(config.offsetHoursGMT, 'hours').subtract(config.offsetMinutesGMT, 'minutes').toDate();
 			data.width = window.innerWidth < 900 ? window.innerWidth : 900;
 			data.height = data.width;
 			planetarium = $.virtualsky(data);
@@ -66,12 +67,18 @@ function compile($compile) {
 function AppCtrl($scope, $timeout, $http, _) {
 	
 	buildOverlay();
-	
-    var imageName = "gibbons-resize.jpg";
+
     $scope.imageURL = "loading.jpg";
     $scope.showInfo = false;
     $scope.showOverlay = false;
     $scope.notification = "";
+    $scope.title = config.title;
+    $scope.location = config.location;
+    $scope.latitude = config.latitude;
+    $scope.longitude = config.longitude;
+    $scope.camera = config.camera;
+    $scope.computer = config.computer;
+    $scope.owner = config.owner;
 
     function getHiddenProp() {
         var prefixes = ['webkit', 'moz', 'ms', 'o'];
@@ -101,28 +108,27 @@ function AppCtrl($scope, $timeout, $http, _) {
         var imageClass= "";
         if (!isHidden() && $scope.sunset) {
             var now = moment.utc(new Date());
-            if (moment($scope.sunset).isBefore(now)) {
-                console.log("It's night time... Live stream is on");
-                url = imageName;
+            if (moment($scope.sunset).isBefore(now) || $scope.streamDaytime) {
+                console.log($scope.streamDaytime ? "Day Time streaming" : "It's night time... Live stream is on");
+                url = config.imageName;
                 imageClass = 'current';
             } else {
                 console.log("It's still pretty bright outside. We'll resume live stream at sunset");
-                url = "http://services.swpc.noaa.gov/images/animations/ovation-north/latest.jpg";
+                url = "http://services.swpc.noaa.gov/images/animations/ovation-" + config.auroraMap + "/latest.jpg";
                 imageClass = 'forecast-map';
                 //Countdown calculation
                 var ms = moment($scope.sunset,"DD/MM/YYYY HH:mm:ss").diff(moment(now,"DD/MM/YYYY HH:mm:ss"));
                 var d = moment.duration(ms);
                 var hours = Math.floor(d.asHours());
                 var minutes = moment.utc(ms).format("mm");
-                var h = hours != 0 ? hours + "h" : "";
-                var m = hours != 0 ? minutes : minutes + " minutes";
+                var h = hours !== 0 ? hours + "h" : "";
+                var m = hours !== 0 ? minutes : minutes + " minutes";
                 var s = h + m;
-                $scope.notification = "It's not dark yet in Whitehorse. Come back in " + s;
-				//$scope.notification = "The camera is in maintenance mode... no live view available, but you can check the <a href='./videos'>archives</a>";
+                $scope.notification = "It's not dark yet in " + config.location + ". Come back in " + s;
             }
             var img = $("<img />").attr('src', url + '?_ts=' + new Date().getTime()).addClass(imageClass)
                 .on('load', function() {
-                    if (!this.complete || typeof this.naturalWidth == "undefined" || this.naturalWidth == 0) {
+                    if (!this.complete || typeof this.naturalWidth === "undefined" || this.naturalWidth === 0) {
                         alert('broken image!');
                         $timeout(function(){
                             $scope.getImage();
@@ -140,8 +146,8 @@ function AppCtrl($scope, $timeout, $http, _) {
             cache: false
         }).then(
             function (data) {
-                //$scope.sunset = moment(data.data.sunset.replace("-0800", "-0700"));
                 $scope.sunset = moment(data.data.sunset);
+                $scope.streamDaytime = data.data.streamDaytime === "true";
 				$scope.getImage()
             }
         );
@@ -190,9 +196,7 @@ function AppCtrl($scope, $timeout, $http, _) {
             var total = _.sumBy(data, function (row) {
                 return parseInt(row[field]);
             });
-            var average = Math.round(total / 7);
-            //console.log(average);
-            return average;
+            return Math.round(total / 7);
         }
 
         function getDay(number) {

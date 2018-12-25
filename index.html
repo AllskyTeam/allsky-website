@@ -5,6 +5,7 @@
     <meta property="og:type" content="image/jpeg" />
     <meta property="og:url" content="http://www.thomasjacquin/allsky/" />
     <meta property="og:image" content="http://www.thomasjacquin.com/allsky/image.jpg" />
+	<link rel="shortcut icon" type="image/png" href="allsky-favicon.png">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
           integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
@@ -25,12 +26,7 @@
 </head>
 <body ng-app="allsky" ng-controller="AppCtrl">
 	<div class="header">
-		<div class=title>ALLSKY - Whitehorse, YT</div>
-		<!--<div class="menu">
-			<i class="fa fa-2x fa-info-circle" title="Information about the camera" ng-click="toggleInfo()" ng-class="{'active': showInfo}"></i>
-			<a href="./videos" title="Archived Videos"><i class="fa fa-2x fa-youtube-play" style="color:red"></i></a>
-			<i class="fa fa-2x fa-star-o" id="overlayBtn"></i>
-		</div> -->
+		<div class=title>{{title}}</div>
 		<div ng-show="forecast" class="forecast pull-right">
 			<span>Aurora activity: </span>
 			<span class="forecast-day" ng-repeat="(key,val) in forecast">{{key}}:
@@ -41,12 +37,12 @@
 	</div>
 	<div class="info animated slideInRight" ng-show="showInfo==true">
 		<ul>
-			<li><i class="fa fa-fw fa-map"></i>Location: Whitehorse, YT</li>
-			<li><i class="fa fa-fw fa-map-marker"></i>Latitude: 60.71N</li>
-			<li><i class="fa fa-fw fa-map-marker"></i>Longitude: 135.05W</li>
-			<li><i class="fa fa-fw fa-camera"></i>Camera: ASI224MC</li>
-			<li><i class="fa fa-fw fa-gears"></i>Computer: Raspberry Pi 3</li>
-			<li><i class="fa fa-fw fa-user"></i>Owner: Thomas Jacquin</li>
+			<li><i class="fa fa-fw fa-map"></i>Location: <span>{{location}}</span></li>
+			<li><i class="fa fa-fw fa-map-marker"></i>Latitude: <span>{{latitude < 0 ? latitude * -1 + 'S' : latitude + 'N'}}</span></li>
+			<li><i class="fa fa-fw fa-map-marker"></i>Longitude: <span>{{longitude < 0 ? longitude * -1 + 'W' : longitude + 'E'}}</span></li>
+			<li><i class="fa fa-fw fa-camera"></i>Camera: <span>{{camera}}</span></li>
+			<li><i class="fa fa-fw fa-gears"></i>Computer: <span>{{computer}}</span></li>
+			<li><i class="fa fa-fw fa-user"></i>Owner: <span>{{owner}}</span></li>
 		</ul>
 	</div>
 	<span class="notification" compile="notification"></span>

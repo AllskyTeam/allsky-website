@@ -31,7 +31,7 @@
 			$month = substr($file, 12, 2);
 			$day = substr($file, 14, 2);
 			$date = $year.$month.$day;
-			echo "<a href='./$file'><div class='day-container'><div class='image-container'><img id=".$date." src='./$file' title='Keogram-$year-$month-$day'/></div><div>$year-$month-$day</div></div></a>";			
+			echo "<a href='./$file'><div class='day-container'><div class='image-container keogram'><img id=".$date." src='./$file' title='Keogram-$year-$month-$day'/></div><div>$year-$month-$day</div></div></a>";
 		}
 		echo "</div>";
 
