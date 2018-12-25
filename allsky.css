@@ -14,8 +14,9 @@ body {
 .title {
 	float: left;
 	color: #DDD;
-	font-size: 26px;
+	font-size: 20px;
 	padding-left: 65px;
+	padding-top: 4px;
     margin-left: 5px;
     margin-top: 2px;
 	background: url('allsky-logo.png') left center;
