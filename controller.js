@@ -6,12 +6,10 @@ var config = {
     location: "Whitehorse",
     latitude: 60.7,
     longitude: -135.05,
-    az: 325,
+    az: 180,
     camera: "ASI224MC",
     computer: "Raspberry Pi 3",
     owner: "Thomas Jacquin",
-    offsetHoursGMT: 7,
-    offsetMinutesGMT: 40,
     auroraMap: "north",
 }
 
@@ -19,23 +17,19 @@ $(window).resize(function () {
 	buildOverlay();
 });
 
-function buildOverlay(params){
+function buildOverlay(){
     var planetarium;
 	$.ajax({
 		url: "virtualsky.json" + '?_ts=' + new Date().getTime(),
 		cache: false
 	}).done(
 		function (data) {
-			var clock = null;
-			if (params && params.clock) {
-				clock = moment(params.clock);
-			} else {
-				clock = moment();
-			}
-
-			data.clock = clock.add(config.offsetHoursGMT, 'hours').subtract(config.offsetMinutesGMT, 'minutes').toDate();
+		    // This is to scale the overlay when the window is resized
 			data.width = window.innerWidth < 900 ? window.innerWidth : 900;
 			data.height = data.width;
+			data.latitude = config.latitude;
+			data.longitude = config.longitude;
+			data.az = config.az;
 			planetarium = $.virtualsky(data);
 		}
 	);
@@ -108,8 +102,12 @@ function AppCtrl($scope, $timeout, $http, _) {
         var imageClass= "";
         if (!isHidden() && $scope.sunset) {
             var now = moment.utc(new Date());
-            if (moment($scope.sunset).isBefore(now) || $scope.streamDaytime) {
-                console.log($scope.streamDaytime ? "Day Time streaming" : "It's night time... Live stream is on");
+            if (moment($scope.sunset).isBefore(now)) {
+                console.log("It's night time... Live stream is on");
+                url = config.imageName;
+                imageClass = 'current';
+            } else if ($scope.streamDaytime) {
+                console.log("Day Time streaming");
                 url = config.imageName;
                 imageClass = 'current';
             } else {
