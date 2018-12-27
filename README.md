@@ -31,3 +31,5 @@ Available options are:
 | computer      | Raspberry Pi 3    | Your Raspberry Pi model |
 | owner         | Thomas Jacquin    | The camera owner |
 | auroraMap     | north             | aurora oval map for the north or south hemisphere |
+| overlayOffsetLeft     | 0             | Lateral offset of the constellations overlay in pixels (+/-) |
+| overlayOffsetTop     | 0             | Vertical offset of the constellations overlay in pixels (+/-) |

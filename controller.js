@@ -11,6 +11,8 @@ var config = {
     computer: "Raspberry Pi 3",
     owner: "Thomas Jacquin",
     auroraMap: "north",
+    overlayOffsetLeft: 0,
+    overlayOffsetTop: 0,
 }
 
 $(window).resize(function () {
@@ -31,6 +33,8 @@ function buildOverlay(){
 			data.longitude = config.longitude;
 			data.az = config.az;
 			planetarium = $.virtualsky(data);
+            $("#starmap").css("margin-top", config.overlayOffsetTop + "px");
+            $("#starmap").css("margin-left", config.overlayOffsetLeft + "px");
 		}
 	);
 };

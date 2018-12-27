@@ -83,51 +83,6 @@ body {
 	margin-left: 10px;
 }
 
-.date-picker-container{
-	position: fixed;
-    bottom: 0px;
-    width: 414px;
-    left: 50%;
-    margin-left: -207px;
-    margin-bottom: 10px;
-    background-color: #333;
-    border: 2px solid #888;
-    border-radius: 5px;
-    padding: 10px;
-}
-
-.settings {
-	position: fixed;
-    bottom: 0;
-    left: 0;
-    margin-left: 10px;
-    margin-bottom: 10px;
-    background-color: #333;
-    border: 2px solid #888;
-    border-radius: 5px;
-    padding: 10px;
-}
-
-.settings .input-label {
-	width: 160px;
-	display: inline-block;
-	margin-right: 5px;
-}
-
-.settings div.form-row {
-	margin: 5px 0;
-}
-
-input {
-	color: white;
-    background-color: gray;
-    border: none;
-    border-radius: 4px;
-    padding: 3px;
-    text-align: center;
-    font-weight: bold;
-}
-
 #imageContainer {
 	text-align: center;
 }
@@ -142,11 +97,6 @@ img.current {
 	opacity: 0.45;
 	overflow: hidden;
 	height: 720px;
-}
-
-#starmap{
-	margin-top: -92px;
-	margin-left: -11px;
 }
 
 .starmap_credit {
