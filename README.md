@@ -11,11 +11,13 @@ Web interface displaying an image from an allsky camera.
 
 **startrails/index.php** lists the startrails in the startrails/ directory
 
-**virtualsky.json** contains settings to generate the constellations overlay (lat, long, etc). The position of the overlay can be adjusted in allsky.css (#starmap).
+**virtualsky.json** contains settings to generate the constellations overlay (lat, long, etc).
+
+**config.js** is the only file you need to modify. The content is described below.
 
 ## Configuration
 
-To configure the website for your own location, you will need to edit the `config` object in `controller.js`
+To configure the website for your own location, you will need to edit the `config.js` file.
 
 Available options are:
 
