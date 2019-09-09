@@ -25,8 +25,10 @@
 		}
 
 		asort($files);
-
-		mkdir('thumbnails', 0755);
+		
+		if (!is_dir('thumbnails')) {
+			mkdir('thumbnails', 0755);
+		}		
 
 		echo "<a class='back-button' href='..'><i class='fa fa-chevron-left'></i>Back to Live View</a>";
 		echo "<div class=archived-videos>";
