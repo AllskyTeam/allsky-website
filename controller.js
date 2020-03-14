@@ -12,7 +12,7 @@ function buildOverlay(){
 	}).done(
 		function (data) {
 		    // This is to scale the overlay when the window is resized
-			data.width = window.innerWidth < 900 ? window.innerWidth : 900;
+			data.width = window.innerWidth < config.overlaySize ? window.innerWidth : config.overlaySize;
 			data.height = data.width;
 			data.latitude = config.latitude;
 			data.longitude = config.longitude;
