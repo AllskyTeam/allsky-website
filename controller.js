@@ -105,7 +105,7 @@ function AppCtrl($scope, $timeout, $http, _) {
                 imageClass = 'current';
             } else {
                 console.log("It's still pretty bright outside. We'll resume live stream at sunset");
-                url = "http://services.swpc.noaa.gov/images/animations/ovation-" + config.auroraMap + "/latest.jpg";
+                url = "http://services.swpc.noaa.gov/images/animations/ovation/" + config.auroraMap + "/latest.jpg";
                 imageClass = 'forecast-map';
                 //Countdown calculation
                 var ms = moment($scope.sunset,"DD/MM/YYYY HH:mm:ss").diff(moment(now,"DD/MM/YYYY HH:mm:ss"));
