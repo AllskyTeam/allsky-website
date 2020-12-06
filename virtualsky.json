@@ -13,5 +13,6 @@
 	"sky_gradient": false,
 	"gradient": false,
 	"transparent": true,
-	"objects": "M42;M45;M31;M51;M81"
+	"objects": "M42;M45;M31;M51;M81",
+	"lang": "en"
 }
