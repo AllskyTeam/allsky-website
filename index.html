@@ -1,6 +1,6 @@
-<html prefix="og: http://ogp.me/ns#">
+<html prefix="og: http://ogp.me/ns#" ng-app="allsky" ng-controller="AppCtrl">
 <head>
-    <title>Yukon All Sky</title>
+    <title>Allsky - {{title}}</title>
     <meta property="og:title" content="All Sky Camera" />
     <meta property="og:type" content="image/jpeg" />
     <meta property="og:url" content="http://www.thomasjacquin/allsky/" />
@@ -26,10 +26,10 @@
     <script src="config.js"></script>
     <script src="controller.js"></script>
 </head>
-<body ng-app="allsky" ng-controller="AppCtrl">
+<body >
 	<div class="header">
 		<div class=title>{{title}}</div>
-		<div ng-show="forecast" class="forecast pull-right">
+		<div ng-show="auroraForecast === true && forecast" class="forecast pull-right">
 			<span>Aurora activity: </span>
 			<span class="forecast-day" ng-repeat="(key,val) in forecast">{{key}}:
 				<span ng-class="getScale(val)"

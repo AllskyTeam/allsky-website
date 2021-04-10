@@ -12,4 +12,5 @@ var config = {
     overlaySize: 875,
     overlayOffsetLeft: 0,
     overlayOffsetTop: 0,
+    auroraForecast: false,
 }

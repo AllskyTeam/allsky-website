@@ -36,3 +36,4 @@ Available options are:
 | overlaySize	| 875		    | Size of the overlay (width and height)
 | overlayOffsetLeft     | 0             | Lateral adjustment of the overlay in pixels (+/-) |
 | overlayOffsetTop     | 0             | Vertical adjustment of the overlay in pixels (+/-) |
+| auroraForecast     | false             | Displays the 3 day aurora forecast in the top left corner when set to `true`|
