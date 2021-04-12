@@ -1,6 +1,14 @@
 # allsky-website
 Web interface displaying an image from an allsky camera.
 
+## Update
+Please make sure to remove this line from your `virtualsky.json` as it has put a strain on Stuart Lowe's lookup service over time.
+```
+"objects": "M42;M45;M31;M51;M81",
+```
+
+https://www.strudel.org.uk/lookUP/
+
 ## Brief overview
 
 **controller.js** contains the logic of the website. It has a timeout that refreshes the image after a certain amount of time. It also grabs the space weather from NOAA and displays it at the top. The constellation overlay is also generated here.
