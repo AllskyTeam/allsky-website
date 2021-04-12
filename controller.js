@@ -50,10 +50,6 @@ function compile($compile) {
 function AppCtrl($scope, $timeout, $http, _) {
 
     buildOverlay();
-    // Rebuild the overlay every minute in order to follow the stars in the picture.
-    setInterval(function (){
-        buildOverlay();
-    },60 * 1000);
 
     $scope.imageURL = "loading.jpg";
     $scope.showInfo = false;
