@@ -1156,19 +1156,22 @@ VirtualSky.prototype.createSky = function(){
 
 	// Add named objects to the display
 	if(this.objects){
-		var ob = this.objects.split(';');
-		for(var o = 0; o < ob.length ; o++)
-			$.ajax({ dataType: "jsonp", url: 'http://www.strudel.org.uk/lookUP/json/?name='+ob[o], context: this, success: function(data){
-				if(data && data.dec && data.ra){
+		$.ajax(this.dir+this.objects, { dataType: 'json', context: this, success: function(data){
+			// Loop over the array of objects
+			for(var i = 0; i < data.length ; i++){
+				// The object needs an RA and Declination
+				if(data[i] && data[i].dec && data[i].ra){
 					this.addPointer({
-						ra:data.ra.decimal,
-						dec:data.dec.decimal,
-						label:data.target.name,
+						ra:data[i].ra.decimal,
+						dec:data[i].dec.decimal,
+						label:data[i].target.name,
 						colour:this.col.pointers
 					});
-					this.draw();
 				}
-			}});
+				// Update the sky with all the points we've added
+				this.draw();
+			}
+		}});
 	}
 
 	// If the Javascript function has been passed a width/height
