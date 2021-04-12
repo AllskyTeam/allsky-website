@@ -1,6 +1,6 @@
 {
-	"id":"starmap",
-	"projection":"fisheye",
+	"id": "starmap",
+	"projection": "fisheye",
 	"width": 960,
 	"height": 960,
 	"constellations": true,
@@ -15,5 +15,6 @@
 	"transparent": true,
 	"showgalaxy": true,
 	"live": true,
-	"lang": "en"
+	"lang": "en",
+	"objects": "messier.json"
 }
