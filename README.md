@@ -32,7 +32,7 @@ Available options are:
 | Option        | Default           | Description  |
 | ------------- |:-------------    | :-----|
 | title         | Whitehorse, YT    | Title displayed next to the logo |
-| imageName     | image-resize.jpg  | The image uploaded from your allsky camera |
+| imageName     | image.jpg  | The image uploaded from your allsky camera.  To use the image from /home/pi/allsky, enter "/current/zzz" where "zzz" is the name of the image file, e.g., "image-resize.jpg". |
 | location      | Whitehorse        | The location of your camera   |
 | latitude      | 60.7              | Latitude of the camera |
 | longitude     | -135.05           | Longitude of the camera |
@@ -45,3 +45,4 @@ Available options are:
 | overlayOffsetLeft     | 0             | Lateral adjustment of the overlay in pixels (+/-) |
 | overlayOffsetTop     | 0             | Vertical adjustment of the overlay in pixels (+/-) |
 | auroraForecast     | false             | Displays the 3 day aurora forecast in the top left corner when set to `true`|
+| showOverlayAtStartup     | false             | Determines whether or not the overlay should be displayed when the page is loaded |
