@@ -1,7 +1,20 @@
 <?php
 
+$displayed_thumbnail_error_message = false;
 function make_thumb($src, $dest, $desired_width)
 {
+    /* Make sure the imagecreatefromjpeg() function is in PHP. */
+    global $displayed_thumbnail_error_message;
+    if (function_exists('imagecreatefromjpeg') == false)
+    {
+        if ($displayed_thumbnail_error_message == false)
+	{
+            echo "<br><p style='color: red'>Unable to make thumbnail(s); imagecreatefromjpeg() does not exist.<br>If you do NOT have the file '/etc/php/7.3/mods-available/gd.ini' you need to download the latest PHP.</p>";
+	    $displayed_thumbnail_error_message = true;
+	}
+        return(false);
+    }
+
     /* read the source image */
     $source_image = imagecreatefromjpeg($src);
     $width = imagesx($source_image);
@@ -18,6 +31,8 @@ function make_thumb($src, $dest, $desired_width)
 
     /* create the physical thumbnail image to its destination */
     imagejpeg($virtual_image, $dest);
+
+    return(true);
 }
 
 ?>
