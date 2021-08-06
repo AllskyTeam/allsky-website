@@ -53,7 +53,7 @@ function AppCtrl($scope, $timeout, $http, _) {
 
     $scope.imageURL = "loading.jpg";
     $scope.showInfo = false;
-    $scope.showOverlay = false;
+    $scope.showOverlay = config.showOverlayAtStartup;
     $scope.notification = "";
     $scope.title = config.title;
     $scope.location = config.location;
