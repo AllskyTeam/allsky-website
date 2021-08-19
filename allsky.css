@@ -2,8 +2,8 @@ body {
 	color:white;
 	font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
 	background-color: black;
-    max-width: 960px;
-    margin: auto;
+	max-width: 960px;
+	margin: auto;
 }
 
 .header {
@@ -17,13 +17,13 @@ body {
 	font-size: 20px;
 	padding-left: 65px;
 	padding-top: 4px;
-    margin-left: 5px;
-    margin-top: 2px;
+	margin-left: 5px;
+	margin-top: 2px;
 	background: url('allsky-logo.png') left center;
 	background-size: 57px;
-    background-repeat: no-repeat;
-    font-family: 'Ubuntu', sans-serif;
-    font-weight: 400;
+	background-repeat: no-repeat;
+	font-family: 'Ubuntu', sans-serif;
+	font-weight: 400;
 	height: 35px;
 }
 
@@ -35,14 +35,14 @@ body {
 	border-top-left-radius: 5px;
 	border-bottom-left-radius: 5px;
 	background-color: #333;
-    border: 2px solid #888;
+	border: 2px solid #888;
 	border-right: none;
 }
 
 .info ul {
 	list-style: none;
 	padding-left: 10px;
-    margin-bottom: 0;
+	margin-bottom: 0;
 }
 
 .info ul li i {
@@ -51,10 +51,10 @@ body {
 
 #sidebar {
 	position: fixed;
-    left: 0;
-    top: 150px;
-    padding: 0;
-    padding: 5px;
+	left: 0;
+	top: 150px;
+	padding: 0;
+	padding: 5px;
 	border-top-right-radius: 5px;
 	border-bottom-right-radius: 5px;
 	background-color: #333;
@@ -137,6 +137,10 @@ img.current {
 	padding: 10px;
 }
 
+.archived-videos .day-container .day-text {
+	color: #7777ff;
+}
+
 .archived-videos .day-container .image-container {
 	height: 90px;
 }
@@ -151,20 +155,20 @@ img.current {
 }
 
 .forecast-day {
-    font-weight: bold;
+	font-weight: bold;
 	margin: 0 3px;
 }
 
 .forecast .Low {
-    color: green;
+	color: green;
 }
 
 .forecast .Active {
-    color: yellow;
+	color: yellow;
 }
 
 .forecast .High {
-    color: darkorange;
+	color: darkorange;
 }
 
 .forecast .Extreme {
