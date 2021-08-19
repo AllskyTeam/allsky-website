@@ -7,48 +7,8 @@
 	</head>
 	<body>
 		<?php
-
 		include '../functions.php';
-
-		$files = array();
-		if ($handle = opendir('.')) {
-
-			while (false !== ($entry = readdir($handle))) {
-
-				if (strpos($entry, 'jpg') !== false) {
-
-					$files[] = $entry;
-				}
-			}
-
-			closedir($handle);
-		}
-
-		asort($files);
-	
-		if (!is_dir('thumbnails')) {
-			mkdir('thumbnails', 0755);
-		}
-
-		echo "<a class='back-button' href='..'><i class='fa fa-chevron-left'></i>Back to Live View</a>";
-		echo "<div class=archived-videos>";
-
-		foreach ($files as $file) {
-			$thumbnail = "thumbnails/$file";
-			if (! file_exists($thumbnail) &&
-			    ! make_thumb($file, $thumbnail, 100)) {
-				// xxx: fix: use THUMBNAIL_SIZE_X in config.sh
-				$thumbnail = "./$file";
-			}
-			$year = substr($file, 11, 4);
-			$month = substr($file, 15, 2);
-			$day = substr($file, 17, 2);
-			$date = $year.$month.$day;
-			# On large screens, the thumbnails are stretched width-wise, so set width to auto.
-			echo "<a href='./$file'><div class='day-container'><div class='image-container'><img id=".$date." src='$thumbnail' title='Startrails-$year-$month-$day'/></div><div>$year-$month-$day</div></div></a>";
-		}
-		echo "</div>";
-
+		display_thumbnails("Startrails");
 		?>
 	</body>
 </html>
