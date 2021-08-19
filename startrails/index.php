@@ -35,12 +35,10 @@
 
 		foreach ($files as $file) {
 			$thumbnail = "thumbnails/$file";
-			if (!file_exists($thumbnail)) {
-				if (make_thumb($file, $thumbnail, 100))	// xxx: fix: use THUMBNAIL_SIZE_X in config.sh
-					$thumbnail = "./thumbnails/$file";
-				else
-					// These files are big so generating the thumbnails will take time.
-					$thumbnail = "./$file";
+			if (! file_exists($thumbnail) &&
+			    ! make_thumb($file, $thumbnail, 100)) {
+				// xxx: fix: use THUMBNAIL_SIZE_X in config.sh
+				$thumbnail = "./$file";
 			}
 			$year = substr($file, 11, 4);
 			$month = substr($file, 15, 2);
