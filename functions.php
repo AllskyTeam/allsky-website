@@ -83,12 +83,11 @@ function display_thumbnails($image_type)
 	echo "<div class=archived-videos>";
 
 	foreach ($files as $file) {
-		$thumbnail = "thumbnails/$file";
+		// The thumbnail should be a .jpg.
+		$thumbnail = str_replace(".mp4", ".jpg", "thumbnails/$file");
 		if (! file_exists($thumbnail)) {
 			// xxx: fix: use THUMBNAIL_SIZE_X and Y in config.sh instead of 100 x 75
 			if ($image_type == "allsky") {
-				// The thumbnail should be a .jpg.
-				$thumbnail = str_replace(".mp4", ".jpg", $thumbnail);
 				if (! make_thumb_from_video($file, $thumbnail, 100, 75)) {
 					// We can't use the video file as a thumbnail
 					$thumbnail = "../NoThumbnail.png";
