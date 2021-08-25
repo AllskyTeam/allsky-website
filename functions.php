@@ -42,9 +42,11 @@ function make_thumb($src, $dest, $desired_width)
 }
 
 // Similar to make_thumb() but using a video for the input file.
-function make_thumb_from_video($src, $dest, $desired_width, $desired_height)
+function make_thumb_from_video($src, $dest, $desired_width)
 {
-	exec("ffmpeg -i '$src' -vcodec mjpeg -vframes 1 -s $desired_width" . "x" . "$desired_height $dest");
+	// start 5 seconds in to skip any auto-exposure changes at the beginning.  This of course assumes the video is at least 5 sec long.
+	// "-1" scales the height to the original aspect ratio.
+	exec("ffmpeg -ss 00:00:05 -i '$src' -frames:v 1 -filter:v scale='$desired_width:-1' -frames:v 1 '$dest'");
 	if (file_exists($dest)) return(true);
 	else return(false);
 }
@@ -83,13 +85,12 @@ function display_thumbnails($image_type)
 	echo "<div class=archived-videos>";
 
 	foreach ($files as $file) {
-		$thumbnail = "thumbnails/$file";
+		// The thumbnail should be a .jpg.
+		$thumbnail = str_replace(".mp4", ".jpg", "thumbnails/$file");
 		if (! file_exists($thumbnail)) {
-			// xxx: fix: use THUMBNAIL_SIZE_X and Y in config.sh instead of 100 x 75
+			// xxx: fix: use THUMBNAIL_SIZE_X in config.sh instead of 100.
 			if ($image_type == "allsky") {
-				// The thumbnail should be a .jpg.
-				$thumbnail = str_replace(".mp4", ".jpg", $thumbnail);
-				if (! make_thumb_from_video($file, $thumbnail, 100, 75)) {
+				if (! make_thumb_from_video($file, $thumbnail, 100)) {
 					// We can't use the video file as a thumbnail
 					$thumbnail = "../NoThumbnail.png";
 				}
