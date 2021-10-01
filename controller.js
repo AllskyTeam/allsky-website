@@ -173,7 +173,8 @@ function AppCtrl($scope, $timeout, $http, _) {
             6: "Extreme",
             7: "Extreme",
             8: "Extreme",
-            9: "Extreme"
+            9: "Extreme",
+            100: "UNABLE_TO_GET_DATA"
         };
         return scale[index];
     };
@@ -195,9 +196,13 @@ function AppCtrl($scope, $timeout, $http, _) {
         $http.get("getForecast.php")
             .then(function (response) {
                 $scope.forecast = {};
-                $scope.forecast[getDay(0)] = getSum(response.data, "day1");
-                $scope.forecast[getDay(1)] = getSum(response.data, "day2");
-                $scope.forecast[getDay(2)] = getSum(response.data, "day3");
+                if (response.data != "") {
+                    $scope.forecast[getDay(0)] = getSum(response.data, "day1");
+                    $scope.forecast[getDay(1)] = getSum(response.data, "day2");
+                    $scope.forecast[getDay(2)] = getSum(response.data, "day3");
+                } else {
+                    $scope.forecast[getDay(0)] = 100;
+                }
             });
     };
 

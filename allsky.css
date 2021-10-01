@@ -175,6 +175,12 @@ img.current {
 	color: red;
 }
 
+.forecast .UNABLE_TO_GET_DATA {
+	color: red;
+	font-weight: bold;
+	font-size: 125%;
+}
+
 .forecast-map {
 	width: 75%;
 	max-width: 800px;
