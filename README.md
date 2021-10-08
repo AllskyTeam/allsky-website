@@ -1,48 +1,49 @@
 # allsky-website
-Web interface displaying an image from an allsky camera.
-
-## Update
-Please make sure to remove this line from your `virtualsky.json` as it has put a strain on Stuart Lowe's lookup service over time.
-```
-"objects": "M42;M45;M31;M51;M81",
-```
-
-https://www.strudel.org.uk/lookUP/
-
-## Brief overview
-
-**controller.js** contains the logic of the website. It has a timeout that refreshes the image after a certain amount of time. It also grabs the space weather from NOAA and displays it at the top. The constellation overlay is also generated here.
-
-**videos/index.php** lists the timelapses in the videos/ directory.
-
-**keograms/index.php** lists the keograms in the keograms/ directory
-
-**startrails/index.php** lists the startrails in the startrails/ directory
-
-**virtualsky.json** contains settings to generate the constellations overlay (lat, long, etc).
-
-**config.js** is the only file you need to modify. The content is described below.
+Web interface displaying an image from an allsky camera, optionally with an overlay of constellations and other objects, as well as optional space weather data from NOAA.  
+  
+  
 
 ## Configuration
 
-To configure the website for your own location, you will need to edit the `config.js` file.
+To configure the website for your own location, edit the `config.js` and `virtualsky.json` files.
 
-Available options are:
+### `config.js` options
 
 | Option        | Default           | Description  |
 | ------------- |:-------------    | :-----|
-| title         | Whitehorse, YT    | Title displayed next to the logo |
-| imageName     | image.jpg  | The image uploaded from your allsky camera.  To use the image from /home/pi/allsky, enter "/current/zzz" where "zzz" is the name of the image file, e.g., "image-resize.jpg". |
+| title         | Whitehorse, YT    | Title displayed next to the logo.  Can be anything you want, but keep it short. |
+| imageName     | image.jpg  | The image uploaded from your allsky camera.  To use the image from /home/pi/allsky, enter "/current/zzz" where "zzz" is the name of the image file, e.g., "image.jpg". |
 | location      | Whitehorse        | The location of your camera   |
-| latitude      | 60.7              | Latitude of the camera |
-| longitude     | -135.05           | Longitude of the camera |
+| latitude      | 60.7              | Latitude of the camera as a decimal number |
+| longitude     | -135.05           | Longitude of the camera, negative is west |
 | az            | 180               | Azimuth at the bottom of the image (0 is north, 90 is east, 180 is south, 270 is west) |
 | camera        | ASI224MC          | Your camera model |
 | computer      | Raspberry Pi 3    | Your Raspberry Pi model |
 | owner         | Thomas Jacquin    | The camera owner |
 | auroraMap     | north             | aurora oval map for the north or south hemisphere |
-| overlaySize	| 875		    | Size of the overlay (width and height)
-| overlayOffsetLeft     | 0             | Lateral adjustment of the overlay in pixels (+/-) |
+| overlaySize	| 875               | Size of the overlay (width and height)
+| overlayOffsetLeft     | 0             | Horizontal adjustment of the overlay in pixels (+/-) |
 | overlayOffsetTop     | 0             | Vertical adjustment of the overlay in pixels (+/-) |
-| auroraForecast     | false             | Displays the 3 day aurora forecast in the top left corner when set to `true`|
+| auroraForecast     | false             | Displays the 3-day aurora forecast in the top right corner when set to `true` |
 | showOverlayAtStartup     | false             | Determines whether or not the overlay should be displayed when the page is loaded |
+
+### `virtualsky.json` options
+
+| Option        | Default           | Description  |
+| ------------- |:-------------    | :-----|
+| id | starmap | This is used by the web page so do not change |
+| projection | fisheye | Leave at the default if your Allsky camera has a fisheye lens
+| width | 960 | width of the overlay | Width of the sky in the picture, in pixels
+| height | 960 | height of the overlay | Height of the sky in the picture, in pixels
+| constellations | true | Show constellation lines? |
+| mouse | false | Allow the mouse to rotate the overlay? |
+| gridlines_eq | true | Show the RA/Dec grid lines? |
+| keyboard | true | Allow keyboard controls? | XXXXXXXXXXXX what are they?
+| showdate | false | Show the date and time? |
+| showposition | false | Show/hide the latitude/longitude |
+| sky_gradient | false | Should the sky lighten toward the horizon? |
+| gradient | false | Reduce the brightness of stars near the horizon? |
+| showgalaxy | true | Show galaxies? |
+| live | true | Update the display in real time? |
+| lang | en | Language the object names shoud be in? Look in the `virtualsky/lang` directory for available languages. |
+| objects | messier.json | Name of a file in the `virtualsky` directory that contains other objects to display |
