@@ -137,7 +137,10 @@ function AppCtrl($scope, $timeout, $http, _) {
                 $scope.sunset = moment(data.data.sunset);
                 $scope.streamDaytime = data.data.streamDaytime === "true";
 				$scope.getImage()
-            }
+            }, function() {
+				alert("ERROR:\n'data.json' file not found, cannot continue.\nSet 'POST_END_OF_NIGHT_DATE=true' in config.sh");
+			}
+
         );
     };
 
