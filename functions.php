@@ -1,5 +1,38 @@
 <?php
 
+/**
+*
+* Get a variable from a file and return its value; if not there, return the default.
+* NOTE: The variable's value is anything after the equal sign, so there shouldn't be a comment on the line.
+* NOTE: There may be something before $searchfor, e.g., "export X=1", where "X" is $searchfor.
+*/
+function get_variable($file, $searchfor, $default)
+{
+	// get the file contents
+	$contents = file_get_contents($file);
+	if ("$contents" == "") return($default);	// file not found or not readable
+
+	// escape special characters in the query
+	$pattern = preg_quote($searchfor, '/');
+	// finalise the regular expression, matching the whole line
+	$pattern = "/^.*$pattern.*\$/m";
+
+	// search, and store all matching occurences in $matches, but only return the last one
+	$num_matches = preg_match_all($pattern, $contents, $matches);
+	if ($num_matches) {
+		$double_quote = '"';
+
+		// Format: [stuff]$searchfor=$value   or   [stuff]$searchfor="$value"
+		// Need to delete  [stuff]$searchfor=  and optional double quotes
+		$last = $matches[0][$num_matches - 1];	// get the last one
+		$last = explode( '=', $last)[1];	// get everything after equal sign
+		$last = str_replace($double_quote, "", $last);
+		return($last);
+	} else {
+		return($default);
+	}
+}
+
 $displayed_thumbnail_error_message = false;
 function make_thumb($src, $dest, $desired_width)
 {
@@ -84,18 +117,18 @@ function display_thumbnails($image_type)
 	echo "<a class='back-button' href='..'><i class='fa fa-chevron-left'></i>Back to Live View</a>";
 	echo "<div class=archived-videos>";
 
+	$thumbnailSizeX = get_variable(ALLSKY_CONFIG .'/config.sh', 'THUMBNAILSIZE_X=', '100');
 	foreach ($files as $file) {
 		// The thumbnail should be a .jpg.
 		$thumbnail = str_replace(".mp4", ".jpg", "thumbnails/$file");
 		if (! file_exists($thumbnail)) {
-			// xxx: fix: use THUMBNAIL_SIZE_X in config.sh instead of 100.
 			if ($image_type == "allsky") {
-				if (! make_thumb_from_video($file, $thumbnail, 100)) {
+				if (! make_thumb_from_video($file, $thumbnail, thumbnailSizeX)) {
 					// We can't use the video file as a thumbnail
 					$thumbnail = "../NoThumbnail.png";
 				}
 			} else {
-				if (! make_thumb($file, $thumbnail, 100)) {
+				if (! make_thumb($file, $thumbnail, thumbnailSizeX)) {
 					// Using the full-sized file as a thumbnail is overkill,
 					// but it's better than no thumbnail.
 					$thumbnail = "./$file";
