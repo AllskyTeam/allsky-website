@@ -1,5 +1,9 @@
 <?php
 
+// On Pi's, XX_ALLSKY_CONFIG_XX will get replaced with ${ALLSKY_CONFIG}.
+// On other machines it won't and references to it will silently fail.
+define('ALLSKY_CONFIG',  'XX_ALLSKY_CONFIG_XX');
+
 /**
 *
 * Get a variable from a file and return its value; if not there, return the default.
@@ -9,8 +13,10 @@
 function get_variable($file, $searchfor, $default)
 {
 	// get the file contents
+	if (! file_exists($file)) return($default);
+
 	$contents = file_get_contents($file);
-	if ("$contents" == "") return($default);	// file not found or not readable
+	if ("$contents" == "") return($default);	// file not readable
 
 	// escape special characters in the query
 	$pattern = preg_quote($searchfor, '/');
@@ -123,12 +129,12 @@ function display_thumbnails($image_type)
 		$thumbnail = str_replace(".mp4", ".jpg", "thumbnails/$file");
 		if (! file_exists($thumbnail)) {
 			if ($image_type == "allsky") {
-				if (! make_thumb_from_video($file, $thumbnail, thumbnailSizeX)) {
+				if (! make_thumb_from_video($file, $thumbnail, $thumbnailSizeX)) {
 					// We can't use the video file as a thumbnail
 					$thumbnail = "../NoThumbnail.png";
 				}
 			} else {
-				if (! make_thumb($file, $thumbnail, thumbnailSizeX)) {
+				if (! make_thumb($file, $thumbnail, $thumbnailSizeX)) {
 					// Using the full-sized file as a thumbnail is overkill,
 					// but it's better than no thumbnail.
 					$thumbnail = "./$file";
