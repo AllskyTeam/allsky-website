@@ -4,6 +4,19 @@
 // On other machines it won't and references to it will silently fail.
 define('ALLSKY_CONFIG',  'XX_ALLSKY_CONFIG_XX');
 
+// If on a Pi, check that the placholder was replaced.
+exec("grep 'Model.*: Raspberry' /proc/cpuinfo", $on_Pi);
+if ($on_Pi[0] != "" && ALLSKY_CONFIG == "XX_ALLSKY_CONFIG_XX") {
+	// This file hasn't been updated yet after installation.
+	echo "<div style='font-size: 200%;'>";
+	echo "<span style='color: red'>";
+	echo "Please run the following from the 'allsky' directory before using the Website:";
+	echo "</span>";
+	echo "<code>   website/install.sh --update</code>";
+	echo "</div>";
+	exit;
+}
+
 /**
 *
 * Get a variable from a file and return its value; if not there, return the default.
