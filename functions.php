@@ -1,6 +1,6 @@
 <?php
 
-// On Pi's, XX_ALLSKY_CONFIG_XX will get replaced with ${ALLSKY_CONFIG}.
+// On Pi's, this placeholder gets replaced with ${ALLSKY_CONFIG}.
 // On other machines it won't and references to it will silently fail.
 define('ALLSKY_CONFIG',  'XX_ALLSKY_CONFIG_XX');
 
