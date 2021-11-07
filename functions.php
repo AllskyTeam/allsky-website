@@ -136,7 +136,7 @@ function display_thumbnails($image_type)
 	echo "<a class='back-button' href='..'><i class='fa fa-chevron-left'></i>Back to Live View</a>";
 	echo "<div class=archived-videos>";
 
-  $thumbnailSizeX = get_variable(ALLSKY_CONFIG .'/config.sh', 'THUMBNAILSIZE_X=', '100');
+	$thumbnailSizeX = get_variable(ALLSKY_CONFIG .'/config.sh', 'THUMBNAILSIZE_X=', '100');
 	foreach ($files as $file) {
 		// The thumbnail should be a .jpg.
 		$thumbnail = str_replace(".mp4", ".jpg", "thumbnails/$file");
