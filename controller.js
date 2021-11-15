@@ -137,11 +137,10 @@ function AppCtrl($scope, $timeout, $http, _) {
                 $scope.sunset = moment(data.data.sunset);
                 $scope.streamDaytime = data.data.streamDaytime === "true";
 				$scope.getImage()
-            }, function() {
+			}, function() {
 				alert("ERROR:\n'data.json' file not found, cannot continue.\nSet 'POST_END_OF_NIGHT_DATE=true' in config.sh");
 			}
-
-        );
+		);
     };
 
     $scope.getSunset();
@@ -177,7 +176,7 @@ function AppCtrl($scope, $timeout, $http, _) {
             7: "Extreme",
             8: "Extreme",
             9: "Extreme",
-            100: "UNABLE_TO_GET_DATA"
+            100: "WARNING"
         };
         return scale[index];
     };
@@ -199,12 +198,16 @@ function AppCtrl($scope, $timeout, $http, _) {
         $http.get("getForecast.php")
             .then(function (response) {
                 $scope.forecast = {};
-                if (response.data != "") {
+                // If the 1st 'time' value begins with "ERROR", there was an error getting data.
+                msg = response.data[0]['time'];
+                if ((msg.substring(0,9) == "WARNING: ") || response.data == "") {
+                    // 100 indicates warning
+                    $scope.forecast[''] = 100;	// displays "WARNING"
+                    $scope.forecast[msg.substring(9)] = -1; // displays msg
+                } else {
                     $scope.forecast[getDay(0)] = getSum(response.data, "day1");
                     $scope.forecast[getDay(1)] = getSum(response.data, "day2");
                     $scope.forecast[getDay(2)] = getSum(response.data, "day3");
-                } else {
-                    $scope.forecast[getDay(0)] = 100;
                 }
             });
     };
