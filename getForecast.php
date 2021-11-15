@@ -21,8 +21,8 @@ if ($forecast != "") {
         $info[$row]['day3']  = $row_data[3];
     }
 } else {
-	// The calling routine looks for "ERROR" in this field.
-	$info[0]['time'] = "ERROR: Unable to get data from '$url'";
+	// The calling routine looks for "WARNING" in this field.
+	$info[0]['time'] = "WARNING: Unable to get data from '$url'";
 }
 echo json_encode($info);
 ?>
