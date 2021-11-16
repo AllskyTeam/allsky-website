@@ -175,8 +175,8 @@ img.current {
 	color: red;
 }
 
-.forecast .UNABLE_TO_GET_DATA {
-	color: red;
+.forecast .WARNING {	/* for Aurora activity */
+	color: yellow;
 	font-weight: bold;
 	font-size: 125%;
 }

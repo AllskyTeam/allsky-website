@@ -15,15 +15,14 @@ if ($forecast != "") {
         $noBrackets = preg_replace("/\([^)]+\)/","", $data);
         $dataFormatted = preg_replace('!\s+!', ' ', $noBrackets);
         $row_data = explode(' ', $dataFormatted);
-
         $info[$row]['time']  = $row_data[0];
         $info[$row]['day1']  = $row_data[1];
         $info[$row]['day2']  = $row_data[2];
         $info[$row]['day3']  = $row_data[3];
     }
-
-    echo json_encode($info);
 } else {
-    echo "ERROR: Unable to get data from '$url'";
+	// The calling routine looks for "WARNING" in this field.
+	$info[0]['time'] = "WARNING: Unable to get data from '$url'";
 }
+echo json_encode($info);
 ?>
