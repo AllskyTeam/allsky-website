@@ -5,96 +5,96 @@ $(window).resize(function () {
 });
 
 function buildOverlay(){
-    var planetarium;
+	var planetarium;
 	$.ajax({
 		url: "virtualsky.json" + '?_ts=' + new Date().getTime(),
 		cache: false
 	}).done(
 		function (data) {
-		    // This is to scale the overlay when the window is resized
+			// This is to scale the overlay when the window is resized
 			data.width = window.innerWidth < config.overlaySize ? window.innerWidth : config.overlaySize;
 			data.height = data.width;
 			data.latitude = config.latitude;
 			data.longitude = config.longitude;
 			data.az = config.az;
 			planetarium = $.virtualsky(data);
-            $("#starmap").css("margin-top", config.overlayOffsetTop + "px");
-            $("#starmap").css("margin-left", config.overlayOffsetLeft + "px");
+			$("#starmap").css("margin-top", config.overlayOffsetTop + "px");
+			$("#starmap").css("margin-left", config.overlayOffsetLeft + "px");
 		}
 	);
 };
 
 function compile($compile) {
-    // directive factory creates a link function
-    return function (scope, element, attrs) {
-        scope.$watch(
-            function (scope) {
-                // watch the 'compile' expression for changes
-                return scope.$eval(attrs.compile);
-            },
-            function (value) {
-                // when the 'compile' expression changes
-                // assign it into the current DOM
-                element.html(value);
+	// directive factory creates a link function
+	return function (scope, element, attrs) {
+		scope.$watch(
+			function (scope) {
+				// watch the 'compile' expression for changes
+				return scope.$eval(attrs.compile);
+			},
+			function (value) {
+				// when the 'compile' expression changes
+				// assign it into the current DOM
+				element.html(value);
 
-                // compile the new DOM and link it to the current
-                // scope.
-                // NOTE: we only compile .childNodes so that
-                // we don't get into infinite loop compiling ourselves
-                $compile(element.contents())(scope);
-            }
-        );
-    };
+				// compile the new DOM and link it to the current
+				// scope.
+				// NOTE: we only compile .childNodes so that
+				// we don't get into infinite loop compiling ourselves
+				$compile(element.contents())(scope);
+			}
+		);
+	};
 }
 
 function AppCtrl($scope, $timeout, $http, _) {
 
-    buildOverlay();
+	buildOverlay();
 
-    $scope.imageURL = "loading.jpg";
-    $scope.showInfo = false;
-    $scope.showOverlay = config.showOverlayAtStartup;
-    $scope.notification = "";
-    $scope.title = config.title;
-    $scope.location = config.location;
-    $scope.latitude = config.latitude;
-    $scope.longitude = config.longitude;
-    $scope.camera = config.camera;
-    $scope.computer = config.computer;
-    $scope.owner = config.owner;
-    $scope.auroraForecast = config.auroraForecast;
+	$scope.imageURL = "loading.jpg";
+	$scope.showInfo = false;
+	$scope.showOverlay = config.showOverlayAtStartup;
+	$scope.notification = "";
+	$scope.title = config.title;
+	$scope.location = config.location;
+	$scope.latitude = config.latitude;
+	$scope.longitude = config.longitude;
+	$scope.camera = config.camera;
+	$scope.computer = config.computer;
+	$scope.owner = config.owner;
+	$scope.auroraForecast = config.auroraForecast;
 
-    function getHiddenProp() {
-        var prefixes = ['webkit', 'moz', 'ms', 'o'];
+	function getHiddenProp() {
+		var prefixes = ['webkit', 'moz', 'ms', 'o'];
 
-        // if 'hidden' is natively supported just return it
-        if ('hidden' in document) return 'hidden';
+		// if 'hidden' is natively supported just return it
+		if ('hidden' in document) return 'hidden';
 
-        // otherwise loop over all the known prefixes until we find one
-        for (var i = 0; i < prefixes.length; i++) {
-            if ((prefixes[i] + 'Hidden') in document)
-                return prefixes[i] + 'Hidden';
-        }
+		// otherwise loop over all the known prefixes until we find one
+		for (var i = 0; i < prefixes.length; i++) {
+			if ((prefixes[i] + 'Hidden') in document)
+				return prefixes[i] + 'Hidden';
+		}
 
-        // otherwise it's not supported
-        return null;
-    }
+		// otherwise it's not supported
+		return null;
+	}
 
-    function isHidden() {
-        var prop = getHiddenProp();
-        if (!prop) return false;
+	function isHidden() {
+		var prop = getHiddenProp();
+		if (!prop) return false;
 
-        return document[prop];
-    }
+		return document[prop];
+	}
 
 	var last_type = "";
-    $scope.getImage = function () {
-        var url= "";
-        var imageClass= "";
-        if (!isHidden() && $scope.sunset) {
+	$scope.getImage = function () {
+		var url= "";
+		var imageClass= "";
+		if (!isHidden() && $scope.sunset) {
 			var d = new Date();
 			var now = moment.utc(d);
-				//
+
 			// Is it daytime or nighttime?
 			var is_nighttime;
 			if (($scope.sunrise && moment($scope.sunrise).isAfter(now)) ||
@@ -132,11 +132,12 @@ function AppCtrl($scope, $timeout, $http, _) {
 					url = config.imageName;
 					imageClass = 'current';
 				}
-			 	//Countdown calculation
+
+			 	// Countdown calculation
 				// The sunset time only has hours and minutes so could be off by up to a minute,
 				// so add some time.  Better to tell the user to come back in 2 minutes and
-				// have the actual time be 1 minute, then to tell them 1 minute and a new
-				// picture doesn't appear for 2 minutes.
+				// have the actual time be 1 minute, than to tell them 1 minute and a new
+				// picture doesn't appear for 2 minutes so they sit around waiting.
 				var ms = moment($scope.sunset,"DD/MM/YYYY HH:mm:ss").diff(moment(now,"DD/MM/YYYY HH:mm:ss"));
 				// Testing showed that 1 minute wasn't enough to add, and we need to account for
 				// long nighttime exposures, so add 3 minutes.
@@ -159,110 +160,110 @@ function AppCtrl($scope, $timeout, $http, _) {
 				$scope.notification = "<div style='text-align: center; font-size: 145%; font-weight: bold;'>It's not dark yet in " + config.location + ". Come back at " + t + " (" + s + ").</div>";
 			}
 			var img = $("<img />").attr('src', url + '?_ts=' + new Date().getTime()).addClass(imageClass)
-                .on('load', function() {
-                    if (!this.complete || typeof this.naturalWidth === "undefined" || this.naturalWidth === 0) {
-                        alert('broken image!');
-                        $timeout(function(){
-                            $scope.getImage();
-                        }, 500);
-                    } else {
-                        $scope.notification = "";
-                        $("#live_container").empty().append(img);
-                    }
-                });
-        }
-    };
+				.on('load', function() {
+					if (!this.complete || typeof this.naturalWidth === "undefined" || this.naturalWidth === 0) {
+						alert('broken image!');
+						$timeout(function(){
+							$scope.getImage();
+						}, 500);
+					} else {
+						$scope.notification = "";
+						$("#live_container").empty().append(img);
+					}
+				});
+		}
+	};
 
 	$scope.getSunRiseSet = function () {
-        $http.get("data.json" + '?_ts=' + new Date().getTime(), {
-            cache: false
-        }).then(
-            function (data) {
-                $scope.sunrise = moment(data.data.sunrise);
-                $scope.sunset = moment(data.data.sunset);
-                $scope.streamDaytime = data.data.streamDaytime === "true";
+		$http.get("data.json" + '?_ts=' + new Date().getTime(), {
+			cache: false
+		}).then(
+			function (data) {
+				$scope.sunrise = moment(data.data.sunrise);
+				$scope.sunset = moment(data.data.sunset);
+				$scope.streamDaytime = data.data.streamDaytime === "true";
 				$scope.getImage()
 			}, function() {
 				alert("ERROR:\n'data.json' file not found, cannot continue.\nSet 'POST_END_OF_NIGHT_DATE=true' in config.sh");
 			}
 		);
-    };
+	};
 
 	$scope.getSunRiseSet();
 
-    $scope.intervalFunction = function () {
-        $timeout(function () {
-            $scope.getImage();
-            $scope.intervalFunction();
-        }, 5000)
-    };
+	$scope.intervalFunction = function () {
+		$timeout(function () {
+			$scope.getImage();
+			$scope.intervalFunction();
+		}, 5000)
+	};
 
-    $scope.intervalFunction();
+	$scope.intervalFunction();
 
-    $scope.toggleInfo = function () {
-        $scope.showInfo = !$scope.showInfo;
-    };
+	$scope.toggleInfo = function () {
+		$scope.showInfo = !$scope.showInfo;
+	};
 	
 	$scope.toggleOverlay = function () {
-        $scope.showOverlay = !$scope.showOverlay;
+		$scope.showOverlay = !$scope.showOverlay;
 		$('.options').fadeToggle();
 		$('#starmap_container').fadeToggle();
-    };
+	};
 
-    $scope.getScale = function (index) {
-        var scale = {
-            0: "Low",
-            1: "Low",
-            2: "Low",
-            3: "Active",
-            4: "High",
-            5: "Extreme",
-            6: "Extreme",
-            7: "Extreme",
-            8: "Extreme",
-            9: "Extreme",
-            100: "WARNING"
-        };
-        return scale[index];
-    };
+	$scope.getScale = function (index) {
+		var scale = {
+			0: "Low",
+			1: "Low",
+			2: "Low",
+			3: "Active",
+			4: "High",
+			5: "Extreme",
+			6: "Extreme",
+			7: "Extreme",
+			8: "Extreme",
+			9: "Extreme",
+			100: "WARNING"
+		};
+		return scale[index];
+	};
 
-    $scope.getForecast = function () {
+	$scope.getForecast = function () {
 
-        function getSum(data, field) {
-            var total = _.sumBy(data, function (row) {
-                return parseInt(row[field]);
-            });
-            return Math.round(total / 7);
-        }
+		function getSum(data, field) {
+			var total = _.sumBy(data, function (row) {
+				return parseInt(row[field]);
+			});
+			return Math.round(total / 7);
+		}
 
-        function getDay(number) {
-            var day = moment().add(number, 'd');
-            return moment(day).format("MMM") + " " + moment(day).format("DD");
-        }
+		function getDay(number) {
+			var day = moment().add(number, 'd');
+			return moment(day).format("MMM") + " " + moment(day).format("DD");
+		}
 
-        $http.get("getForecast.php")
-            .then(function (response) {
-                $scope.forecast = {};
-                // If the 1st 'time' value begins with "ERROR", there was an error getting data.
-                msg = response.data[0]['time'];
-                if ((msg.substring(0,9) == "WARNING: ") || response.data == "") {
-                    // 100 indicates warning
-                    $scope.forecast[''] = 100;	// displays "WARNING"
-                    $scope.forecast[msg.substring(9)] = -1; // displays msg
-                } else {
-                    $scope.forecast[getDay(0)] = getSum(response.data, "day1");
-                    $scope.forecast[getDay(1)] = getSum(response.data, "day2");
-                    $scope.forecast[getDay(2)] = getSum(response.data, "day3");
-                }
-            });
-    };
+		$http.get("getForecast.php")
+			.then(function (response) {
+				$scope.forecast = {};
+				// If the 1st 'time' value begins with "ERROR", there was an error getting data.
+				msg = response.data[0]['time'];
+				if ((msg.substring(0,9) == "WARNING: ") || response.data == "") {
+					// 100 indicates warning
+					$scope.forecast[''] = 100;	// displays "WARNING"
+					$scope.forecast[msg.substring(9)] = -1; // displays msg
+				} else {
+					$scope.forecast[getDay(0)] = getSum(response.data, "day1");
+					$scope.forecast[getDay(1)] = getSum(response.data, "day2");
+					$scope.forecast[getDay(2)] = getSum(response.data, "day3");
+				}
+			});
+	};
 
-    $scope.getForecast();
+	$scope.getForecast();
 }
 
 
 angular
-    .module('allsky')
-    .directive('compile', ['$compile', compile])
-    .controller("AppCtrl", ['$scope', '$timeout', '$http', 'lodash', AppCtrl])
+	.module('allsky')
+	.directive('compile', ['$compile', compile])
+	.controller("AppCtrl", ['$scope', '$timeout', '$http', 'lodash', AppCtrl])
 ;
