@@ -87,34 +87,78 @@ function AppCtrl($scope, $timeout, $http, _) {
         return document[prop];
     }
 
+	var last_type = "";
     $scope.getImage = function () {
         var url= "";
         var imageClass= "";
         if (!isHidden() && $scope.sunset) {
-            var now = moment.utc(new Date());
-            if (moment($scope.sunset).isBefore(now)) {
-                console.log("It's night time... Live stream is on");
-                url = config.imageName;
-                imageClass = 'current';
-            } else if ($scope.streamDaytime) {
-                console.log("Day Time streaming");
-                url = config.imageName;
-                imageClass = 'current';
-            } else {
-                console.log("It's still pretty bright outside. We'll resume live stream at sunset");
-                url = "http://services.swpc.noaa.gov/images/animations/ovation/" + config.auroraMap + "/latest.jpg";
-                imageClass = 'forecast-map';
-                //Countdown calculation
-                var ms = moment($scope.sunset,"DD/MM/YYYY HH:mm:ss").diff(moment(now,"DD/MM/YYYY HH:mm:ss"));
-                var d = moment.duration(ms);
-                var hours = Math.floor(d.asHours());
-                var minutes = moment.utc(ms).format("mm");
-                var h = hours !== 0 ? hours + "h" : "";
-                var m = hours !== 0 ? minutes : minutes + " minutes";
-                var s = h + m;
-                $scope.notification = "It's not dark yet in " + config.location + ". Come back in " + s;
-            }
-            var img = $("<img />").attr('src', url + '?_ts=' + new Date().getTime()).addClass(imageClass)
+			var d = new Date();
+			var now = moment.utc(d);
+				//
+			// Is it daytime or nighttime?
+			var is_nighttime;
+			if (($scope.sunrise && moment($scope.sunrise).isAfter(now)) ||
+				moment($scope.sunset).isBefore(now)) {
+					// sunrise is in the future so it's currently nighttime
+					is_nighttime = true;
+			} else {
+					is_nighttime = false;
+			}
+
+			if (is_nighttime) {
+				// Only add to the console log once per message type
+				if (last_type !== "nighttime") {
+					console.log("Night Time streaming");
+					last_type = "nighttime";
+				}
+				url = config.imageName;
+				imageClass = 'current';
+			} else if ($scope.streamDaytime) {
+				if (last_type !== "daytime") {
+					console.log("Day Time streaming");
+					last_type = "daytime";
+				}
+				url = config.imageName;
+				imageClass = 'current';
+			} else {
+				if (last_type !== "daytimeoff") {
+					console.log("Camera off during day. We'll resume live stream at sunset");
+					last_type = "daytimeoff";
+				}
+				if ($scope.auroraForecast) {
+					url = "https://services.swpc.noaa.gov/images/animations/ovation/" + config.auroraMap + "/latest.jpg";
+					imageClass = 'forecast-map';
+				} else {
+					url = config.imageName;
+					imageClass = 'current';
+				}
+			 	//Countdown calculation
+				// The sunset time only has hours and minutes so could be off by up to a minute,
+				// so add some time.  Better to tell the user to come back in 2 minutes and
+				// have the actual time be 1 minute, then to tell them 1 minute and a new
+				// picture doesn't appear for 2 minutes.
+				var ms = moment($scope.sunset,"DD/MM/YYYY HH:mm:ss").diff(moment(now,"DD/MM/YYYY HH:mm:ss"));
+				// Testing showed that 1 minute wasn't enough to add, and we need to account for
+				// long nighttime exposures, so add 3 minutes.
+				var add = 180 * 1000;
+				ms += add;
+				var t = moment($scope.sunset + add).format("h:mm:ss a");
+
+				var d = moment.duration(ms);
+				var hours = Math.floor(d.asHours());
+				var minutes = moment.utc(ms).format("m");
+				var seconds = moment.utc(ms).format("s");
+				var h = hours !== 0 ? hours + " hour" + (hours > 1 ? "s " : " ") : "";
+				var m = minutes !== 0 ? minutes + " minute" + (minutes > 1 ? "s" : "") : "";
+				var s
+				if (hours == 0 && minutes == 0) {
+					s = seconds + " seconds";
+				} else {
+					s = h + m;
+				}
+				$scope.notification = "<div style='text-align: center; font-size: 145%; font-weight: bold;'>It's not dark yet in " + config.location + ". Come back at " + t + " (" + s + ").</div>";
+			}
+			var img = $("<img />").attr('src', url + '?_ts=' + new Date().getTime()).addClass(imageClass)
                 .on('load', function() {
                     if (!this.complete || typeof this.naturalWidth === "undefined" || this.naturalWidth === 0) {
                         alert('broken image!');
@@ -129,11 +173,12 @@ function AppCtrl($scope, $timeout, $http, _) {
         }
     };
 
-    $scope.getSunset = function () {
+	$scope.getSunRiseSet = function () {
         $http.get("data.json" + '?_ts=' + new Date().getTime(), {
             cache: false
         }).then(
             function (data) {
+                $scope.sunrise = moment(data.data.sunrise);
                 $scope.sunset = moment(data.data.sunset);
                 $scope.streamDaytime = data.data.streamDaytime === "true";
 				$scope.getImage()
@@ -143,7 +188,7 @@ function AppCtrl($scope, $timeout, $http, _) {
 		);
     };
 
-    $scope.getSunset();
+	$scope.getSunRiseSet();
 
     $scope.intervalFunction = function () {
         $timeout(function () {
