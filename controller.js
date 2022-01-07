@@ -88,17 +88,25 @@ function AppCtrl($scope, $timeout, $http, _) {
 	}
 
 	var last_type = "";
+	var logged_times = false;
 	$scope.getImage = function () {
 		var url= "";
 		var imageClass= "";
 		if (!isHidden() && $scope.sunset) {
 			var d = new Date();
-			var now = moment.utc(d);
+			var now = moment(d);	// xxx used to have moment.utc(d) but sunset didn't use utc()
 
-			// Is it daytime or nighttime?
 			var is_nighttime;
-			if (($scope.sunrise && moment($scope.sunrise).isAfter(now)) ||
-				moment($scope.sunset).isBefore(now)) {
+var before_sunrise = $scope.sunrise && moment($scope.sunrise).isAfter(now);
+var after_sunset = moment($scope.sunset).isBefore(now);
+			// This check assumes sunrise and sunset are both in the same day,
+			// which they should be since postData.sh runs at the end of nighttime and calculates
+			// sunrise and sunset.
+
+			// It's nighttime if we're either before sunrise (e.g., 3 am and sunrise is 6 am) OR
+			// it's after sunset (e.g., 9 pm and sunset is 8 pm).
+			// If we're in the same day as sunset
+			if (before_sunrise || after_sunset) {
 					// sunrise is in the future so it's currently nighttime
 					is_nighttime = true;
 			} else {
@@ -110,29 +118,21 @@ function AppCtrl($scope, $timeout, $http, _) {
 				if (last_type !== "nighttime") {
 					console.log("Night Time streaming");
 					last_type = "nighttime";
+					logged_times = false;
 				}
 				url = config.imageName;
 				imageClass = 'current';
+
 			} else if ($scope.streamDaytime) {
 				if (last_type !== "daytime") {
 					console.log("Day Time streaming");
 					last_type = "daytime";
+					logged_times = false;
 				}
 				url = config.imageName;
 				imageClass = 'current';
-			} else {
-				if (last_type !== "daytimeoff") {
-					console.log("Camera off during day. We'll resume live stream at sunset");
-					last_type = "daytimeoff";
-				}
-				if ($scope.auroraForecast) {
-					url = "https://services.swpc.noaa.gov/images/animations/ovation/" + config.auroraMap + "/latest.jpg";
-					imageClass = 'forecast-map';
-				} else {
-					url = config.imageName;
-					imageClass = 'current';
-				}
 
+			} else {	// daytime but we're not taking pictures
 			 	// Countdown calculation
 				// The sunset time only has hours and minutes so could be off by up to a minute,
 				// so add some time.  Better to tell the user to come back in 2 minutes and
@@ -143,7 +143,7 @@ function AppCtrl($scope, $timeout, $http, _) {
 				// long nighttime exposures, so add 3 minutes.
 				var add = 180 * 1000;
 				ms += add;
-				var t = moment($scope.sunset + add).format("h:mm:ss a");
+				var t = moment($scope.sunset + add).format("h:mm a");
 
 				var d = moment.duration(ms);
 				var hours = Math.floor(d.asHours());
@@ -152,13 +152,37 @@ function AppCtrl($scope, $timeout, $http, _) {
 				var h = hours !== 0 ? hours + " hour" + (hours > 1 ? "s " : " ") : "";
 				var m = minutes !== 0 ? minutes + " minute" + (minutes > 1 ? "s" : "") : "";
 				var s
-				if (hours == 0 && minutes == 0) {
+				if (hours == 0 && minutes == 0)
 					s = seconds + " seconds";
-				} else {
+				else
 					s = h + m;
+				$scope.notification = "<div style='color: red; text-align: center; font-size: 145%; font-weight: bold; border: 3px solid white; margin: 20px 0 20px; 0;'>It's not dark yet in " + config.location + ". Come back at " + t + " (" + s + ").</div>";
+
+				if (last_type !== "daytimeoff") {
+					console.log("Camera off during day. We'll resume live stream at nighttime in " + s);
+					last_type = "daytimeoff";
+					logged_times = false;
 				}
-				$scope.notification = "<div style='text-align: center; font-size: 145%; font-weight: bold;'>It's not dark yet in " + config.location + ". Come back at " + t + " (" + s + ").</div>";
+				if ($scope.auroraForecast) {
+					url = "https://services.swpc.noaa.gov/images/animations/ovation/" + config.auroraMap + "/latest.jpg";
+					imageClass = 'forecast-map';
+				} else {
+					url = config.imageName;
+					imageClass = 'current';
+				}
+
 			}
+
+if (! logged_times) {		// for debugging
+	logged_times = true;
+	//console.log("now=" + now);
+	console.log(now.format("YYYY-MM-DD HH:mm:ss") + " == now");
+	console.log($scope.sunrise.format("YYYY-MM-DD HH:mm:ss") + " == sunrise");
+	console.log($scope.sunset.format("YYYY-MM-DD HH:mm:ss") + " == sunset");
+	console.log("before sunrise = " + before_sunrise);
+	console.log("after sunset = " + after_sunset);
+}
+
 			var img = $("<img />").attr('src', url + '?_ts=' + new Date().getTime()).addClass(imageClass)
 				.on('load', function() {
 					if (!this.complete || typeof this.naturalWidth === "undefined" || this.naturalWidth === 0) {
