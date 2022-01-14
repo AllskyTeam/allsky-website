@@ -208,7 +208,7 @@ if (! logged_times) {		// for debugging
 				$scope.streamDaytime = data.data.streamDaytime === "true";
 				$scope.getImage()
 			}, function() {
-				alert("ERROR:\n'data.json' file not found, cannot continue.\nSet 'POST_END_OF_NIGHT_DATE=true' in config.sh");
+				alert("ERROR:\n'data.json' file not found, cannot continue.\nSet 'POST_END_OF_NIGHT_DATA=true' in config.sh");
 			}
 		);
 	};
