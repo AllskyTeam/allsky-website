@@ -1,6 +1,6 @@
 var config = {
     title: "Whitehorse, YT",
-    imageName: "image.jpg",
+    imageName: "/current/tmp/image.jpg",
     location: "Whitehorse",
     latitude: 60.7,
     longitude: -135.05,
