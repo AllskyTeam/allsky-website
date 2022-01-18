@@ -1,6 +1,11 @@
-# allsky-website
+# Allsky Website ![Release 0.8.3](https://img.shields.io/badge/Release-0.8.3-green.svg) 
 The "allsky-website" package allows you to display your images on a website, either on your Pi or on another machine. It can optionally add an overlay of constellations and other objects, as well as optional Aurora data from NOAA.
 
-For instructions on how to install "allsky-website", click [here](https://github.com/thomasjacquin/allsky).
+## Update
+This version of the WebUI works best with Allsky camera software version 0.8.3 or newer.
 
-Once installed, there are several configuration variables you'll want to change.  Click [here](https://github.com/thomasjacquin/allsky/wiki/allsky-website-Settings) to see them.
+
+## Installation
+The installation script for installing on a Pi is documented on the [main Allsky GitHub page](https://github.com/thomasjacquin/allsky).
+
+Once installed, there are several [configuration variables](https://github.com/thomasjacquin/allsky/wiki/allsky-website-Settings) you'll want to change.
