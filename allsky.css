@@ -2,7 +2,7 @@ body {
 	color:white;
 	font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
 	background-color: black;
-	max-width: 960px;
+	max-width: 960px;	/* Optionally change to change size of image */
 	margin: auto;
 }
 
@@ -89,14 +89,14 @@ body {
 
 img.current {
 	width: 100%;
-	max-width: 960px;
+	max-width: 960px;	/* Optionally change to change size of image */
 }
 
 #starmap_container {
 	position: absolute;
 	opacity: 0.45;
 	overflow: hidden;
-	height: 720px;
+	height: 720px;		/* Optionally change or delete to change size of image */
 }
 
 .starmap_credit {
@@ -135,6 +135,7 @@ img.current {
 	min-width: 100px;
 	float: left;
 	padding: 10px;
+	text-align: center;	/* so text is centered below thumbnail */
 }
 
 .archived-videos .day-container .day-text {
