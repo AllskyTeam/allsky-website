@@ -63,6 +63,7 @@ function AppCtrl($scope, $timeout, $http, _) {
 	$scope.computer = config.computer;
 	$scope.owner = config.owner;
 	$scope.auroraForecast = config.auroraForecast;
+	$scope.imageName = config.imageName;
 
 	function getHiddenProp() {
 		var prefixes = ['webkit', 'moz', 'ms', 'o'];
@@ -87,61 +88,94 @@ function AppCtrl($scope, $timeout, $http, _) {
 		return document[prop];
 	}
 
+	// The default_interval should ideally be based on the time between day and night images - why
+	// check every 5 seconds if new images only appear once a minute?
+	var default_interval = (5 * 1000);		// Time to wait between normal images.  READ ONLY
+	var interval_timer = default_interval;		// Amount of time we're currently waiting
+
+	// If we're not taking pictures during the day, we don't need to check for updated images as often.
+	// If we're displaying an aurora picture, it's only updated every 5 mintutes, so wait half that.
+	// If we're not displaying an aurora picture the picture we ARE displaying doesn't change so
+	// there's no need to check until nightfall.
+	// However, in case the image DOES change, check every minute.  Seems like a good compromise.
+	var aurora_interval_timer = ((5/2) * 60 * 1000);
+	var non_aurora_interval_timer = (60 * 1000);
+
 	var last_type = "";
 	var logged_times = false;
+	var num_images_read = 0;
 	$scope.getImage = function () {
 		var url= "";
 		var imageClass= "";
 		if (!isHidden() && $scope.sunset) {
-			var d = new Date();
-			var now = moment(d);	// xxx used to have moment.utc(d) but sunset didn't use utc()
+			interval_timer = default_interval;
+			num_images_read++;
+
+			var now = moment(new Date());
 
 			var is_nighttime;
-var before_sunrise = $scope.sunrise && moment($scope.sunrise).isAfter(now);
-var after_sunset = moment($scope.sunset).isBefore(now);
+			var before_sunrise = $scope.sunrise && moment($scope.sunrise).isAfter(now);
+			var after_sunset = moment($scope.sunset).isBefore(now);
+
 			// This check assumes sunrise and sunset are both in the same day,
 			// which they should be since postData.sh runs at the end of nighttime and calculates
-			// sunrise and sunset.
+			// sunrise and sunset for the current day.
 
 			// It's nighttime if we're either before sunrise (e.g., 3 am and sunrise is 6 am) OR
 			// it's after sunset (e.g., 9 pm and sunset is 8 pm).
-			// If we're in the same day as sunset
+			// Both only work if we're in the same day.
 			if (before_sunrise || after_sunset) {
-					// sunrise is in the future so it's currently nighttime
-					is_nighttime = true;
+				// sunrise is in the future so it's currently nighttime
+				is_nighttime = true;
 			} else {
-					is_nighttime = false;
+				is_nighttime = false;
 			}
 
+			// The sunrise and sunset times change every day, and the user may have changed
+			// streamDaytime, so re-read the data.json file when something changes.
+			var reread_sunrise_sunset = false;
 			if (is_nighttime) {
 				// Only add to the console log once per message type
 				if (last_type !== "nighttime") {
-					console.log("Night Time streaming");
+					console.log("=== Night Time streaming starting at " + now.format("h:mm a"));
 					last_type = "nighttime";
 					logged_times = false;
+					reread_sunrise_sunset = true;
+console.log("XXX starting nighttime, reread_sunrise_sunset=" + reread_sunrise_sunset);
 				}
 				url = config.imageName;
 				imageClass = 'current';
+				$scope.notification = "";
 
 			} else if ($scope.streamDaytime) {
 				if (last_type !== "daytime") {
-					console.log("Day Time streaming");
+					console.log("=== Day Time streaming starting at " + now.format("h:mm a"));
 					last_type = "daytime";
 					logged_times = false;
+					reread_sunrise_sunset = true;
 				}
 				url = config.imageName;
 				imageClass = 'current';
+				$scope.notification = "";
 
 			} else {	// daytime but we're not taking pictures
+				if (last_type !== "daytimeoff") {
+					console.log("=== Camera turned off during Day Time at " + now.format("h:mm a"));
+					last_type = "daytimeoff";
+					logged_times = false;
+					reread_sunrise_sunset = true;
+console.log("XXX starting no capture daytime, reread_sunrise_sunset=" + reread_sunrise_sunset);
+				}
+
 			 	// Countdown calculation
 				// The sunset time only has hours and minutes so could be off by up to a minute,
 				// so add some time.  Better to tell the user to come back in 2 minutes and
 				// have the actual time be 1 minute, than to tell them 1 minute and a new
-				// picture doesn't appear for 2 minutes so they sit around waiting.
+				// picture doesn't appear for 2 minutes after they return so they sit around waiting.
 				var ms = moment($scope.sunset,"DD/MM/YYYY HH:mm:ss").diff(moment(now,"DD/MM/YYYY HH:mm:ss"));
 				// Testing showed that 1 minute wasn't enough to add, and we need to account for
 				// long nighttime exposures, so add 3 minutes.
-				var add = 180 * 1000;
+				var add = 3 * 60 * 1000;
 				ms += add;
 				var t = moment($scope.sunset + add).format("h:mm a");
 
@@ -150,38 +184,36 @@ var after_sunset = moment($scope.sunset).isBefore(now);
 				var minutes = moment.utc(ms).format("m");
 				var seconds = moment.utc(ms).format("s");
 				var h = hours !== 0 ? hours + " hour" + (hours > 1 ? "s " : " ") : "";
-				var m = minutes !== 0 ? minutes + " minute" + (minutes > 1 ? "s" : "") : "";
+				// Have to use != instead of !== because "minutes" is a string.
+				var m = minutes != 0 ? minutes + " minute" + (minutes > 1 ? "s" : "") : "";
 				var s
 				if (hours == 0 && minutes == 0)
 					s = seconds + " seconds";
 				else
 					s = h + m;
-				$scope.notification = "<div style='color: red; text-align: center; font-size: 145%; font-weight: bold; border: 3px solid white; margin: 20px 0 20px; 0;'>It's not dark yet in " + config.location + ". Come back at " + t + " (" + s + ").</div>";
+				$scope.notification = "<div style='background-color: #333; color: red; text-align: center; font-size: 145%; font-weight: bold; border: 3px dashed white; margin: 20px 0 20px; 0;'>It's not dark yet in " + config.location + ".&nbsp; &nbsp; Come back at " + t + " (" + s + ").</div>";
 
-				if (last_type !== "daytimeoff") {
-					console.log("Camera off during day. We'll resume live stream at nighttime in " + s);
-					last_type = "daytimeoff";
-					logged_times = false;
+				if (! logged_times) {
+					console.log("=== Resuming at nighttime in " + s);
 				}
 				if ($scope.auroraForecast) {
 					url = "https://services.swpc.noaa.gov/images/animations/ovation/" + config.auroraMap + "/latest.jpg";
 					imageClass = 'forecast-map';
+					interval_timer = aurora_interval_timer;
 				} else {
 					url = config.imageName;
 					imageClass = 'current';
+					interval_timer = non_aurora_interval_timer;
 				}
 
 			}
 
-if (! logged_times) {		// for debugging
-	logged_times = true;
-	//console.log("now=" + now);
-	console.log(now.format("YYYY-MM-DD HH:mm:ss") + " == now");
-	console.log($scope.sunrise.format("YYYY-MM-DD HH:mm:ss") + " == sunrise");
-	console.log($scope.sunset.format("YYYY-MM-DD HH:mm:ss") + " == sunset");
-	console.log("before sunrise = " + before_sunrise);
-	console.log("after sunset = " + after_sunset);
-}
+			if (! logged_times) {		// for debugging
+				logged_times = true;
+				console.log("  " + now.format("YYYY-MM-DD HH:mm:ss") + " == now");
+				console.log("  before sunrise = " + before_sunrise);
+				console.log("  after sunset = " + after_sunset);
+			}
 
 			var img = $("<img />").attr('src', url + '?_ts=' + new Date().getTime()).addClass(imageClass)
 				.on('load', function() {
@@ -191,10 +223,19 @@ if (! logged_times) {		// for debugging
 							$scope.getImage();
 						}, 500);
 					} else {
-						$scope.notification = "";
 						$("#live_container").empty().append(img);
 					}
 				});
+
+			// Don't re-read after the 1st image since we read the file right before the image.
+			if (reread_sunrise_sunset && num_images_read > 1) {
+				console.log("Re-reading data.json xxxxxxxxxx");
+				$scope.getSunRiseSet();
+			} else if (reread_sunrise_sunset) {
+				console.log("XXXX Not rereading data.json, num_images_read=" + num_images_read);
+			} else {
+				console.log("reread_sunrise_sunset=" + reread_sunrise_sunset);
+			}
 		}
 	};
 
@@ -206,22 +247,26 @@ if (! logged_times) {		// for debugging
 				$scope.sunrise = moment(data.data.sunrise);
 				$scope.sunset = moment(data.data.sunset);
 				$scope.streamDaytime = data.data.streamDaytime === "true";
+
+				console.log("Read data.json at " + moment(new Date()).format("h:mm:ss a"));
+				console.log("  * streamDaytime == " + $scope.streamDaytime);
+				console.log("  * " + $scope.sunrise.format("YYYY-MM-DD HH:mm:ss") + " == sunrise");
+				console.log("  * " + $scope.sunset.format("YYYY-MM-DD HH:mm:ss") + " == sunset");
+
 				$scope.getImage()
 			}, function() {
 				alert("ERROR:\n'data.json' file not found, cannot continue.\nSet 'POST_END_OF_NIGHT_DATA=true' in config.sh");
 			}
 		);
 	};
-
 	$scope.getSunRiseSet();
 
 	$scope.intervalFunction = function () {
 		$timeout(function () {
 			$scope.getImage();
 			$scope.intervalFunction();
-		}, 5000)
+		}, interval_timer)
 	};
-
 	$scope.intervalFunction();
 
 	$scope.toggleInfo = function () {
