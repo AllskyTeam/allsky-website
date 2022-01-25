@@ -107,23 +107,32 @@ function make_thumb_from_video($src, $dest, $desired_width)
 // Display thumbnails with links to the full-size files
 // for startrails, keograms, and videos.
 // The function to make thumbnails for videos is different
+$back_button = "<a class='back-button' href='..'><i class='fa fa-chevron-left'></i>Back to Live View</a>";
 function display_thumbnails($image_type)
 {
+	global $back_button;
 	$image_type_len = strlen($image_type);
-	if ($image_type == "allsky") {
+	if ($image_type == "Timelapse") {
 		$ext = "mp4";
 	} else {
 		$ext = "jpg";
 	}
 
+	$num_files = 0;
 	$files = array();
 	if ($handle = opendir('.')) {
 		while (false !== ($entry = readdir($handle))) {
 			if (strpos($entry, $ext) !== false) {
-				$files[] = $entry;
+				$files[] = $entry;;
+				$num_files++;
 			}
 		}
 		closedir($handle);
+	}
+	if ($num_files == 0) {
+		echo $back_button;
+		echo "<div style='text-align: center; font-size: 200%; color: yellow; border: 2px solid gray'>No $image_type images</div>";
+		return;
 	}
 
 	asort($files);
@@ -134,7 +143,7 @@ function display_thumbnails($image_type)
 			print_r(error_get_last());
 	}
 
-	echo "<a class='back-button' href='..'><i class='fa fa-chevron-left'></i>Back to Live View</a>";
+	echo $back_button;
 	echo "<div class=archived-videos>";
 
 	$thumbnailSizeX = get_variable(ALLSKY_CONFIG .'/config.sh', 'THUMBNAILSIZE_X=', '100');
@@ -142,7 +151,7 @@ function display_thumbnails($image_type)
 		// The thumbnail should be a .jpg.
 		$thumbnail = str_replace(".mp4", ".jpg", "thumbnails/$file");
 		if (! file_exists($thumbnail)) {
-			if ($image_type == "allsky") {
+			if ($image_type == "Timelapse") {
 				if (! make_thumb_from_video($file, $thumbnail, $thumbnailSizeX)) {
 					// We can't use the video file as a thumbnail
 					$thumbnail = "../NoThumbnail.png";

@@ -8,7 +8,7 @@
 	<body>
 		<?php
 		include '../functions.php';
-		display_thumbnails("allsky");
+		display_thumbnails("Timelapse");
 		?>
 	</body>
 </html>
