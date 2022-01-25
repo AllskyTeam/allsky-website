@@ -63,6 +63,7 @@ function AppCtrl($scope, $timeout, $http, _) {
 	$scope.computer = config.computer;
 	$scope.owner = config.owner;
 	$scope.auroraForecast = config.auroraForecast;
+	$scope.imageName = config.imageName;
 
 	function getHiddenProp() {
 		var prefixes = ['webkit', 'moz', 'ms', 'o'];
