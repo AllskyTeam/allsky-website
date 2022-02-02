@@ -156,7 +156,7 @@ function display_thumbnails($image_type)
 	$thumbnailSizeX = get_variable(ALLSKY_CONFIG .'/config.sh', 'THUMBNAILSIZE_X=', '100');
 	foreach ($files as $file) {
 		// The thumbnail should be a .jpg.
-		$thumbnail = str_replace(".mp4", ".jpg", "thumbnails/$file");
+		$thumbnail = preg_replace($ext, ".jpg", "thumbnails/$file");
 		if (! file_exists($thumbnail)) {
 			if ($image_type == "Timelapse") {
 				if (! make_thumb_from_video($file, $thumbnail, $thumbnailSizeX)) {
