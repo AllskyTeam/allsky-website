@@ -90,8 +90,7 @@ function make_thumb($src, $dest, $desired_width)
 	imagecopyresampled($virtual_image, $source_image, 0, 0, 0, 0, $desired_width, $desired_height, $width, $height);
 
 	/* create the physical thumbnail image to its destination */
-	$funcname="image{$funcext}";
- 	$funcname($virtual_image, $dest);
+ 	imagejpeg($virtual_image, $dest);
 
 	if (file_exists($dest)) {
 		return(true);
