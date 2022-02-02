@@ -59,9 +59,9 @@ function make_thumb($src, $dest, $desired_width)
 {
  	/* Make sure the imagecreatefromjpeg() function is in PHP. */
 	global $displayed_thumbnail_error_message;
-	if ( preg_match("/^.*\.(jpg|jpeg)$/", $src ) ) {
+	if ( preg_match("/\.(jpg|jpeg)$/", $src ) ) {
 		$funcext='jpeg';
-	} elseif ( preg_match("/^.*\.png$/", $src ) ) {
+	} elseif ( preg_match("/\.png$/", $src ) ) {
 		$funcext='png';
 	}
 	if (function_exists("imagecreatefrom${funcext}") == false)
@@ -120,9 +120,9 @@ function display_thumbnails($image_type)
 	global $back_button;
 	$image_type_len = strlen($image_type);
 	if ($image_type == "Timelapse") {
-		$ext = "/^.*\.(mp4|webm)$/";
+		$ext = "/\.(mp4|webm)$/";
 	} else {
-		$ext = "/^.*\.(jpg|jpeg|png)$/";
+		$ext = "/\.(jpg|jpeg|png)$/";
 	}
 
 	$num_files = 0;
