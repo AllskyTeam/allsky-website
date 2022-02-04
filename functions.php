@@ -5,9 +5,10 @@
 define('ALLSKY_CONFIG',  'XX_ALLSKY_CONFIG_XX');
 
 // If on a Pi, check that the placholder was replaced.
-exec("grep 'Model.*: Raspberry' /proc/cpuinfo", $on_Pi);
+exec("grep -q 'Model.*: Raspberry' /proc/cpuinfo", $none, $return);
 // Split the placeholder so it doesn't get replaced if the update script is run multiple times.
-if ($on_Pi[0] != "" && ALLSKY_CONFIG == "XX_ALLSKY_CONFIG" . "_XX") {
+// Note: return code 0 == a match, return code 1 == no match
+if ($return==0 && ALLSKY_CONFIG == "XX_ALLSKY_CONFIG" . "_XX") {
 	// This file hasn't been updated yet after installation.
 	echo "<div style='font-size: 200%;'>";
 	echo "<span style='color: red'>";
@@ -58,18 +59,24 @@ function make_thumb($src, $dest, $desired_width)
 {
  	/* Make sure the imagecreatefromjpeg() function is in PHP. */
 	global $displayed_thumbnail_error_message;
-	if (function_exists('imagecreatefromjpeg') == false)
+	if ( preg_match("/\.(jpg|jpeg)$/", $src ) ) {
+		$funcext='jpeg';
+	} elseif ( preg_match("/\.png$/", $src ) ) {
+		$funcext='png';
+	}
+	if (function_exists("imagecreatefrom${funcext}") == false)
 	{
 		if ($displayed_thumbnail_error_message == false)
 		{
-			echo "<br><p style='color: red'>Unable to make thumbnail(s); imagecreatefromjpeg() does not exist.<br>If you do NOT have the file '/etc/php/7.3/mods-available/gd.ini' you need to download the latest PHP.</p>";
+			echo "<br><p style='color: red'>Unable to make thumbnail(s); imagecreatefrom{$funcext}() does not exist.<br>If you do NOT have the file '/etc/php/7.3/mods-available/gd.ini' you need to download the latest PHP.</p>";
 			$displayed_thumbnail_error_message = true;
 		}
 		return(false);
 	}
 
 	/* read the source image */
-	$source_image = imagecreatefromjpeg($src);
+	$funcname="imagecreatefrom{$funcext}";
+	$source_image = $funcname($src);
 	$width = imagesx($source_image);
 	$height = imagesy($source_image);
 
@@ -113,16 +120,16 @@ function display_thumbnails($image_type)
 	global $back_button;
 	$image_type_len = strlen($image_type);
 	if ($image_type == "Timelapse") {
-		$ext = "mp4";
+		$ext = "/\.(mp4|webm)$/";
 	} else {
-		$ext = "jpg";
+		$ext = "/\.(jpg|jpeg|png)$/";
 	}
 
 	$num_files = 0;
 	$files = array();
 	if ($handle = opendir('.')) {
 		while (false !== ($entry = readdir($handle))) {
-			if (strpos($entry, $ext) !== false) {
+			if ( preg_match( $ext, $entry ) ) {
 				$files[] = $entry;;
 				$num_files++;
 			}
@@ -149,7 +156,7 @@ function display_thumbnails($image_type)
 	$thumbnailSizeX = get_variable(ALLSKY_CONFIG .'/config.sh', 'THUMBNAILSIZE_X=', '100');
 	foreach ($files as $file) {
 		// The thumbnail should be a .jpg.
-		$thumbnail = str_replace(".mp4", ".jpg", "thumbnails/$file");
+		$thumbnail = preg_replace($ext, ".jpg", "thumbnails/$file");
 		if (! file_exists($thumbnail)) {
 			if ($image_type == "Timelapse") {
 				if (! make_thumb_from_video($file, $thumbnail, $thumbnailSizeX)) {
