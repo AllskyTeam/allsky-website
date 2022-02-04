@@ -118,12 +118,17 @@ $back_button = "<a class='back-button' href='..'><i class='fa fa-chevron-left'><
 function display_thumbnails($image_type)
 {
 	global $back_button;
-	$image_type_len = strlen($image_type);
+	// The name of the timelapse video file is "allsky-yyyymmdd.xxx" but the $image_type is "Timelapse" which is more meaningful for users.
+	// For startrails and keograms, the prefix and the $image_type are the same.
 	if ($image_type == "Timelapse") {
+		$file_prefix = "allsky";
 		$ext = "/\.(mp4|webm)$/";
 	} else {
+		$file_prefix = $image_type;
 		$ext = "/\.(jpg|jpeg|png)$/";
 	}
+	$file_prefix_len = strlen($file_prefix);
+		
 
 	$num_files = 0;
 	$files = array();
@@ -171,11 +176,11 @@ function display_thumbnails($image_type)
 				}
 			}
 		}
-		$year = substr($file, $image_type_len + 1, 4);
-		$month = substr($file, $image_type_len + 5, 2);
-		$day = substr($file, $image_type_len + 7, 2);
+		$year = substr($file, $file_prefix_len + 1, 4);
+		$month = substr($file, $file_prefix_len + 5, 2);
+		$day = substr($file, $file_prefix_len + 7, 2);
 		$date = $year.$month.$day;
-		echo "<a href='./$file'><div class='day-container'><div class='image-container'><img id=".$date." src='$thumbnail' title='$image_type-$year-$month-$day'/></div><div class='day-text'>$year-$month-$day</div></div></a>";
+		echo "<a href='./$file'><div class='day-container'><div class='image-container'><img id=".$date." src='$thumbnail' title='$file_prefix-$year-$month-$day'/></div><div class='day-text'>$year-$month-$day</div></div></a>";
 	}
 	echo "</div>";
 }
