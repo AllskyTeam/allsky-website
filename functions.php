@@ -14,13 +14,13 @@ define('ALLSKY_CONFIG',  'XX_ALLSKY_CONFIG_XX');
 
 // If on a Pi, check that the placholder was replaced.
 $exec_works = file_exists('/var/www/html/allsky/config.js');		// YUCK!
-if ($exec_works&& ALLSKY_CONFIG == "XX_ALLSKY_CONFIG" . "_XX") {
+if ($exec_works && ALLSKY_CONFIG == "XX_ALLSKY_CONFIG" . "_XX") {
 	// This file hasn't been updated yet after installation.
 	echo "<div style='font-size: 200%;'>";
 	echo "<span style='color: red'>";
 	echo "Please run the following from the 'allsky' directory before using the Website:";
 	echo "</span>";
-	echo "<br><code>   website/install.sh --update</code>";
+	echo "<br><br><code>   website/install.sh --update</code>";
 	echo "</div>";
 	exit;
 }
@@ -65,18 +65,24 @@ function make_thumb($src, $dest, $desired_width)
 {
  	/* Make sure the imagecreatefromjpeg() function is in PHP. */
 	global $displayed_thumbnail_error_message;
-	if (function_exists('imagecreatefromjpeg') == false)
+	if ( preg_match("/\.(jpg|jpeg)$/", $src ) ) {
+		$funcext='jpeg';
+	} elseif ( preg_match("/\.png$/", $src ) ) {
+		$funcext='png';
+	}
+	if (function_exists("imagecreatefrom${funcext}") == false)
 	{
 		if ($displayed_thumbnail_error_message == false)
 		{
-			echo "<br><p style='color: red'>Unable to make thumbnail(s); imagecreatefromjpeg() does not exist.<br>If you do NOT have the file '/etc/php/7.3/mods-available/gd.ini' you need to download the latest PHP.</p>";
+			echo "<br><p style='color: red'>Unable to make thumbnail(s); imagecreatefrom{$funcext}() does not exist.<br>If you do NOT have the file '/etc/php/7.3/mods-available/gd.ini' you need to download the latest PHP.</p>";
 			$displayed_thumbnail_error_message = true;
 		}
 		return(false);
 	}
 
 	/* read the source image */
-	$source_image = imagecreatefromjpeg($src);
+	$funcname="imagecreatefrom{$funcext}";
+	$source_image = $funcname($src);
 	$width = imagesx($source_image);
 	$height = imagesy($source_image);
 
@@ -124,18 +130,23 @@ $back_button = "<a class='back-button' href='..'><i class='fa fa-chevron-left'><
 function display_thumbnails($image_type)
 {
 	global $back_button;
-	$image_type_len = strlen($image_type);
-	if ($image_type == "allsky") {
-		$ext = "mp4";
+	// The name of the timelapse video file is "allsky-yyyymmdd.xxx" but the $image_type is "Timelapse" which is more meaningful for users.
+	// For startrails and keograms, the prefix and the $image_type are the same.
+	if ($image_type == "Timelapse") {
+		$file_prefix = "allsky";
+		$ext = "/\.(mp4|webm)$/";
 	} else {
-		$ext = "jpg";
+		$file_prefix = $image_type;
+		$ext = "/\.(jpg|jpeg|png)$/";
 	}
+	$file_prefix_len = strlen($file_prefix);
+		
 
 	$num_files = 0;
 	$files = array();
 	if ($handle = opendir('.')) {
 		while (false !== ($entry = readdir($handle))) {
-			if (strpos($entry, $ext) !== false) {
+			if ( preg_match( $ext, $entry ) ) {
 				$files[] = $entry;
 				$num_files++;
 			}
@@ -162,9 +173,9 @@ function display_thumbnails($image_type)
 	$thumbnailSizeX = get_variable(ALLSKY_CONFIG .'/config.sh', 'THUMBNAILSIZE_X=', '100');
 	foreach ($files as $file) {
 		// The thumbnail should be a .jpg.
-		$thumbnail = str_replace(".mp4", ".jpg", "thumbnails/$file");
+		$thumbnail = preg_replace($ext, ".jpg", "thumbnails/$file");
 		if (! file_exists($thumbnail)) {
-			if ($image_type == "allsky") {
+			if ($image_type == "Timelapse") {
 				if (! make_thumb_from_video($file, $thumbnail, $thumbnailSizeX)) {
 					// We can't use the video file as a thumbnail
 					$thumbnail = "../NoThumbnail.png";
@@ -177,11 +188,11 @@ function display_thumbnails($image_type)
 				}
 			}
 		}
-		$year = substr($file, $image_type_len + 1, 4);
-		$month = substr($file, $image_type_len + 5, 2);
-		$day = substr($file, $image_type_len + 7, 2);
+		$year = substr($file, $file_prefix_len + 1, 4);
+		$month = substr($file, $file_prefix_len + 5, 2);
+		$day = substr($file, $file_prefix_len + 7, 2);
 		$date = $year.$month.$day;
-		echo "<a href='./$file'><div class='day-container'><div class='image-container'><img id=".$date." src='$thumbnail' title='$image_type-$year-$month-$day'/></div><div class='day-text'>$year-$month-$day</div></div></a>";
+		echo "<a href='./$file'><div class='day-container'><div class='image-container'><img id=".$date." src='$thumbnail' title='$file_prefix-$year-$month-$day'/></div><div class='day-text'>$year-$month-$day</div></div></a>";
 	}
 	echo "</div>";
 }
