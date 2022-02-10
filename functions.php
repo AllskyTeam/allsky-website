@@ -5,13 +5,10 @@
 define('ALLSKY_CONFIG',  'XX_ALLSKY_CONFIG_XX');
 
 // If on a Pi, check that the placholder was replaced.
-exec("grep 'Model.*: Raspberry' /proc/cpuinfo", $on_Pi);
-$Pi = false;
-if (isset($on_Pi[0]))
-	if ($on_Pi[0] != "")
-		$Pi = true;
+exec("grep -q 'Model.*: Raspberry' /proc/cpuinfo", $none, $return);
 // Split the placeholder so it doesn't get replaced if the update script is run multiple times.
-if ($Pi && ALLSKY_CONFIG == "XX_ALLSKY_CONFIG" . "_XX") {
+// Note: return code 0 == a match, return code 1 == no match
+if ($return==0 && ALLSKY_CONFIG == "XX_ALLSKY_CONFIG" . "_XX") {
 	// This file hasn't been updated yet after installation.
 	echo "<div style='font-size: 200%;'>";
 	echo "<span style='color: red'>";
