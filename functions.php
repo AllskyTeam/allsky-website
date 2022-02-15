@@ -13,8 +13,11 @@ define('ALLSKY_CONFIG',  'XX_ALLSKY_CONFIG_XX');
 // path, please update the code.
 
 // If on a Pi, check that the placholder was replaced.
-$exec_works = file_exists('/var/www/html/allsky/config.js');		// YUCK!
-if ($exec_works && ALLSKY_CONFIG == "XX_ALLSKY_CONFIG" . "_XX") {
+function exec_works() {
+    $disabled = explode(',', ini_get('disable_functions'));
+    return !in_array('exec', $disabled);
+}
+if ($exec_works() && ALLSKY_CONFIG == "XX_ALLSKY_CONFIG" . "_XX") {
 	// This file hasn't been updated yet after installation.
 	echo "<div style='font-size: 200%;'>";
 	echo "<span style='color: red'>";
