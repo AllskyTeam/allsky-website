@@ -1,7 +1,5 @@
-var usingNewVirtualSky = typeof S != "undefined" && typeof S.virtualsky == "function";	// ECC
+var usingNewVirtualSky = typeof S != "undefined" && typeof S.virtualsky == "function";
 console.log("usingNewVirtualSky=" + usingNewVirtualSky);
-//console.log("typeof S=" + typeof S);
-//console.log("typeof S.virtualsky=" + typeof S.virtualsky);
 
 var app = angular.module('allsky', ['ngLodash']);
 
@@ -65,7 +63,7 @@ function compile($compile) {
 	};
 }
 
-var config_not_set = false;	// Has the config.js file been updated by the user?
+var configNotSet = false;	// Has the config.js file been updated by the user?
 
 function AppCtrl($scope, $timeout, $http, _) {
 
@@ -80,7 +78,7 @@ function AppCtrl($scope, $timeout, $http, _) {
 	if ($scope.title == "XX_need_to_update_XX") {
 		// Could (or should?) check other variables for not being set.
 		// Or assume if the title is set, everything else is too.
-		config_not_set = true;
+		configNotSet = true;
 	}
 	$scope.location = config.location;
 	$scope.latitude = config.latitude;
@@ -110,6 +108,8 @@ function AppCtrl($scope, $timeout, $http, _) {
 	function isHidden() {
 		var prop = getHiddenProp();
 		if (!prop) return false;
+//return false; // xxxxxxxxx for testing, uncomment to make never hidden
+
 		return document[prop];
 	}
 
@@ -148,6 +148,7 @@ function AppCtrl($scope, $timeout, $http, _) {
 	// there's no need to check until nightfall.
 	// However, in case the image DOES change, check every minute.  Seems like a good compromise.
 	var auroraIntervalTimer = ((5/2) * 60 * 1000);
+//auroraIntervalTimer = 20 * 1000; // xxxxxxxxxxxxx shorter during testing
 	var auroraIntervalTimerShortened = (10 * 1000);	// seconds
 	var nonAuroraIntervalTimer = (60 * 1000);		// seconds
 	// When there is only this much time to nightime, shorten the timout value for quicker message updates.
@@ -160,7 +161,7 @@ function AppCtrl($scope, $timeout, $http, _) {
 		var url= "";
 		var imageClass= "";
 		if (! isHidden()) {
-			if (config_not_set) {
+			if (configNotSet) {
 				$scope.notification = formatMessage("Please update the 'config.js' file.<br>Replace the 'XX_need_to_update_XX' entries and check all other entries.<br>Refresh your browser when done.", type="error");
 			} else if (dataMissingMessage !== "") {
 				$scope.notification = formatMessage(dataMissingMessage, type = dataFileIsOld ? "warning": "error");
@@ -458,11 +459,11 @@ function AppCtrl($scope, $timeout, $http, _) {
 		$scope.showInfo = !$scope.showInfo;
 	};
 	
-	var overlayBuilt = false;	// xxxxxxxxxxxxx ECC
+	var overlayBuilt = false;	// has the overlay been built yet?
 	$scope.toggleOverlay = function () {
 		$scope.showOverlay = !$scope.showOverlay;
 
-	if (usingNewVirtualSky && ! overlayBuilt && $scope.showOverlay) {	// xxxxxxxxx ECC added "if" statement
+	if (usingNewVirtualSky && ! overlayBuilt && $scope.showOverlay) {
 		console.log("@@@@ Building overlay...");
 		overlayBuilt = true;
 		// The new 0.7.7 version of VirtualSky doesn't show the overlay unless buildOverlay() is called here.
@@ -491,7 +492,7 @@ function AppCtrl($scope, $timeout, $http, _) {
 	};
 
 	if ($scope.auroraForecast) {
-	$scope.getForecast = function () {
+		$scope.getForecast = function () {
 
 			function getSum(data, field) {
 				var total = _.sumBy(data, function (row) {
@@ -532,3 +533,4 @@ angular
 	.directive('compile', ['$compile', compile])
 	.controller("AppCtrl", ['$scope', '$timeout', '$http', 'lodash', AppCtrl])
 ;
+
