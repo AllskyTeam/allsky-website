@@ -1,5 +1,5 @@
 <?php
-$url = "http://services.swpc.noaa.gov/text/3-day-forecast.txt";
+$url = "https://services.swpc.noaa.gov/text/3-day-forecast.txt";
 // Don't want warning messages to go into the web log for things like the server is down.
 // We display a message to the user which is sufficient.
 error_reporting(E_ALL ^ E_WARNING);
