@@ -135,23 +135,30 @@ function AppCtrl($scope, $timeout, $http, _) {
 	}
 
 	// How old should the data file be, or the sunset time be, in order to warn the user?
-	// In the morning before a new file is uploaded, it'll be a day old so use a value at least greater than 1.
+	// In the morning before a new file is uploaded,
+	// it'll be a day old so use a value at least greater than 1.
 	const oldDataLimit = 2;
+
 	// The defaultInterval should ideally be based on the time between day and night images - why
 	// check every 5 seconds if new images only appear once a minute?
-	const defaultInterval = (5 * 1000);		// Time to wait between normal images.  READ ONLY
+	var defaultInterval = (5 * 1000);		// Time to wait between normal images.
+	if (config.intervalSeconds) defaultInterval = config.intervalSeconds * 1000;
+
 	var intervalTimer = defaultInterval;		// Amount of time we're currently waiting
 
 	// If we're not taking pictures during the day, we don't need to check for updated images as often.
-	// If we're displaying an aurora picture, it's only updated every 5 mintutes, so wait half that.
+	// If we're displaying an aurora picture, it's only updated every 5 mintutes.
 	// If we're not displaying an aurora picture the picture we ARE displaying doesn't change so
 	// there's no need to check until nightfall.
 	// However, in case the image DOES change, check every minute.  Seems like a good compromise.
-	var auroraIntervalTimer = ((5/2) * 60 * 1000);
-//auroraIntervalTimer = 20 * 1000; // xxxxxxxxxxxxx shorter during testing
-	var auroraIntervalTimerShortened = (10 * 1000);	// seconds
+	// Also, in both cases, if we wait too long, when the user returns to the web page after
+	// it being hidden, they'll have to wait a long time for the page to update.
+	var auroraIntervalTimer = (60 * 1000);			// seconds
+	var auroraIntervalTimerShortened = (15 * 1000);	// seconds
 	var nonAuroraIntervalTimer = (60 * 1000);		// seconds
-	// When there is only this much time to nightime, shorten the timout value for quicker message updates.
+
+	// When there is only this much time to nightime,
+	// shorten the timeout value for quicker message updates.
 	const startShortenedTimeout = (10 * 60 * 1000);	// minutes
 
 	var lastType = "";
@@ -162,9 +169,9 @@ function AppCtrl($scope, $timeout, $http, _) {
 		var imageClass= "";
 		if (! isHidden()) {
 			if (configNotSet) {
-				$scope.notification = formatMessage("Please update the 'config.js' file.<br>Replace the 'XX_need_to_update_XX' entries and check all other entries.<br>Refresh your browser when done.", type="error");
+				$scope.notification = formatMessage("Please update the 'config.js' file.<br>Replace the 'XX_need_to_update_XX' entries and check all other entries.<br>Refresh your browser when done.", msgType="error");
 			} else if (dataMissingMessage !== "") {
-				$scope.notification = formatMessage(dataMissingMessage, type = dataFileIsOld ? "warning": "error");
+				$scope.notification = formatMessage(dataMissingMessage, msgType = dataFileIsOld ? "warning": "error");
 			} else {
 				$scope.notification = "";
 			}
@@ -201,7 +208,7 @@ function AppCtrl($scope, $timeout, $http, _) {
 //console.log("DEBUG: sunset daysOld=" + daysOld);
 				if (daysOld > oldDataLimit) {
 					var oldMsg = "WARNING: sunset is " + daysOld + " days old.";
-					$scope.notification = formatMessage(oldMsg + "<br>Check Allsky log file if 'postData.sh' has been running successfully at the end of nighttime.", type="warning");
+					$scope.notification = formatMessage(oldMsg + "<br>Check Allsky log file if 'postData.sh' has been running successfully at the end of nighttime.", msgType="warning");
 				}
 			}
 
@@ -280,7 +287,7 @@ function AppCtrl($scope, $timeout, $http, _) {
 					s = seconds + " seconds";
 				else
 					s = h + m;
-				$scope.notification += formatMessage("It's not dark yet in " + config.location + ".&nbsp; &nbsp; Come back at " + time_to_come_back + " (" + s + ").", type="notice");
+				$scope.notification += formatMessage("It's not dark yet in " + config.location + ".&nbsp; &nbsp; Come back at " + time_to_come_back + " (" + s + ").", msgType="notice");
 
 				if (! loggedTimes) {
 					console.log("=== Resuming at nighttime in " + s);
@@ -533,4 +540,3 @@ angular
 	.directive('compile', ['$compile', compile])
 	.controller("AppCtrl", ['$scope', '$timeout', '$http', 'lodash', AppCtrl])
 ;
-
