@@ -1,4 +1,5 @@
 var config = {
+    comment: "See https://github.com/thomasjacquin/allsky/wiki/allsky-website-Settings for a description of these settings",
     title: "XX_need_to_update_XX",
     imageName: "/current/tmp/image.jpg",
     location: "XX_need_to_update_XX",
@@ -14,4 +15,5 @@ var config = {
     showOverlayAtStartup: false,
     auroraForecast: false,
     auroraMap: "XX_need_to_update_XX",
+    intervalSeconds: 10,
 }
