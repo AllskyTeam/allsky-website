@@ -1,3 +1,4 @@
+<?php include '../functions.php'; disableBuffering(); // must be first line ?>
 <html>
 	<head>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
@@ -6,9 +7,6 @@
 		<link href="../allsky.css" rel="stylesheet">
 	</head>
 	<body>
-		<?php
-		include '../functions.php';
-		display_thumbnails("Keogram");
-		?>
+		<?php display_thumbnails("Keogram"); ?>
 	</body>
 </html>
