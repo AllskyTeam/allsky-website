@@ -17,7 +17,7 @@ function exec_works() {
     $disabled = explode(',', ini_get('disable_functions'));
     return !in_array('exec', $disabled);
 }
-if ($exec_works() && ALLSKY_CONFIG == "XX_ALLSKY_CONFIG" . "_XX") {
+if (exec_works() && ALLSKY_CONFIG == "XX_ALLSKY_CONFIG" . "_XX") {
 	// This file hasn't been updated yet after installation.
 	echo "<div style='font-size: 200%;'>";
 	echo "<span style='color: red'>";
@@ -113,9 +113,8 @@ function make_thumb($src, $dest, $desired_width)
 // Similar to make_thumb() but using a video for the input file.
 function make_thumb_from_video($src, $dest, $desired_width)
 {
-	global $exec_works;
-	if (! $exec_works) {
-// echo "Can't make video thumbnail - exec_works=$exec_works";
+	if (! exec_works()) {
+// echo "Can't make video thumbnail - exec_works=" . exec_works();
 		return(false);
 	}
 
