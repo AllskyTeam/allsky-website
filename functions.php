@@ -3,20 +3,40 @@
 // On Pi's, this placeholder gets replaced with ${ALLSKY_CONFIG}.
 // On other machines it won't and references to it will silently fail.
 define('ALLSKY_CONFIG',  'XX_ALLSKY_CONFIG_XX');
+// The issue is how to determine if we're on a Pi without using
+// the exec() function which is often disabled on remote machines.
+// And we can't do @exec() to see if it works because that can
+// display a message in the user's browser window.
+// To avoid that message, assume if we're not on a Pi that exec() doesn't work.
+// TODO: make this a user setting if exec() works???
+// If you can think of a better way than to check for a hard-coded
+// path, please update the code.
 
 // If on a Pi, check that the placholder was replaced.
-exec("grep -q 'Model.*: Raspberry' /proc/cpuinfo", $none, $return);
-// Split the placeholder so it doesn't get replaced if the update script is run multiple times.
-// Note: return code 0 == a match, return code 1 == no match
-if ($return==0 && ALLSKY_CONFIG == "XX_ALLSKY_CONFIG" . "_XX") {
+function exec_works() {
+    $disabled = explode(',', ini_get('disable_functions'));
+    return !in_array('exec', $disabled);
+}
+if (exec_works() && ALLSKY_CONFIG == "XX_ALLSKY_CONFIG" . "_XX") {
 	// This file hasn't been updated yet after installation.
 	echo "<div style='font-size: 200%;'>";
 	echo "<span style='color: red'>";
 	echo "Please run the following from the 'allsky' directory before using the Website:";
 	echo "</span>";
-	echo "<code>   website/install.sh --update</code>";
+	echo "<br><br><code>   website/install.sh --update</code>";
 	echo "</div>";
 	exit;
+}
+
+/*
+ * Disable buffering.
+*/
+function disableBuffering() {
+	ini_set('output_buffering', false);
+	ini_set('implicit_flush', true);
+	ob_implicit_flush(true);
+	for ($i = 0; $i < ob_get_level(); $i++)
+		ob_end_clean();
 }
 
 /**
@@ -93,6 +113,9 @@ function make_thumb($src, $dest, $desired_width)
  	imagejpeg($virtual_image, $dest);
 
 	if (file_exists($dest)) {
+		// flush so user sees thumbnails as they are created, instead of waiting for them all.
+		// echo "<br>flushing after $dest:";
+		flush();
 		return(true);
 	} else {
 		echo "<p>Unable to create thumbnail for '$src'.</p>";
@@ -102,13 +125,35 @@ function make_thumb($src, $dest, $desired_width)
 }
 
 // Similar to make_thumb() but using a video for the input file.
-function make_thumb_from_video($src, $dest, $desired_width)
+function make_thumb_from_video($src, $dest, $desired_width, $attempts)
 {
-	// start 5 seconds in to skip any auto-exposure changes at the beginning.  This of course assumes the video is at least 5 sec long.
+	if (! exec_works()) {
+// echo "Can't make video thumbnail - exec_works=" . exec_works();
+		return(false);
+	}
+
+	// Start 5 seconds in to skip any auto-exposure changes at the beginning.
+	// This of course assumes the video is at least 5 sec long.  If it's not, we won't be able
+	// to create a thumbnail, so call ourselfs a second time using 1 second.
+	// If the file is less than 1 second long, well, too bad.
 	// "-1" scales the height to the original aspect ratio.
-	exec("ffmpeg -ss 00:00:05 -i '$src' -frames:v 1 -filter:v scale='$desired_width:-1' -frames:v 1 '$dest'");
-	if (file_exists($dest)) return(true);
-	else return(false);
+	if ($attempts === 1)
+		$sec = "05";
+	else
+		$sec = "00";
+	$command = "ffmpeg -ss 00:00:$sec -i '$src' -frames:v 1 -filter:v scale='$desired_width:-1' -frames:v 1 '$dest'";
+	exec($command);
+	if (file_exists($dest)) {
+		return(true);
+	}
+
+//echo "<br>Attempt $attempts: Failed to make thumbnail for $src using $sec seconds:<br>$command";
+	if ($attempts >= 2) {
+		echo "<br>Failed to make thumbnail for $src after $attempts attempts.<br>";
+		return(false);
+	}
+
+	return make_thumb_from_video($src, $dest, $desired_width, $attempts+1);
 }
 
 // Display thumbnails with links to the full-size files
@@ -118,19 +163,24 @@ $back_button = "<a class='back-button' href='..'><i class='fa fa-chevron-left'><
 function display_thumbnails($image_type)
 {
 	global $back_button;
-	$image_type_len = strlen($image_type);
+	// The name of the timelapse video file is "allsky-yyyymmdd.xxx" but the $image_type is "Timelapse" which is more meaningful for users.
+	// For startrails and keograms, the prefix and the $image_type are the same.
 	if ($image_type == "Timelapse") {
+		$file_prefix = "allsky";
 		$ext = "/\.(mp4|webm)$/";
 	} else {
+		$file_prefix = $image_type;
 		$ext = "/\.(jpg|jpeg|png)$/";
 	}
+	$file_prefix_len = strlen($file_prefix);
+		
 
 	$num_files = 0;
 	$files = array();
 	if ($handle = opendir('.')) {
 		while (false !== ($entry = readdir($handle))) {
 			if ( preg_match( $ext, $entry ) ) {
-				$files[] = $entry;;
+				$files[] = $entry;
 				$num_files++;
 			}
 		}
@@ -151,7 +201,7 @@ function display_thumbnails($image_type)
 	}
 
 	echo $back_button;
-	echo "<div class=archived-videos>";
+	echo "<div class=archived-videos>\n";
 
 	$thumbnailSizeX = get_variable(ALLSKY_CONFIG .'/config.sh', 'THUMBNAILSIZE_X=', '100');
 	foreach ($files as $file) {
@@ -159,7 +209,7 @@ function display_thumbnails($image_type)
 		$thumbnail = preg_replace($ext, ".jpg", "thumbnails/$file");
 		if (! file_exists($thumbnail)) {
 			if ($image_type == "Timelapse") {
-				if (! make_thumb_from_video($file, $thumbnail, $thumbnailSizeX)) {
+				if (! make_thumb_from_video($file, $thumbnail, $thumbnailSizeX, 1)) {
 					// We can't use the video file as a thumbnail
 					$thumbnail = "../NoThumbnail.png";
 				}
@@ -170,13 +220,17 @@ function display_thumbnails($image_type)
 					$thumbnail = "./$file";
 				}
 			}
+			// flush so user sees thumbnails as they are created, instead of waiting for them all.
+			//echo "<br>flushing after $file:";
+			flush();
 		}
-		$year = substr($file, $image_type_len + 1, 4);
-		$month = substr($file, $image_type_len + 5, 2);
-		$day = substr($file, $image_type_len + 7, 2);
+		$year = substr($file, $file_prefix_len + 1, 4);
+		$month = substr($file, $file_prefix_len + 5, 2);
+		$day = substr($file, $file_prefix_len + 7, 2);
 		$date = $year.$month.$day;
-		echo "<a href='./$file'><div class='day-container'><div class='image-container'><img id=".$date." src='$thumbnail' title='$image_type-$year-$month-$day'/></div><div class='day-text'>$year-$month-$day</div></div></a>";
+		echo "<a href='./$file'><div class='day-container'><div class='image-container'><img id=".$date." src='$thumbnail' title='$file_prefix-$year-$month-$day'/></div><div class='day-text'>$year-$month-$day</div></div></a>\n";
 	}
 	echo "</div>";
 }
 ?>
+
