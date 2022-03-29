@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html prefix="og: http://ogp.me/ns#" ng-app="allsky" ng-controller="AppCtrl">
+<html prefix="og: http://ogp.me/ns#" ng-app="allsky" ng-controller="AppCtrl" lang="en">
 <head>
 	<title>Allsky - {{title}}</title>
 	<meta property="og:title" content="All Sky Camera" />
@@ -48,6 +48,7 @@
 			<li><i class="fa fa-fw fa-map-marker"></i>Latitude: <span>{{latitude < 0 ? latitude * -1 + 'S' : latitude + 'N'}}</span></li>
 			<li><i class="fa fa-fw fa-map-marker"></i>Longitude: <span>{{longitude < 0 ? longitude * -1 + 'W' : longitude + 'E'}}</span></li>
 			<li><i class="fa fa-fw fa-camera"></i>Camera: <span>{{camera}}</span></li>
+			<li><i class="fa fa-fw fa-eye"></i>Lens: <span>{{lens}}</span></li>
 			<li><i class="fa fa-fw fa-gears"></i>Computer: <span>{{computer}}</span></li>
 			<li><i class="fa fa-fw fa-user"></i>Owner: <span>{{owner}}</span></li>
 		</ul>
@@ -62,18 +63,16 @@
 		<li><i class="fa fa-2x fa-fw fa-camera" title="Information about the camera" ng-click="toggleInfo()" ng-class="{'active': showInfo}" style="margin-top: 5px; font-size: 1.9em"></i></li>	
 	</ul>
 
-	<a href="{{imageName}}">
-		<div id="imageContainer">
-			<div id="starmap_container" ng-show="showOverlay==true">
-				<div id="starmap"></div>
-			</div>
-			<div id="live_container">
-				<img id="current" class="current" src="loading.jpg">
-			</div>
+	<div id="imageContainer">
+		<div id="starmap_container" ng-show="showOverlay==true">
+			<div id="starmap"></div>
 		</div>
-	</a>
+		<div id="live_container">
+			<img title="allsky image" alt="allsky image" id="current" class="current" src="loading.jpg">
+		</div>
+	</div>
 	
-	<div class="diy"><a href="http://thomasjacquin.com/make-your-own-allsky-camera"><i class="fa fa-gear"></i> Make Your Own</div>
+	<div class="diy"><a href="http://thomasjacquin.com/make-your-own-allsky-camera"><i class="fa fa-gear"></i> Make Your Own</a></div>
 
 	<script src="analyticsTracking.js"></script>
 </body>
