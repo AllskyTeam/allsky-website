@@ -84,6 +84,7 @@ function AppCtrl($scope, $timeout, $http, _) {
 	$scope.latitude = config.latitude;
 	$scope.longitude = config.longitude;
 	$scope.camera = config.camera;
+	$scope.lens = config.lens;
 	$scope.computer = config.computer;
 	$scope.owner = config.owner;
 	$scope.auroraForecast = config.auroraForecast;
