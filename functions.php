@@ -3,20 +3,30 @@
 // On Pi's, this placeholder gets replaced with ${ALLSKY_CONFIG}.
 // On other machines it won't and references to it will silently fail.
 define('ALLSKY_CONFIG',  'XX_ALLSKY_CONFIG_XX');
+// The issue is how to determine if we're on a Pi without using
+// the exec() function which is often disabled on remote machines.
+// And we can't do @exec() to see if it works because that can
+// display a message in the user's browser window.
 
 // If on a Pi, check that the placholder was replaced.
-exec("grep -q 'Model.*: Raspberry' /proc/cpuinfo", $none, $return);
-// Split the placeholder so it doesn't get replaced if the update script is run multiple times.
-// Note: return code 0 == a match, return code 1 == no match
-if ($return==0 && ALLSKY_CONFIG == "XX_ALLSKY_CONFIG" . "_XX") {
+$isarm = preg_match("/(arm|aarch)/",php_uname());
+if ($isarm && ALLSKY_CONFIG == "XX_ALLSKY_CONFIG" . "_XX") {
 	// This file hasn't been updated yet after installation.
 	echo "<div style='font-size: 200%;'>";
 	echo "<span style='color: red'>";
 	echo "Please run the following from the 'allsky' directory before using the Website:";
 	echo "</span>";
-	echo "<code>   website/install.sh --update</code>";
+	echo "<br><br><code>   website/install.sh --update</code>";
 	echo "</div>";
 	exit;
+}
+
+/*
+ * Does the exec() function work?  It's needed to make thumbnails from video files.
+*/
+function exec_works() {
+    $disabled = explode(',', ini_get('disable_functions'));
+    return !in_array('exec', $disabled);
 }
 
 /**
@@ -104,6 +114,11 @@ function make_thumb($src, $dest, $desired_width)
 // Similar to make_thumb() but using a video for the input file.
 function make_thumb_from_video($src, $dest, $desired_width)
 {
+	if (! exec_works()) {
+// echo "Can't make video thumbnail - exec_works=" . exec_works();
+		return(false);
+	}
+
 	// start 5 seconds in to skip any auto-exposure changes at the beginning.  This of course assumes the video is at least 5 sec long.
 	// "-1" scales the height to the original aspect ratio.
 	exec("ffmpeg -ss 00:00:05 -i '$src' -frames:v 1 -filter:v scale='$desired_width:-1' -frames:v 1 '$dest'");
@@ -118,19 +133,24 @@ $back_button = "<a class='back-button' href='..'><i class='fa fa-chevron-left'><
 function display_thumbnails($image_type)
 {
 	global $back_button;
-	$image_type_len = strlen($image_type);
+	// The name of the timelapse video file is "allsky-yyyymmdd.xxx" but the $image_type is "Timelapse" which is more meaningful for users.
+	// For startrails and keograms, the prefix and the $image_type are the same.
 	if ($image_type == "Timelapse") {
+		$file_prefix = "allsky";
 		$ext = "/\.(mp4|webm)$/";
 	} else {
+		$file_prefix = $image_type;
 		$ext = "/\.(jpg|jpeg|png)$/";
 	}
+	$file_prefix_len = strlen($file_prefix);
+		
 
 	$num_files = 0;
 	$files = array();
 	if ($handle = opendir('.')) {
 		while (false !== ($entry = readdir($handle))) {
 			if ( preg_match( $ext, $entry ) ) {
-				$files[] = $entry;;
+				$files[] = $entry;
 				$num_files++;
 			}
 		}
@@ -171,11 +191,11 @@ function display_thumbnails($image_type)
 				}
 			}
 		}
-		$year = substr($file, $image_type_len + 1, 4);
-		$month = substr($file, $image_type_len + 5, 2);
-		$day = substr($file, $image_type_len + 7, 2);
+		$year = substr($file, $file_prefix_len + 1, 4);
+		$month = substr($file, $file_prefix_len + 5, 2);
+		$day = substr($file, $file_prefix_len + 7, 2);
 		$date = $year.$month.$day;
-		echo "<a href='./$file'><div class='day-container'><div class='image-container'><img id=".$date." src='$thumbnail' title='$image_type-$year-$month-$day'/></div><div class='day-text'>$year-$month-$day</div></div></a>";
+		echo "<a href='./$file'><div class='day-container'><div class='image-container'><img id=".$date." src='$thumbnail' title='$file_prefix-$year-$month-$day'/></div><div class='day-text'>$year-$month-$day</div></div></a>";
 	}
 	echo "</div>";
 }
