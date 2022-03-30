@@ -7,15 +7,21 @@
 	"constellations": true,
 	"mouse": false,
 	"gridlines_eq": true,
+	"gridlineswidth": 0.75",
 	"keyboard": false,
 	"showdate": false,
 	"showposition": false,
 	"constellationlabels": true,
+	"constellationboundaries": false,
+	"constellationwidth": 0.75,
+	"constellationboundarieswidth": 0.75,
 	"sky_gradient": false,
 	"gradient": false,
 	"transparent": true,
 	"showgalaxy": true,
+	"galaxywidth": 0.75,
 	"live": true,
 	"lang": "en",
-	"objects": "messier.json"
+	"objects": "virtualsky/messier.json",
+	"opacity": 0.5
 }
