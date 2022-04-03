@@ -198,7 +198,7 @@ function display_thumbnails($image_type)
 	asort($files);
 	
 	if (! is_dir('thumbnails')) {
-		if (! mkdir('thumbnails', 0755))
+		if (! mkdir('thumbnails', 0775))
 			echo "<p>Unable to make 'thumbnails' directory. You will need to create it manually.</p>";
 			print_r(error_get_last());
 	}
