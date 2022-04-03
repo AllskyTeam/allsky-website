@@ -7,17 +7,12 @@ define('ALLSKY_CONFIG',  'XX_ALLSKY_CONFIG_XX');
 // the exec() function which is often disabled on remote machines.
 // And we can't do @exec() to see if it works because that can
 // display a message in the user's browser window.
-// To avoid that message, assume if we're not on a Pi that exec() doesn't work.
-// TODO: make this a user setting if exec() works???
-// If you can think of a better way than to check for a hard-coded
-// path, please update the code.
+// Checking if exec() is disabled doesn't always work, for example on a user's NAS
+// the function isn't disabled, but the website isn't on a Pi.
 
 // If on a Pi, check that the placholder was replaced.
-function exec_works() {
-    $disabled = explode(',', ini_get('disable_functions'));
-    return !in_array('exec', $disabled);
-}
-if (exec_works() && ALLSKY_CONFIG == "XX_ALLSKY_CONFIG" . "_XX") {
+$isarm = preg_match("/(arm|aarch)/",php_uname());
+if ($isarm && ALLSKY_CONFIG == "XX_ALLSKY_CONFIG" . "_XX") {
 	// This file hasn't been updated yet after installation.
 	echo "<div style='font-size: 200%;'>";
 	echo "<span style='color: red'>";
@@ -26,6 +21,14 @@ if (exec_works() && ALLSKY_CONFIG == "XX_ALLSKY_CONFIG" . "_XX") {
 	echo "<br><br><code>   website/install.sh --update</code>";
 	echo "</div>";
 	exit;
+}
+
+/*
+ * Does the exec() function work?  It's needed to make thumbnails from video files.
+*/
+function exec_works() {
+    $disabled = explode(',', ini_get('disable_functions'));
+    return !in_array('exec', $disabled);
 }
 
 /*
@@ -112,10 +115,10 @@ function make_thumb($src, $dest, $desired_width)
 	/* create the physical thumbnail image to its destination */
  	imagejpeg($virtual_image, $dest);
 
+	// flush so user sees thumbnails as they are created, instead of waiting for them all.
+	// echo "<br>flushing after $dest:";
+	flush();	// flush even if we couldn't make the thumbnail so the user sees this file immediately.
 	if (file_exists($dest)) {
-		// flush so user sees thumbnails as they are created, instead of waiting for them all.
-		// echo "<br>flushing after $dest:";
-		flush();
 		return(true);
 	} else {
 		echo "<p>Unable to create thumbnail for '$src'.</p>";
@@ -233,4 +236,3 @@ function display_thumbnails($image_type)
 	echo "</div>";
 }
 ?>
-
