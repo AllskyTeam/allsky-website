@@ -113,6 +113,28 @@ img.current {
 	color: white;
 }
 
+.noImages {
+	text-align: center;
+	font-size: 200%;
+	color: yellow;
+	border: 2px solid gray;
+	margin: 4px;
+}
+
+.imagesHeader {	/* the whole table */
+	width: 100%;
+	padding: 5px 5px 20px 20px;
+}
+.imagesHeader .headerButton {
+	text-align: left;
+	width: 5%;	/* want headerTitle to be as wide as possible */
+}
+.imagesHeader .headerTitle {
+	text-align: center;
+	font-weight: bold;
+	font-size: 150%;
+}
+
 .back-button {
 	text-decoration: none;
 	margin: 5px;
@@ -120,7 +142,7 @@ img.current {
 	color: white;
 	background-color: #5D5D5D;
 	border-radius: 5px;
-	display: inline-block;
+	white-space: nowrap;
 }
 
 .back-button i {
