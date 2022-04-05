@@ -153,6 +153,7 @@ function make_thumb_from_video($src, $dest, $desired_width, $attempts)
 //echo "<br>Attempt $attempts: Failed to make thumbnail for $src using $sec seconds:<br>$command";
 	if ($attempts >= 2) {
 		echo "<br>Failed to make thumbnail for $src after $attempts attempts.<br>";
+		echo "Last command: $command";
 		return(false);
 	}
 
