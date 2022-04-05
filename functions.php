@@ -191,7 +191,7 @@ function display_thumbnails($image_type)
 		closedir($handle);
 	}
 	if ($num_files == 0) {
-		echo $back_button;
+		echo "<p>$back_button</p>";
 		echo "<div style='text-align: center; font-size: 200%; color: yellow; border: 2px solid gray'>No $image_type images</div>";
 		return;
 	}
@@ -204,7 +204,7 @@ function display_thumbnails($image_type)
 			print_r(error_get_last());
 	}
 
-	echo $back_button;
+	echo "<table class='imagesHeader'><tr><td class='headerButton'>$back_button</td> <td class='headerTitle'>$image_type</td></tr></table>";
 	echo "<div class=archived-videos>\n";
 
 	$thumbnailSizeX = get_variable(ALLSKY_CONFIG .'/config.sh', 'THUMBNAILSIZE_X=', '100');
