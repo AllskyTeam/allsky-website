@@ -144,7 +144,7 @@ function make_thumb_from_video($src, $dest, $desired_width, $attempts)
 		$sec = "05";
 	else
 		$sec = "00";
-	$command = "ffmpeg -ss 00:00:$sec -i '$src' -frames:v 1 -filter:v scale='$desired_width:-1' -frames:v 1 '$dest'";
+	$command = "ffmpeg -ss 00:00:$sec -i '$src' -filter:v scale='$desired_width:-1' -frames:v 1 '$dest'";
 	exec($command);
 	if (file_exists($dest)) {
 		return(true);
