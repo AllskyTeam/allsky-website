@@ -7,17 +7,12 @@ define('ALLSKY_CONFIG',  'XX_ALLSKY_CONFIG_XX');
 // the exec() function which is often disabled on remote machines.
 // And we can't do @exec() to see if it works because that can
 // display a message in the user's browser window.
-// To avoid that message, assume if we're not on a Pi that exec() doesn't work.
-// TODO: make this a user setting if exec() works???
-// If you can think of a better way than to check for a hard-coded
-// path, please update the code.
+// Checking if exec() is disabled doesn't always work, for example on a user's NAS
+// the function isn't disabled, but the website isn't on a Pi.
 
 // If on a Pi, check that the placholder was replaced.
-function exec_works() {
-    $disabled = explode(',', ini_get('disable_functions'));
-    return !in_array('exec', $disabled);
-}
-if (exec_works() && ALLSKY_CONFIG == "XX_ALLSKY_CONFIG" . "_XX") {
+$isarm = preg_match("/(arm|aarch)/",php_uname());
+if ($isarm && ALLSKY_CONFIG == "XX_ALLSKY_CONFIG" . "_XX") {
 	// This file hasn't been updated yet after installation.
 	echo "<div style='font-size: 200%;'>";
 	echo "<span style='color: red'>";
@@ -26,6 +21,14 @@ if (exec_works() && ALLSKY_CONFIG == "XX_ALLSKY_CONFIG" . "_XX") {
 	echo "<br><br><code>   website/install.sh --update</code>";
 	echo "</div>";
 	exit;
+}
+
+/*
+ * Does the exec() function work?  It's needed to make thumbnails from video files.
+*/
+function exec_works() {
+    $disabled = explode(',', ini_get('disable_functions'));
+    return !in_array('exec', $disabled);
 }
 
 /*
@@ -112,10 +115,10 @@ function make_thumb($src, $dest, $desired_width)
 	/* create the physical thumbnail image to its destination */
  	imagejpeg($virtual_image, $dest);
 
+	// flush so user sees thumbnails as they are created, instead of waiting for them all.
+	// echo "<br>flushing after $dest:";
+	flush();	// flush even if we couldn't make the thumbnail so the user sees this file immediately.
 	if (file_exists($dest)) {
-		// flush so user sees thumbnails as they are created, instead of waiting for them all.
-		// echo "<br>flushing after $dest:";
-		flush();
 		return(true);
 	} else {
 		echo "<p>Unable to create thumbnail for '$src'.</p>";
@@ -141,7 +144,7 @@ function make_thumb_from_video($src, $dest, $desired_width, $attempts)
 		$sec = "05";
 	else
 		$sec = "00";
-	$command = "ffmpeg -ss 00:00:$sec -i '$src' -frames:v 1 -filter:v scale='$desired_width:-1' -frames:v 1 '$dest'";
+	$command = "ffmpeg -ss 00:00:$sec -i '$src' -filter:v scale='$desired_width:-1' -frames:v 1 '$dest'";
 	exec($command);
 	if (file_exists($dest)) {
 		return(true);
@@ -150,6 +153,7 @@ function make_thumb_from_video($src, $dest, $desired_width, $attempts)
 //echo "<br>Attempt $attempts: Failed to make thumbnail for $src using $sec seconds:<br>$command";
 	if ($attempts >= 2) {
 		echo "<br>Failed to make thumbnail for $src after $attempts attempts.<br>";
+		echo "Last command: $command";
 		return(false);
 	}
 
@@ -159,7 +163,7 @@ function make_thumb_from_video($src, $dest, $desired_width, $attempts)
 // Display thumbnails with links to the full-size files
 // for startrails, keograms, and videos.
 // The function to make thumbnails for videos is different
-$back_button = "<a class='back-button' href='..'><i class='fa fa-chevron-left'></i>Back to Live View</a>";
+$back_button = "<a class='back-button' href='..'><i class='fa fa-chevron-left'></i>&nbsp; Back to Live View</a>";
 function display_thumbnails($image_type)
 {
 	global $back_button;
@@ -187,20 +191,20 @@ function display_thumbnails($image_type)
 		closedir($handle);
 	}
 	if ($num_files == 0) {
-		echo $back_button;
-		echo "<div style='text-align: center; font-size: 200%; color: yellow; border: 2px solid gray'>No $image_type images</div>";
+		echo "<p>$back_button</p>";
+		echo "<div class='noImages'>No $image_type images</div>";
 		return;
 	}
 
 	asort($files);
 	
 	if (! is_dir('thumbnails')) {
-		if (! mkdir('thumbnails', 0755))
+		if (! mkdir('thumbnails', 0775))
 			echo "<p>Unable to make 'thumbnails' directory. You will need to create it manually.</p>";
 			print_r(error_get_last());
 	}
 
-	echo $back_button;
+	echo "<table class='imagesHeader'><tr><td class='headerButton'>$back_button</td> <td class='headerTitle'>$image_type</td></tr></table>";
 	echo "<div class=archived-videos>\n";
 
 	$thumbnailSizeX = get_variable(ALLSKY_CONFIG .'/config.sh', 'THUMBNAILSIZE_X=', '100');
@@ -233,4 +237,3 @@ function display_thumbnails($image_type)
 	echo "</div>";
 }
 ?>
-
