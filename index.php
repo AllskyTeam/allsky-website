@@ -74,6 +74,8 @@
 	
 	<div class="diy"><a href="http://thomasjacquin.com/make-your-own-allsky-camera"><i class="fa fa-gear"></i> Make Your Own</a></div>
 
+<?php if (file_exists("analyticsTracking.js") && filesize("analyticsTracking.js") > 50) { ?>
 	<script src="analyticsTracking.js"></script>
+<?php } ?>
 </body>
 </html>
