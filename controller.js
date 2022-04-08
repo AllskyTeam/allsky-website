@@ -66,13 +66,21 @@ function compile($compile) {
 var configNotSet = false;	// Has the config.js file been updated by the user?
 
 function AppCtrl($scope, $timeout, $http, _) {
+	var overlayBuilt = false;	// has the overlay been built yet?
 
-	if (! usingNewVirtualSky)
+	if (! usingNewVirtualSky) {
+		overlayBuilt = true;
 		buildOverlay();
+	}
 
 	$scope.imageURL = "loading.jpg";
 	$scope.showInfo = false;
 	$scope.showOverlay = config.showOverlayAtStartup;
+	if ($scope.showOverlay && usingNewVirtualSky) {
+		overlayBuilt = true;
+		console.log("@@ Building overlay...");
+		buildOverlay();
+	}
 	$scope.notification = "";
 	$scope.title = config.title;
 	if ($scope.title == "XX_need_to_update_XX") {
@@ -466,7 +474,6 @@ function AppCtrl($scope, $timeout, $http, _) {
 		$scope.showInfo = !$scope.showInfo;
 	};
 	
-	var overlayBuilt = false;	// has the overlay been built yet?
 	$scope.toggleOverlay = function () {
 		$scope.showOverlay = !$scope.showOverlay;
 
