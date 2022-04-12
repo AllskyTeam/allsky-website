@@ -18,5 +18,5 @@ var config = {
 	showOverlayAtStartup: false,
 	auroraForecast: false,
 	auroraMap: "XX_need_to_update_XX",
-	intervalSeconds: 10,
+	intervalSeconds: 5,
 }
