@@ -197,14 +197,6 @@ function AppCtrl($scope, $timeout, $http, _) {
 			var beforeSunriseTime = m_nowTime < m_sunriseTime;
 			var afterSunsetTime = m_nowTime > m_sunsetTime;
 
-// Once set to false, beforeSunrise will stay FALSE until we re-read the data.json file.
-// Once set to true, afterSunset will stay TRUE until we re-read the data.json file.
-// This means is_nighttime will remain true until we re-read the file.
-// XXXX compare times only, not with date??
-	// OLD WAY:
-			var beforeSunrise = $scope.sunrise && moment($scope.sunrise).isAfter(m_now);
-			var afterSunset = moment($scope.sunset).isBefore(m_now);
-
 			// Check if the sunset time is too old.
 			// If the data file is old, don't bother checking sunset time since it'll be old too.
 			// However, we may need "daysOld" below so calculate it.
@@ -228,7 +220,6 @@ function AppCtrl($scope, $timeout, $http, _) {
 			// it's after sunset (e.g., 9 pm and sunset is 8 pm).
 			// Both only work if we're in the same day.
 			var is_nighttime;
-//xxxxxxxxxxxxxxxxx if (beforeSunrise || afterSunset) {
 			if (beforeSunriseTime || afterSunsetTime) {
 				// sunrise is in the future so it's currently nighttime
 				is_nighttime = true;
@@ -320,14 +311,12 @@ function AppCtrl($scope, $timeout, $http, _) {
 			if (! loggedTimes) {		// for debugging
 				loggedTimes = true;
 				console.log("  m_now = " + m_now.format("YYYY-MM-DD HH:mm:ss"));
-				console.log("  before sunrise = " + beforeSunrise);
-				console.log("  after sunset = " + afterSunset);
 				if (oldMsg !== "") console.log("    > " + oldMsg);
 
-				console.log("  ## Times:");
-				console.log("     m_now="+m_nowTime + ", m_sunrise="+m_sunriseTime + ", m_sunset="+m_sunsetTime);
-				console.log("  ## beforeSunriseTime = " + beforeSunriseTime);
-				console.log("  ## afterSunsetTime = " + afterSunsetTime);
+				console.log("  Times:");
+				console.log("  m_now="+m_nowTime + ", m_sunrise="+m_sunriseTime + ", m_sunset="+m_sunsetTime);
+				console.log("  beforeSunriseTime = " + beforeSunriseTime);
+				console.log("  afterSunsetTime = " + afterSunsetTime);
 			}
 
 			var img = $("<img />").attr('src', url + '?_ts=' + new Date().getTime()).addClass(imageClass)
