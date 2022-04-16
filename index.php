@@ -7,7 +7,7 @@
 	<meta property="og:url" content="http://www.thomasjacquin/allsky/" />
 	<meta property="og:image" content="http://www.thomasjacquin.com/allsky/image.jpg" />
 	<link rel="shortcut icon" type="image/png" href="allsky-favicon.png">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
 		integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
 	<link href='https://fonts.googleapis.com/css?family=Ubuntu:400,300' rel='stylesheet' type='text/css'>
@@ -41,13 +41,13 @@
 	</div>
 	<div class="info animated slideInRight" ng-show="showInfo==true">
 		<ul>
-			<li><i class="fa fa-fw fa-map"></i>Location: <span>{{location}}</span></li>
+			<li><i class="fa fa-fw fa-map-marker-alt"></i>&nbsp; Location: <span>{{location}}</span></li>
 			<li><i class="fa fa-fw fa-map-marker"></i>Latitude: <span>{{latitude < 0 ? latitude * -1 + 'S' : latitude + 'N'}}</span></li>
 			<li><i class="fa fa-fw fa-map-marker"></i>Longitude: <span>{{longitude < 0 ? longitude * -1 + 'W' : longitude + 'E'}}</span></li>
-			<li><i class="fa fa-fw fa-camera"></i>Camera: <span>{{camera}}</span></li>
-			<li><i class="fa fa-fw fa-eye"></i>Lens: <span>{{lens}}</span></li>
-			<li><i class="fa fa-fw fa-gears"></i>Computer: <span>{{computer}}</span></li>
-			<li><i class="fa fa-fw fa-user"></i>Owner: <span>{{owner}}</span></li>
+			<li><i class="fa fa-fw fa-camera-retro"></i>&nbsp; Camera: <span>{{camera}}</span></li>
+			<li><i class="fa fa-fw fa-dot-circle"></i>&nbsp; Lens: <span>{{lens}}</span></li>
+			<li><i class="fa fa-fw fa-microchip"></i>&nbsp; Computer: <span>{{computer}}</span></li>
+			<li><i class="fa fa-fw fa-user"></i>&nbsp; Owner: <span>{{owner}}</span></li>
 		</ul>
 	</div>
 	<span class="notification" compile="notification"></span>
@@ -56,7 +56,7 @@
 		<li><i class="fa fa-2x fa-fw allsky-constellation" id="overlayBtn" title="Show constellations overlay" ng-click="toggleOverlay()" ng-class="{'active': showOverlay}"></i></li>
 		<li><a href="videos" title="Archived Timelapses"><i class="fa fa-2x fa-fw fa-play-circle"></i></a></li>
 		<li><a href="keograms" title="Archived Keograms"><i class="fa fa-2x fa-fw fa-barcode"></i></a></li>
-		<li><a href="startrails" title="Archived Startrails"><i class="fa fa-2x fa-fw fa-circle-o-notch"></i></a></li>
+		<li><a href="startrails" title="Archived Startrails"><i class="fa fa-2x fa-fw fa-circle-notch"></i></a></li>
 		<li><i class="fa fa-2x fa-fw fa-camera" title="Information about the camera" ng-click="toggleInfo()" ng-class="{'active': showInfo}" style="margin-top: 5px; font-size: 1.9em"></i></li>	
 	</ul>
 
