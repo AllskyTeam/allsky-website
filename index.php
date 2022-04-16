@@ -70,7 +70,9 @@
 	
 	<div class="diy"><a href="http://thomasjacquin.com/make-your-own-allsky-camera"><i class="fa fa-gear"></i> Make Your Own</a></div>
 
-<?php if (file_exists("analyticsTracking.js") && filesize("analyticsTracking.js") > 50) { ?>
+<?php if (file_exists("analyticsTracking.js") && filesize("analyticsTracking.js") > 50) {
+	// The initial analyticsTracking.js file has a comment line "//Include your Google Analytics code here" which is < 50 characters.
+?>
 	<script src="analyticsTracking.js"></script>
 <?php } ?>
 </body>
