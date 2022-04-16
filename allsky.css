@@ -94,7 +94,6 @@ img.current {
 
 #starmap_container {
 	position: absolute;
-	opacity: 0.45;
 	overflow: hidden;
 	height: 720px;		/* Optionally change or delete to change size of image */
 }
