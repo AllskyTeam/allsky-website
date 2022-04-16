@@ -11,8 +11,7 @@
 <?php if (file_exists("../analyticsTracking.js") && filesize("../analyticsTracking.js") > 50) { ?>
 		<script src="../analyticsTracking.js"></script>
 <?php } ?>
-		<!-- Font Awesome -->
-		<script defer src="../js/font-awesome.js"></script>
+		<script defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
 		<link href="../allsky.css" rel="stylesheet">
 	</head>
 	<body>
