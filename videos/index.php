@@ -1,11 +1,12 @@
 <?php include '../functions.php'; disableBuffering(); // must be first line ?>
+<?php $type = "Timelapse"; ?>
 <!DOCTYPE html>
 <html lang="en">
 	<head>
 		<meta http-equiv="Content-Type" content="text/html" />
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="shortcut icon" type="image/png" href="../allsky-favicon.png">
-		<title>Timelapse Videos</title>
+		<title><?php echo $type; ?></title>
 
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
 <?php if (file_exists("../analyticsTracking.js") && filesize("../analyticsTracking.js") > 50) { ?>
@@ -15,6 +16,6 @@
 		<link href="../allsky.css" rel="stylesheet">
 	</head>
 	<body>
-		<?php display_thumbnails("Timelapse"); ?>
+		<?php display_thumbnails($type); ?>
 	</body>
 </html>
