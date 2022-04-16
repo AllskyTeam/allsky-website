@@ -21,7 +21,6 @@
 		crossorigin="anonymous"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
 	<script src="moment.js" type="text/javascript"></script>
-	<!--[if lt IE 9]><script src="virtualsky/excanvas.min.js"></script><![endif]-->
 	<script src="virtualsky/stuquery.js" type="text/javascript"></script>
 	<script src="virtualsky/virtualsky.js" type="text/javascript"></script>
 	<script src="ng-lodash.min.js"></script>
