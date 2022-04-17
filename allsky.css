@@ -148,28 +148,46 @@ img.current {
 	margin-right: 5px;
 }
 
-.archived-videos {
+.archived-files {
 }
 
-.archived-videos .day-container{
-	width: 10%;
-	min-width: 100px;
+.archived-files .day-container{
+	/* width: 10%; */
+	min-width: 100px;	/* same as thumbnail width */
 	float: left;
-	padding: 10px;
+	padding: 8px;
 	text-align: center;	/* so text is centered below thumbnail */
 }
 
-.archived-videos .day-container .day-text {
+.archived-files .img-text {
+	border: 1px solid #333;
+}
+
+.archived-files .day-container .day-text {
+	padding-top: 2px;
 	color: #7777ff;
 }
 
-.archived-videos .day-container .image-container {
-	height: 90px;
+.archived-files .day-container .image-container {
+	height: 100px;	/* based on 100px wide thumbnail */
 }
 
-.archived-videos .day-container .image-container img{
+.archived-files .day-container .image-container img{
 	max-width: 100%;
 	max-height: 100%;
+}
+
+.archived-files-end {
+	clear: both;
+}
+
+.archived-files hr {
+	margin-top: 25px;
+	width: 50%;
+	height: 2px;
+	background-color: #7777ffaa;
+	border-radius: 2px;
+	border: 1px solid #7777ffaa;
 }
 
 .forecast {
