@@ -2,7 +2,7 @@ body {
 	color:white;
 	font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
 	background-color: black;
-	max-width: 960px;	/* Optionally change to change size of image */
+	max-width: 1200px;	/* Optionally change to change size of image */
 	margin: auto;
 }
 
@@ -25,6 +25,11 @@ body {
 	font-family: 'Ubuntu', sans-serif;
 	font-weight: 400;
 	height: 35px;
+}
+
+.localLink {
+	text-align: center;
+	font-size: 150%;
 }
 
 .info {
@@ -86,16 +91,19 @@ body {
 #imageContainer {
 	text-align: center;
 }
+.imageContainer {
+	border: 1px solid #5a5a5a;
+}
 
 img.current {
 	width: 100%;
-	max-width: 960px;	/* Optionally change to change size of image */
+	max-width: 1200px;	/* Optionally change to change size of image */
 }
 
 #starmap_container {
 	position: absolute;
 	overflow: hidden;
-	height: 720px;		/* Optionally change or delete to change size of image */
+	height: 1200px;		/* Optionally change or delete to change size of image */
 }
 
 .starmap_credit {
