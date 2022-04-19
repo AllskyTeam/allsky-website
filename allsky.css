@@ -2,7 +2,7 @@ body {
 	color:white;
 	font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
 	background-color: black;
-	max-width: 1200px;	/* Optionally change to change size of image */
+	max-width: 960px;	/* Optionally change to change size of image */
 	margin: auto;
 }
 
@@ -97,13 +97,13 @@ body {
 
 img.current {
 	width: 100%;
-	max-width: 1200px;	/* Optionally change to change size of image */
+	max-width: 960px;	/* Optionally change to change size of image */
 }
 
 #starmap_container {
 	position: absolute;
 	overflow: hidden;
-	height: 1200px;		/* Optionally change or delete to change size of image */
+	height: 720px;		/* Optionally change or delete to change size of image */
 }
 
 .starmap_credit {
