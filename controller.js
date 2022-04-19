@@ -73,7 +73,7 @@ function AppCtrl($scope, $timeout, $http, _) {
 		buildOverlay();
 	}
 
-	$scope.imageURL = "loading.jpg";
+	$scope.imageURL = config.loadingImage;
 	$scope.showInfo = false;
 	$scope.showOverlay = config.showOverlayAtStartup;
 	if ($scope.showOverlay && usingNewVirtualSky) {
@@ -117,8 +117,6 @@ function AppCtrl($scope, $timeout, $http, _) {
 	function isHidden() {
 		var prop = getHiddenProp();
 		if (!prop) return false;
-//return false; // xxxxxxxxx for testing, uncomment to make never hidden
-
 		return document[prop];
 	}
 
