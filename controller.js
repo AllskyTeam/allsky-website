@@ -1,43 +1,47 @@
-var usingNewVirtualSky = typeof S != "undefined" && typeof S.virtualsky == "function";
-console.log("usingNewVirtualSky=" + usingNewVirtualSky);
-
 var app = angular.module('allsky', ['ngLodash']);
+
+var overlayBuilt = false;	// has the overlay been built yet?
+
+var virtualSkyData = null;
 
 $(window).resize(function () {
 	buildOverlay();
 });
 
 function buildOverlay(){
-	var planetarium;
-	$.ajax({
-		url: "virtualsky.json" + '?_ts=' + new Date().getTime(),
-		cache: false
-	}).done(
-		function (data) {
-			// This is to scale the overlay when the window is resized
-			// Newer versions support both width and height.
-			var width;
-			if (config.overlayWidth) {
-				width = config.overlayWidth;
-			} else {
-				width = config.overlaySize;
+	if (overlayBuilt) {
+		S.virtualsky(virtualSkyData);
+	} else {
+		$.ajax({
+			url: "configuration.json" + '?_ts=' + new Date().getTime(),
+			cache: false
+		}).done(
+			function (data) {
+				virtualSkyData = data.virtualSky;
+
+				// This is to scale the overlay when the window is resized
+				// Newer versions support both width and height.
+				var width;
+				if (config.overlayWidth) {
+					width = config.overlayWidth;
+				} else {
+					width = config.overlaySize;
+				}
+				virtualSkyData.width = window.innerWidth < width ? window.innerWidth : width;
+				if (config.overlayHeight)
+					virtualSkyData.height = config.overlayHeight;
+				else
+					virtualSkyData.height = virtualSkyData.width;	// default is square
+				virtualSkyData.latitude = config.latitude;
+				virtualSkyData.longitude = config.longitude;
+				virtualSkyData.az = config.az;
+				S.virtualsky(virtualSkyData);
+				$("#starmap").css("margin-top", config.overlayOffsetTop + "px");
+				$("#starmap").css("margin-left", config.overlayOffsetLeft + "px");
+				overlayBuilt = true;
 			}
-			data.width = window.innerWidth < width ? window.innerWidth : width;
-			if (config.overlayHeight)
-				data.height = config.overlayHeight;
-			else
-				data.height = data.width;	// default is square
-			data.latitude = config.latitude;
-			data.longitude = config.longitude;
-			data.az = config.az;
-			if (usingNewVirtualSky)
-				planetarium = S.virtualsky(data);
-			else
-				planetarium = typeof $.virtualsky == "undefined" ? undefined : $.virtualsky(data);
-			$("#starmap").css("margin-top", config.overlayOffsetTop + "px");
-			$("#starmap").css("margin-left", config.overlayOffsetLeft + "px");
-		}
-	);
+		);
+	}
 };
 
 function compile($compile) {
@@ -66,18 +70,10 @@ function compile($compile) {
 var configNotSet = false;	// Has the config.js file been updated by the user?
 
 function AppCtrl($scope, $timeout, $http, _) {
-	var overlayBuilt = false;	// has the overlay been built yet?
-
-	if (! usingNewVirtualSky) {
-		overlayBuilt = true;
-		buildOverlay();
-	}
-
 	$scope.imageURL = config.loadingImage;
 	$scope.showInfo = false;
 	$scope.showOverlay = config.showOverlayAtStartup;
-	if ($scope.showOverlay && usingNewVirtualSky) {
-		overlayBuilt = true;
+	if ($scope.showOverlay) {
 		console.log("@@ Building overlay...");
 		buildOverlay();
 	}
@@ -465,9 +461,8 @@ function AppCtrl($scope, $timeout, $http, _) {
 	$scope.toggleOverlay = function () {
 		$scope.showOverlay = !$scope.showOverlay;
 
-	if (usingNewVirtualSky && ! overlayBuilt && $scope.showOverlay) {
+	if (! overlayBuilt && $scope.showOverlay) {
 		console.log("@@@@ Building overlay...");
-		overlayBuilt = true;
 		// The new 0.7.7 version of VirtualSky doesn't show the overlay unless buildOverlay() is called here.
 		buildOverlay();
 	}
