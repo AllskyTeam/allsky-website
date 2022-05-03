@@ -53,9 +53,9 @@
 
 	<ul id="sidebar" class="animated slideInLeft">
 		<li><i class="fa fa-2x fa-fw allsky-constellation" id="overlayBtn" title="Show constellations overlay" ng-click="toggleOverlay()" ng-class="{'active': showOverlay}"></i></li>
-		<li><a href="show_thumbnails.php?dir=videos&prefix=allsky&title=Timelapse%20Videos" title="Archived Timelapses"><i class="fa fa-2x fa-fw fa-play-circle"></i></a></li>
-		<li><a href="show_thumbnails.php?dir=keograms&prefix=keogram&title=Keograms" title="Archived Keograms"><i class="fa fa-2x fa-fw fa-barcode"></i></a></li>
-		<li><a href="show_thumbnails.php?dir=startrails&prefix=startrails&title=Startrails" title="Archived Startrails"><i class="fa fa-2x fa-fw fa-circle-notch"></i></a></li>
+		<li><a href="videos" title="Archived Timelapses"><i class="fa fa-2x fa-fw fa-play-circle"></i></a></li>
+		<li><a href="keograms" title="Archived Keograms"><i class="fa fa-2x fa-fw fa-barcode"></i></a></li>
+		<li><a href="startrails" title="Archived Startrails"><i class="fa fa-2x fa-fw fa-circle-notch"></i></a></li>
 		<li><i class="fa fa-2x fa-fw fa-camera" title="Information about the camera" ng-click="toggleInfo()" ng-class="{'active': showInfo}" style="margin-top: 5px; font-size: 1.9em"></i></li>	
 	</ul>
 
