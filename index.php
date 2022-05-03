@@ -40,7 +40,6 @@
 	</div>
 	<div class="info animated slideInRight" ng-show="showInfo==true">
 		<ul>
-<!-- TODO: read these from a file:       fa-icon, label, variable -->
 			<li><i class="fa fa-fw fa-map-marker-alt"></i>&nbsp; Location: <span>{{location}}</span></li>
 			<li><i class="fa fa-fw fa-map-marker"></i>Latitude: <span>{{latitude < 0 ? latitude * -1 + 'S' : latitude + 'N'}}</span></li>
 			<li><i class="fa fa-fw fa-map-marker"></i>Longitude: <span>{{longitude < 0 ? longitude * -1 + 'W' : longitude + 'E'}}</span></li>
@@ -57,7 +56,6 @@
 		<li><a href="show_thumbnails.php?dir=videos&prefix=allsky&title=Timelapse%20Videos" title="Archived Timelapses"><i class="fa fa-2x fa-fw fa-play-circle"></i></a></li>
 		<li><a href="show_thumbnails.php?dir=keograms&prefix=keogram&title=Keograms" title="Archived Keograms"><i class="fa fa-2x fa-fw fa-barcode"></i></a></li>
 		<li><a href="show_thumbnails.php?dir=startrails&prefix=startrails&title=Startrails" title="Archived Startrails"><i class="fa fa-2x fa-fw fa-circle-notch"></i></a></li>
-<!-- TODO: allow user to add icons.   href, title, fa_icon -->
 		<li><i class="fa fa-2x fa-fw fa-camera" title="Information about the camera" ng-click="toggleInfo()" ng-class="{'active': showInfo}" style="margin-top: 5px; font-size: 1.9em"></i></li>	
 	</ul>
 
