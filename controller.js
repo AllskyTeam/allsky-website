@@ -68,6 +68,7 @@ function compile($compile) {
 }
 
 var configNotSet = false;	// Has the config.js file been updated by the user?
+var needToUpdate = "XX_NEED_TO_UPDATE_XX";	// must match what's in configuration.json
 
 function AppCtrl($scope, $timeout, $http, _) {
 	$scope.imageURL = config.loadingImage;
@@ -78,8 +79,7 @@ function AppCtrl($scope, $timeout, $http, _) {
 		buildOverlay();
 	}
 	$scope.notification = "";
-	$scope.title = config.title;
-	if ($scope.title == "XX_need_to_update_XX") {
+	if (config.title == needToUpdate) {
 		// Could (or should?) check other variables for not being set.
 		// Or assume if the title is set, everything else is too.
 		configNotSet = true;
@@ -172,7 +172,7 @@ function AppCtrl($scope, $timeout, $http, _) {
 		var imageClass= "";
 		if (! isHidden()) {
 			if (configNotSet) {
-				$scope.notification = formatMessage("Please update the 'config.js' file.<br>Replace the 'XX_need_to_update_XX' entries and check all other entries.<br>Refresh your browser when done.", msgType="error");
+				$scope.notification = formatMessage("Please update the 'configuration.json' file.<br>Replace the '" + needToUpdate + "' entries and check all other entries.<br>Refresh your browser when done.", msgType="error");
 			} else if (dataMissingMessage !== "") {
 				$scope.notification = formatMessage(dataMissingMessage, msgType = dataFileIsOld ? "warning": "error");
 			} else {
