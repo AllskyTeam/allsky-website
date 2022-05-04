@@ -234,3 +234,29 @@ img.current {
 	max-width: 800px;
 	margin-top: 30px;
 }
+
+.virtualsky_help {
+	color: black;
+}
+
+/* Messages on the home page */
+.msg {
+	background-color: #333;
+	text-align: center;
+	font-size: 145%;
+	font-weight: bold;
+	margin: 20px 0 20px 0;
+	padding: 20px 0 20px 0;
+}
+.error-msg {
+	color: red;
+	border: 3px dashed red;
+}
+.warning-msg {
+	color: yellow;
+	border: 3px dashed yellow;
+}
+.notice-msg {
+	color: white;
+	border: 3px solid white;
+}
