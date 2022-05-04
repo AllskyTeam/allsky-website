@@ -173,7 +173,7 @@ function make_thumb_from_video($src, $dest, $desired_width, $attempts)
 // Display thumbnails with links to the full-size files
 // for startrails, keograms, and videos.
 // The function to make thumbnails for videos is different
-$back_button = "<a class='back-button' href='index.php'><i class='fa fa-chevron-left'></i>&nbsp; Back to Live View</a>";
+$back_button = "<a class='back-button' href='../index.php'><i class='fa fa-chevron-left'></i>&nbsp; Back to Live View</a>";
 function display_thumbnails($dir, $file_prefix, $title)
 {
 	global $back_button;
