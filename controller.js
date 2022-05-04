@@ -5,7 +5,9 @@ var overlayBuilt = false;	// has the overlay been built yet?
 var virtualSkyData = null;
 
 $(window).resize(function () {
-	buildOverlay();
+	if (overlayBuilt) {			// only rebuild if already built once
+		buildOverlay();
+	}
 });
 
 function buildOverlay(){
@@ -17,24 +19,11 @@ function buildOverlay(){
 			cache: false
 		}).done(
 			function (data) {
-				virtualSkyData = data.virtualSky;
+				virtualSkyData = data.config;
 
-				// This is to scale the overlay when the window is resized
-				// Newer versions support both width and height.
-				var width;
-				if (config.overlayWidth) {
-					width = config.overlayWidth;
-				} else {
-					width = config.overlaySize;
-				}
-				virtualSkyData.width = window.innerWidth < width ? window.innerWidth : width;
-				if (config.overlayHeight)
-					virtualSkyData.height = config.overlayHeight;
-				else
-					virtualSkyData.height = virtualSkyData.width;	// default is square
-				virtualSkyData.latitude = config.latitude;
-				virtualSkyData.longitude = config.longitude;
-				virtualSkyData.az = config.az;
+				// This is to scale the overlay when the window is resized.
+				virtualSkyData.width = window.innerWidth < config.overlayWidth ? window.innerWidth : config.overlayWidth;
+				virtualSkyData.height = config.overlayHeight;
 				S.virtualsky(virtualSkyData);
 				$("#starmap").css("margin-top", config.overlayOffsetTop + "px");
 				$("#starmap").css("margin-left", config.overlayOffsetLeft + "px");
@@ -80,8 +69,7 @@ function AppCtrl($scope, $timeout, $http, _) {
 	}
 	$scope.notification = "";
 	if (config.title == needToUpdate) {
-		// Could (or should?) check other variables for not being set.
-		// Or assume if the title is set, everything else is too.
+		// Assume if the title is set, everything else is too.
 		configNotSet = true;
 	}
 	$scope.location = config.location;
@@ -121,20 +109,7 @@ function AppCtrl($scope, $timeout, $http, _) {
 	var dataMissingMessage = "";
 
 	function formatMessage(msg, msgType) {
-		if (msgType === "error") {
-			textColor = "red";
-			borderColor = "red";
-			borderStyle = "dashed";
-		} else if (msgType === "warning") {
-			textColor = "yellow";
-			borderColor = "yellow";
-			borderStyle = "dashed";
-		} else {
-			textColor = "white";
-			borderColor = "white";
-			borderStyle = "solid";
-		}
-		return("<div style='background-color: #333; color: " + textColor + "; text-align: center; font-size: 145%; font-weight: bold; border: 3px " + borderStyle + " " + borderColor + "; margin: 20px 0 20px 0; padding: 20px 0 20px 0;'>" + msg + "</div>");
+		return("<div class='msg " + msgType + "-msg'>" + msg + "</div>");
 	}
 
 	// How old should the data file be, or the sunset time be, in order to warn the user?
@@ -308,7 +283,6 @@ function AppCtrl($scope, $timeout, $http, _) {
 				console.log("  m_now = " + m_now.format("YYYY-MM-DD HH:mm:ss"));
 				if (oldMsg !== "") console.log("    > " + oldMsg);
 
-				console.log("  Times:");
 				console.log("  m_now="+m_nowTime + ", m_sunrise="+m_sunriseTime + ", m_sunset="+m_sunsetTime);
 				console.log("  beforeSunriseTime = " + beforeSunriseTime);
 				console.log("  afterSunsetTime = " + afterSunsetTime);
@@ -331,7 +305,7 @@ function AppCtrl($scope, $timeout, $http, _) {
 				// console.log("XXX Re-reading data.json");
 				$scope.getSunRiseSet();
 			} else if (rereadSunriseSunset) {
-				console.log("XXX Not rereading data.json, numImagesRead=" + numImagesRead);
+				// console.log("XXX Not rereading data.json, numImagesRead=" + numImagesRead);
 			} else {
 				// console.log("XXX rereadSunriseSunset=" + rereadSunriseSunset);
 			}
@@ -530,3 +504,4 @@ angular
 	.directive('compile', ['$compile', compile])
 	.controller("AppCtrl", ['$scope', '$timeout', '$http', 'lodash', AppCtrl])
 ;
+
