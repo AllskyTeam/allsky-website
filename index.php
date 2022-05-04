@@ -81,6 +81,7 @@
 					echo '"' . $val . '",' . "\n";
 			}
 			// Add additional variable(s) from $homePage that are needed in controller.js.
+			echo "\t\ttitle: " . '"' . $title . '",' . "\n";
 			echo "\t\tloadingImage: " . '"' . $loadingImage . '"';
 
 			echo "\t}";
