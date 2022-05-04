@@ -50,7 +50,7 @@
 			$includeGoogleAnalytics = v("includeGoogleAnalytics", "", $homePage);
 			$imageBorder = v("imageBorder", false, $homePage);
 			$includeLinkToMakeOwn = v("includeLinkToMakeOwn", true, $homePage);
-			$includeOverlayIcon = v("includeOverlayIcon", false, $homePage);
+			$showOverlayIcon = v("showOverlayIcon", false, $homePage);
 			$sidebar = v("sidebar", null, $homePage);
 			$popoutIcons = v("popoutIcons", null, $homePage);
 			$localLink = v("localLink", null, $homePage);
@@ -158,7 +158,7 @@ if (count($popoutIcons) > 0) {
 
 	<ul id="sidebar" class="animated slideInLeft">
 <?php	// The link to the overlay is always first and the camera info is always last.
-	if ($includeOverlayIcon) {
+	if ($showOverlayIcon) {
 		echo "\t\t<li><i class='fa fa-2x fa-fw allsky-constellation' id='overlayBtn' title='Show constellations overlay' ng-click='toggleOverlay()' ng-class=" . '"' ."{'active': showOverlay}" . '"' . "></i></li>\n";
 	}
 	if (count($sidebar) > 0) {
