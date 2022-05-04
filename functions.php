@@ -80,6 +80,11 @@ function get_variable($file, $searchfor, $default)
 $displayed_thumbnail_error_message = false;
 function make_thumb($src, $dest, $desired_width)
 {
+	if (! file_exists($src)) {
+		echo "<br><p style='color: red'>Unable to make thumbnail: '$src' does not exist!</p>";
+		return(false);
+	}
+
  	/* Make sure the imagecreatefromjpeg() function is in PHP. */
 	global $displayed_thumbnail_error_message;
 	if ( preg_match("/\.(jpg|jpeg)$/", $src ) ) {
@@ -121,8 +126,7 @@ function make_thumb($src, $dest, $desired_width)
 	if (file_exists($dest)) {
 		return(true);
 	} else {
-		echo "<p>Unable to create thumbnail for '$src'.</p>";
-		print_r(error_get_last());
+		echo "<p>Unable to create thumbnail for '$src': <b>" . error_get_last()['message'] . "</b></p>";
 		return(false);
 	}
 }
@@ -131,7 +135,12 @@ function make_thumb($src, $dest, $desired_width)
 function make_thumb_from_video($src, $dest, $desired_width, $attempts)
 {
 	if (! exec_works()) {
-// echo "Can't make video thumbnail - exec_works=" . exec_works();
+// echo "Can't make video thumbnail - exec_works=false";
+		return(false);
+	}
+
+	if (! file_exists($src)) {
+		echo "<br><p style='color: red'>Unable to make thumbnail: '$src' does not exist!</p>";
 		return(false);
 	}
 
@@ -144,8 +153,8 @@ function make_thumb_from_video($src, $dest, $desired_width, $attempts)
 		$sec = "05";
 	else
 		$sec = "00";
-	$command = "ffmpeg -ss 00:00:$sec -i '$src' -filter:v scale='$desired_width:-1' -frames:v 1 '$dest'";
-	exec($command);
+	$command = "ffmpeg -loglevel warning -ss 00:00:$sec -i '$src' -filter:v scale='$desired_width:-1' -frames:v 1 '$dest' 2>&1";
+	exec($command, $output);
 	if (file_exists($dest)) {
 		return(true);
 	}
@@ -154,6 +163,7 @@ function make_thumb_from_video($src, $dest, $desired_width, $attempts)
 	if ($attempts >= 2) {
 		echo "<br>Failed to make thumbnail for $src after $attempts attempts.<br>";
 		echo "Last command: $command";
+		echo "<br>Output from command: <b>" . $output[0] . "</b>";
 		return(false);
 	}
 
@@ -163,17 +173,13 @@ function make_thumb_from_video($src, $dest, $desired_width, $attempts)
 // Display thumbnails with links to the full-size files
 // for startrails, keograms, and videos.
 // The function to make thumbnails for videos is different
-$back_button = "<a class='back-button' href='..'><i class='fa fa-chevron-left'></i>&nbsp; Back to Live View</a>";
-function display_thumbnails($image_type)
+$back_button = "<a class='back-button' href='../index.php'><i class='fa fa-chevron-left'></i>&nbsp; Back to Live View</a>";
+function display_thumbnails($dir, $file_prefix, $title)
 {
 	global $back_button;
-	// The name of the timelapse video file is "allsky-yyyymmdd.xxx" but the $image_type is "Timelapse" which is more meaningful for users.
-	// For startrails and keograms, the prefix and the $image_type are the same.
-	if ($image_type == "Timelapse") {
-		$file_prefix = "allsky";
+	if ($file_prefix === "allsky") {
 		$ext = "/\.(mp4|webm)$/";
 	} else {
-		$file_prefix = $image_type;
 		$ext = "/\.(jpg|jpeg|png)$/";
 	}
 	$file_prefix_len = strlen($file_prefix);
@@ -181,7 +187,7 @@ function display_thumbnails($image_type)
 
 	$num_files = 0;
 	$files = array();
-	if ($handle = opendir('.')) {
+	if ($handle = opendir($dir)) {
 		while (false !== ($entry = readdir($handle))) {
 			if ( preg_match( $ext, $entry ) ) {
 				$files[] = $entry;
@@ -192,36 +198,37 @@ function display_thumbnails($image_type)
 	}
 	if ($num_files == 0) {
 		echo "<p>$back_button</p>";
-		echo "<div class='noImages'>No $image_type images</div>";
+		echo "<div class='noImages'>No $title</div>";
 		return;
 	}
 
 	asort($files);
 	
-	if (! is_dir('thumbnails')) {
-		if (! mkdir('thumbnails', 0775))
-			echo "<p>Unable to make 'thumbnails' directory. You will need to create it manually.</p>";
+	$thumb_dir = "$dir/thumbnails";
+	if (! is_dir($thumb_dir)) {
+		if (! mkdir($thum_dir, 0775))
+			echo "<p>Unable to make '$thum_dir' directory. You will need to create it manually.</p>";
 			print_r(error_get_last());
 	}
 
-	echo "<table class='imagesHeader'><tr><td class='headerButton'>$back_button</td> <td class='headerTitle'>$image_type</td></tr></table>";
-	echo "<div class=archived-videos>\n";
+	echo "<table class='imagesHeader'><tr><td class='headerButton'>$back_button</td> <td class='headerTitle'>$title</td></tr></table>";
+	echo "<div class='archived-files'>\n";
 
 	$thumbnailSizeX = get_variable(ALLSKY_CONFIG .'/config.sh', 'THUMBNAILSIZE_X=', '100');
 	foreach ($files as $file) {
 		// The thumbnail should be a .jpg.
-		$thumbnail = preg_replace($ext, ".jpg", "thumbnails/$file");
+		$thumbnail = preg_replace($ext, ".jpg", "$dir/thumbnails/$file");
 		if (! file_exists($thumbnail)) {
-			if ($image_type == "Timelapse") {
-				if (! make_thumb_from_video($file, $thumbnail, $thumbnailSizeX, 1)) {
+			if ($file_prefix == "allsky") {
+				if (! make_thumb_from_video("$dir/$file", $thumbnail, $thumbnailSizeX, 1)) {
 					// We can't use the video file as a thumbnail
-					$thumbnail = "../NoThumbnail.png";
+					$thumbnail = "NoThumbnail.png";
 				}
 			} else {
-				if (! make_thumb($file, $thumbnail, $thumbnailSizeX)) {
+				if (! make_thumb("$dir/$file", $thumbnail, $thumbnailSizeX)) {
 					// Using the full-sized file as a thumbnail is overkill,
 					// but it's better than no thumbnail.
-					$thumbnail = "./$file";
+					$thumbnail = "$dir/$file";
 				}
 			}
 			// flush so user sees thumbnails as they are created, instead of waiting for them all.
@@ -232,8 +239,10 @@ function display_thumbnails($image_type)
 		$month = substr($file, $file_prefix_len + 5, 2);
 		$day = substr($file, $file_prefix_len + 7, 2);
 		$date = $year.$month.$day;
-		echo "<a href='./$file'><div class='day-container'><div class='image-container'><img id=".$date." src='$thumbnail' title='$file_prefix-$year-$month-$day'/></div><div class='day-text'>$year-$month-$day</div></div></a>\n";
+		echo "<a href='$dir/$file'><div class='day-container'><div class='img-text'><div class='image-container'><img id=".$date." src='$thumbnail' title='$file_prefix-$year-$month-$day'/></div><div class='day-text'>$year-$month-$day</div></div></div></a>\n";
 	}
-	echo "</div>";
+	echo "</div>";	// archived-files
+	echo "<div class='archived-files-end'></div>";	// clears "float" from archived-files
+	echo "<div class='archived-files'><hr></div>";
 }
 ?>

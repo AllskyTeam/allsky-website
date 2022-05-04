@@ -59,6 +59,7 @@
 		<li><i class="fa fa-2x fa-fw fa-camera" title="Information about the camera" ng-click="toggleInfo()" ng-class="{'active': showInfo}" style="margin-top: 5px; font-size: 1.9em"></i></li>	
 	</ul>
 
+<!-- TODO: make border optional -->
 	<div id="imageContainer">
 		<div id="starmap_container" ng-show="showOverlay==true">
 			<div id="starmap"></div>
@@ -68,6 +69,7 @@
 		</div>
 	</div>
 	
+<!-- TODO: allow user to not show this. -->
 	<div class="diy"><a href="http://thomasjacquin.com/make-your-own-allsky-camera"><i class="fa fa-gear"></i> Make Your Own</a></div>
 
 <?php if (file_exists("analyticsTracking.js") && filesize("analyticsTracking.js") > 50) {
