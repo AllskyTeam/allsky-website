@@ -42,7 +42,7 @@
 				"title": "Archived Startrails",
 				"icon": "fa-circle-notch"
 			},
-			"comment": "Add sidebar items above."
+			{ "comment": "Add sidebar items above." }
 		],
 		"popoutIcons": [
 			{
@@ -87,11 +87,11 @@
 				"variable": "owner",
 				"value": ""
 			},
-			"comment": "Add popout items above."
+			{ "comment": "Add popout items above." }
 		]
 	},
 
-	"config" : {
+	"config": {
 		"comment": "These settings impact what appears in the popout and the constellation overlay",
 		"imageNameComment": "If your Allsky Website is on a remote server, 'imageName' should be 'image.jpg'.",
 		"imageName": "/current/tmp/image.jpg",
