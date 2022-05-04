@@ -33,7 +33,8 @@
 			$backgroundImage = v("backgroundImage", "", $homePage);
 			if ($backgroundImage != null) {
 				$backgroundImage_url = v("url", "", $backgroundImage);
-				$backgroundImage_style = v("style", "", $backgroundImage);
+				if ($backgroundImage_url == "") $backgroundImage = null;
+				else $backgroundImage_style = v("style", "", $backgroundImage);
 			}
 			$loadingImage = v("loadingImage", "loading.jpg", $homePage);
 			$title = v("title", "Website", $homePage);
@@ -42,7 +43,7 @@
 			$og_url = v("og_url", "http://www.thomasjacquin/allsky/", $homePage);
 			$og_image = v("og_image", "image.jpg", $homePage);
 			$ext = pathinfo($og_image, PATHINFO_EXTENSION); if ($ext === "jpg") $ext = "jpeg";
-			$og_image_type = v("og_image_type", "image/$ext", $homePage);
+			$og_image_type = "image/$ext";
 			$favicon = v("favicon", "allsky-favicon.png", $homePage);
 			$ext = pathinfo($favicon, PATHINFO_EXTENSION); if ($ext === "jpg") $ext = "jpeg";
 			$faviconType = "image/$ext";
@@ -82,7 +83,8 @@
 			// Add additional variable(s) from $homePage that are needed in controller.js.
 			echo "\t\tloadingImage: " . '"' . $loadingImage . '"';
 
-			echo "\t}</script>\n";
+			echo "\t}";
+			echo "\n\t</script>\n";
 	?>
 
 	<title><?php echo $title ?></title>
@@ -112,9 +114,9 @@
 	<script src="ng-lodash.min.js"></script>
 	<script src="controller.js"></script>
 </head>
-<body <?php if ($backgroundImage !== "") echo "style=" . '"background-image: url(' . "'$backgroundImage_url'); $backgroundImage_style" . '"'; ?>>
+<body id="body" <?php if ($backgroundImage !== null) echo "style=" . '"background-image: url(' . "'$backgroundImage_url'); $backgroundImage_style" . '"'; ?>>
 	<div class="header">
-		<div class=title>{{title}}</div>
+		<div class=title><?php echo $title; ?></div>
 		<div ng-show="auroraForecast === true && forecast" class="forecast pull-right">
 			<span>Aurora activity: </span>
 			<span class="forecast-day" ng-repeat="(key,val) in forecast">{{key}}:
@@ -122,7 +124,7 @@
 			</span>
 		</div>
 		<div style="clear:both;"></div>
-<?php
+<?php	// display an optional link to the user's website
 	if ($localLink != null) {
 		echo "\t\t<div class='localLink'>";
 		if ($localLink_prelink !== "") echo "$localLink_prelink";
@@ -155,11 +157,10 @@ if (count($popoutIcons) > 0) {
 	<span class="notification" compile="notification"></span>
 
 	<ul id="sidebar" class="animated slideInLeft">
-<?php
+<?php	// The link to the overlay is always first and the camera info is always last.
 	if ($includeOverlayIcon) {
 		echo "\t\t<li><i class='fa fa-2x fa-fw allsky-constellation' id='overlayBtn' title='Show constellations overlay' ng-click='toggleOverlay()' ng-class=" . '"' ."{'active': showOverlay}" . '"' . "></i></li>\n";
 	}
-
 	if (count($sidebar) > 0) {
 		foreach ($sidebar as $side) {
 			$url = v("url", "", $side);
