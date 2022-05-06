@@ -98,7 +98,8 @@ function make_thumb($src, $dest, $desired_width)
 		return(false);
 	}
 	if (filesize($src) === 0) {
-		echo "<br><p style='color: red'>Unable to make thumbnail: '$src' is empty!</p>";
+		echo "<br><p style='color: red'>Unable to make thumbnail: '$src' is empty!  Removed it.</p>";
+		unlink($src);
 		return(false);
 	}
 
@@ -166,7 +167,6 @@ function make_thumb_from_video($src, $dest, $desired_width, $attempts)
 	}
 
 	if (! can_make_video_thumbnails()) {
-// echo "Can't make video thumbnail - can_make_video_thumbnails=false";
 		return(false);
 	}
 
@@ -175,7 +175,8 @@ function make_thumb_from_video($src, $dest, $desired_width, $attempts)
 		return(false);
 	}
 	if (filesize($src) === 0) {
-		echo "<br><p style='color: red'>Unable to make thumbnail: '$src' is empty!</p>";
+		echo "<br><p style='color: red'>Unable to make thumbnail: '$src' is empty!  Removed it.</p>";
+		unlink($src);
 		return(false);
 	}
 
