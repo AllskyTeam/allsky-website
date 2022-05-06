@@ -26,9 +26,22 @@ if ($isarm && ALLSKY_CONFIG == "XX_ALLSKY_CONFIG" . "_XX") {
 /*
  * Does the exec() function work?  It's needed to make thumbnails from video files.
 */
-function exec_works() {
+function can_make_video_thumbnails() {
     $disabled = explode(',', ini_get('disable_functions'));
-    return !in_array('exec', $disabled);
+    $exec_disabled = in_array('exec', $disabled);
+
+	if ($exec_disabled) {
+		echo "<script>console.log('exec() disabled');</script>";
+		return(false);
+	} else {
+		// See if ffmpeg exists.
+		exec("which ffmpeg", $ret, $retvalue);
+		if ($retvalue == 0) {
+			return(true);
+		} else {
+			echo "<script>console.log('ffmpeg not found');</script>";
+		}
+	}
 }
 
 /*
@@ -108,7 +121,7 @@ function make_thumb($src, $dest, $desired_width)
 
 	/* read the source image */
 	$funcname="imagecreatefrom{$funcext}";
-	$source_image = $funcname($src);
+	$source_image = @$funcname($src);
 	$width = imagesx($source_image);
 	$height = imagesy($source_image);
 
@@ -140,11 +153,20 @@ function make_thumb($src, $dest, $desired_width)
 	}
 }
 
+// Did creation of last thumbnail work?
+// If not, don't try to create any more since they likely won't work either.
+$last_thumbnail_worked = true;
+
 // Similar to make_thumb() but using a video for the input file.
 function make_thumb_from_video($src, $dest, $desired_width, $attempts)
 {
-	if (! exec_works()) {
-// echo "Can't make video thumbnail - exec_works=false";
+	global $last_thumbnail_worked;
+	if (! $last_thumbnail_worked) {
+		return(false);
+	}
+
+	if (! can_make_video_thumbnails()) {
+// echo "Can't make video thumbnail - can_make_video_thumbnails=false";
 		return(false);
 	}
 
@@ -182,6 +204,7 @@ function make_thumb_from_video($src, $dest, $desired_width, $attempts)
 		echo "<br>Failed to make thumbnail for $src after $attempts attempts.<br>";
 		echo "Last command: $command";
 		echo "<br>Output from command: <b>" . $output[0] . "</b>";
+		$last_thumbnail_worked = false;
 		return(false);
 	}
 
