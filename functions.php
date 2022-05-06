@@ -122,7 +122,7 @@ function make_thumb($src, $dest, $desired_width)
 
 	/* read the source image */
 	$funcname="imagecreatefrom{$funcext}";
-	$source_image = @$funcname($src);
+	$source_image = $funcname($src);
 	$width = imagesx($source_image);
 	$height = imagesy($source_image);
 
@@ -136,10 +136,9 @@ function make_thumb($src, $dest, $desired_width)
 	imagecopyresampled($virtual_image, $source_image, 0, 0, 0, 0, $desired_width, $desired_height, $width, $height);
 
 	/* create the physical thumbnail image to its destination */
- 	imagejpeg($virtual_image, $dest);
+ 	@imagejpeg($virtual_image, $dest);
 
 	// flush so user sees thumbnails as they are created, instead of waiting for them all.
-	// echo "<br>flushing after $dest:";
 	flush();	// flush even if we couldn't make the thumbnail so the user sees this file immediately.
 	if (file_exists($dest)) {
 		if (filesize($dest) === 0) {
