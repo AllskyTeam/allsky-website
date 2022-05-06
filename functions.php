@@ -84,6 +84,10 @@ function make_thumb($src, $dest, $desired_width)
 		echo "<br><p style='color: red'>Unable to make thumbnail: '$src' does not exist!</p>";
 		return(false);
 	}
+	if (filesize($src) === 0) {
+		echo "<br><p style='color: red'>Unable to make thumbnail: '$src' is empty!</p>";
+		return(false);
+	}
 
  	/* Make sure the imagecreatefromjpeg() function is in PHP. */
 	global $displayed_thumbnail_error_message;
@@ -141,6 +145,10 @@ function make_thumb_from_video($src, $dest, $desired_width, $attempts)
 
 	if (! file_exists($src)) {
 		echo "<br><p style='color: red'>Unable to make thumbnail: '$src' does not exist!</p>";
+		return(false);
+	}
+	if (filesize($src) === 0) {
+		echo "<br><p style='color: red'>Unable to make thumbnail: '$src' is empty!</p>";
 		return(false);
 	}
 
