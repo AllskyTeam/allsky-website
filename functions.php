@@ -128,6 +128,11 @@ function make_thumb($src, $dest, $desired_width)
 	// echo "<br>flushing after $dest:";
 	flush();	// flush even if we couldn't make the thumbnail so the user sees this file immediately.
 	if (file_exists($dest)) {
+		if (filesize($dest) === 0) {
+			echo "<br><p style='color: red'>Unable to make thumbnail for '$dest': thumbnail was empty!</p>";
+			unlink($dest);
+			return(false);
+		}
 		return(true);
 	} else {
 		echo "<p>Unable to create thumbnail for '$src': <b>" . error_get_last()['message'] . "</b></p>";
@@ -164,6 +169,11 @@ function make_thumb_from_video($src, $dest, $desired_width, $attempts)
 	$command = "ffmpeg -loglevel warning -ss 00:00:$sec -i '$src' -filter:v scale='$desired_width:-1' -frames:v 1 '$dest' 2>&1";
 	exec($command, $output);
 	if (file_exists($dest)) {
+		if (filesize($dest) === 0) {
+			echo "<br><p style='color: red'>Unable to make thumbnail for '$dest': thumbnail was empty!</p>";
+			unlink($dest);
+			return(false);
+		}
 		return(true);
 	}
 
