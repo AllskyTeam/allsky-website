@@ -127,6 +127,8 @@ function make_thumb($src, $dest, $desired_width)
 	$height = imagesy($source_image);
 
 	/* find the "desired height" of this thumbnail, relative to the desired width  */
+	if ($desired_width > $width)
+		$desired_width = $width;	// This might create a very tall thumbnail...
 	$desired_height = floor($height * ($desired_width / $width));
 
 	/* create a new, "virtual" image */
@@ -142,13 +144,13 @@ function make_thumb($src, $dest, $desired_width)
 	flush();	// flush even if we couldn't make the thumbnail so the user sees this file immediately.
 	if (file_exists($dest)) {
 		if (filesize($dest) === 0) {
-			echo "<br><p style='color: red'>Unable to make thumbnail for '$dest': thumbnail was empty!</p>";
+			echo "<br><p style='color: red'>Unable to make thumbnail for '$src': thumbnail was empty!  Using full-size image for thumbnail.</p>";
 			unlink($dest);
 			return(false);
 		}
 		return(true);
 	} else {
-		echo "<p>Unable to create thumbnail for '$src': <b>" . error_get_last()['message'] . "</b></p>";
+		echo "<p style='color: red'>Unable to create thumbnail for '$src': <b>" . error_get_last()['message'] . "</b></p>";
 		return(false);
 	}
 }
@@ -192,7 +194,7 @@ function make_thumb_from_video($src, $dest, $desired_width, $attempts)
 	exec($command, $output);
 	if (file_exists($dest)) {
 		if (filesize($dest) === 0) {
-			echo "<br><p style='color: red'>Unable to make thumbnail for '$dest': thumbnail was empty!</p>";
+			echo "<br><p style='color: red'>Unable to make thumbnail for '$src': thumbnail was empty!  Using full-size image for thumbnail.</p>";
 			unlink($dest);
 			return(false);
 		}
