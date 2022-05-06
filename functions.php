@@ -94,11 +94,11 @@ $displayed_thumbnail_error_message = false;
 function make_thumb($src, $dest, $desired_width)
 {
 	if (! file_exists($src)) {
-		echo "<br><p style='color: red'>Unable to make thumbnail: '$src' does not exist!</p>";
+		echo "<br><p class='thumbnailError'>Unable to make thumbnail: '$src' does not exist!</p>";
 		return(false);
 	}
 	if (filesize($src) === 0) {
-		echo "<br><p style='color: red'>Unable to make thumbnail: '$src' is empty!  Removed it.</p>";
+		echo "<br><p class='thumbnailError'>Unable to make thumbnail: '$src' is empty!  Removed it.</p>";
 		unlink($src);
 		return(false);
 	}
@@ -114,7 +114,7 @@ function make_thumb($src, $dest, $desired_width)
 	{
 		if ($displayed_thumbnail_error_message == false)
 		{
-			echo "<br><p style='color: red'>Unable to make thumbnail(s); imagecreatefrom{$funcext}() does not exist.<br>If you do NOT have the file '/etc/php/7.3/mods-available/gd.ini' you need to download the latest PHP.</p>";
+			echo "<br><p class='thumbnailError'>Unable to make thumbnail(s); imagecreatefrom{$funcext}() does not exist.<br>If you do NOT have the file '/etc/php/7.3/mods-available/gd.ini' you need to download the latest PHP.</p>";
 			$displayed_thumbnail_error_message = true;
 		}
 		return(false);
@@ -144,13 +144,13 @@ function make_thumb($src, $dest, $desired_width)
 	flush();	// flush even if we couldn't make the thumbnail so the user sees this file immediately.
 	if (file_exists($dest)) {
 		if (filesize($dest) === 0) {
-			echo "<br><p style='color: red'>Unable to make thumbnail for '$src': thumbnail was empty!  Using full-size image for thumbnail.</p>";
+			echo "<br><p class='thumbnailError'>Unable to make thumbnail for '$src': thumbnail was empty!  Using full-size image for thumbnail.</p>";
 			unlink($dest);
 			return(false);
 		}
 		return(true);
 	} else {
-		echo "<p style='color: red'>Unable to create thumbnail for '$src': <b>" . error_get_last()['message'] . "</b></p>";
+		echo "<p class='thumbnailError'>Unable to create thumbnail for '$src': <b>" . error_get_last()['message'] . "</b></p>";
 		return(false);
 	}
 }
@@ -172,11 +172,11 @@ function make_thumb_from_video($src, $dest, $desired_width, $attempts)
 	}
 
 	if (! file_exists($src)) {
-		echo "<br><p style='color: red'>Unable to make thumbnail: '$src' does not exist!</p>";
+		echo "<br><p class='thumbnailError'>Unable to make thumbnail: '$src' does not exist!</p>";
 		return(false);
 	}
 	if (filesize($src) === 0) {
-		echo "<br><p style='color: red'>Unable to make thumbnail: '$src' is empty!  Removed it.</p>";
+		echo "<br><p class='thumbnailError'>Unable to make thumbnail: '$src' is empty!  Removed it.</p>";
 		unlink($src);
 		return(false);
 	}
@@ -194,7 +194,7 @@ function make_thumb_from_video($src, $dest, $desired_width, $attempts)
 	exec($command, $output);
 	if (file_exists($dest)) {
 		if (filesize($dest) === 0) {
-			echo "<br><p style='color: red'>Unable to make thumbnail for '$src': thumbnail was empty!  Using full-size image for thumbnail.</p>";
+			echo "<br><p class='thumbnailError'>Unable to make thumbnail for '$src': thumbnail was empty!  Using full-size image for thumbnail.</p>";
 			unlink($dest);
 			return(false);
 		}
