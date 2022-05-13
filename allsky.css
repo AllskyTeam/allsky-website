@@ -226,3 +226,7 @@ img.current {
 	max-width: 800px;
 	margin-top: 30px;
 }
+
+.thumbnailError {
+	color: red;
+}

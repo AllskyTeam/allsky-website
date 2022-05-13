@@ -26,9 +26,22 @@ if ($isarm && ALLSKY_CONFIG == "XX_ALLSKY_CONFIG" . "_XX") {
 /*
  * Does the exec() function work?  It's needed to make thumbnails from video files.
 */
-function exec_works() {
+function can_make_video_thumbnails() {
     $disabled = explode(',', ini_get('disable_functions'));
-    return !in_array('exec', $disabled);
+    $exec_disabled = in_array('exec', $disabled);
+
+	if ($exec_disabled) {
+		echo "<script>console.log('exec() disabled');</script>";
+		return(false);
+	} else {
+		// See if ffmpeg exists.
+		exec("which ffmpeg", $ret, $retvalue);
+		if ($retvalue == 0) {
+			return(true);
+		} else {
+			echo "<script>console.log('ffmpeg not found');</script>";
+		}
+	}
 }
 
 /*
@@ -81,7 +94,12 @@ $displayed_thumbnail_error_message = false;
 function make_thumb($src, $dest, $desired_width)
 {
 	if (! file_exists($src)) {
-		echo "<br><p style='color: red'>Unable to make thumbnail: '$src' does not exist!</p>";
+		echo "<br><p class='thumbnailError'>Unable to make thumbnail: '$src' does not exist!</p>";
+		return(false);
+	}
+	if (filesize($src) === 0) {
+		echo "<br><p class='thumbnailError'>Unable to make thumbnail: '$src' is empty!  Removed it.</p>";
+		unlink($src);
 		return(false);
 	}
 
@@ -96,7 +114,7 @@ function make_thumb($src, $dest, $desired_width)
 	{
 		if ($displayed_thumbnail_error_message == false)
 		{
-			echo "<br><p style='color: red'>Unable to make thumbnail(s); imagecreatefrom{$funcext}() does not exist.<br>If you do NOT have the file '/etc/php/7.3/mods-available/gd.ini' you need to download the latest PHP.</p>";
+			echo "<br><p class='thumbnailError'>Unable to make thumbnail(s); imagecreatefrom{$funcext}() does not exist.<br>If you do NOT have the file '/etc/php/7.3/mods-available/gd.ini' you need to download the latest PHP.</p>";
 			$displayed_thumbnail_error_message = true;
 		}
 		return(false);
@@ -109,6 +127,8 @@ function make_thumb($src, $dest, $desired_width)
 	$height = imagesy($source_image);
 
 	/* find the "desired height" of this thumbnail, relative to the desired width  */
+	if ($desired_width > $width)
+		$desired_width = $width;	// This might create a very tall thumbnail...
 	$desired_height = floor($height * ($desired_width / $width));
 
 	/* create a new, "virtual" image */
@@ -118,29 +138,46 @@ function make_thumb($src, $dest, $desired_width)
 	imagecopyresampled($virtual_image, $source_image, 0, 0, 0, 0, $desired_width, $desired_height, $width, $height);
 
 	/* create the physical thumbnail image to its destination */
- 	imagejpeg($virtual_image, $dest);
+ 	@imagejpeg($virtual_image, $dest);
 
 	// flush so user sees thumbnails as they are created, instead of waiting for them all.
-	// echo "<br>flushing after $dest:";
 	flush();	// flush even if we couldn't make the thumbnail so the user sees this file immediately.
 	if (file_exists($dest)) {
+		if (filesize($dest) === 0) {
+			echo "<br><p class='thumbnailError'>Unable to make thumbnail for '$src': thumbnail was empty!  Using full-size image for thumbnail.</p>";
+			unlink($dest);
+			return(false);
+		}
 		return(true);
 	} else {
-		echo "<p>Unable to create thumbnail for '$src': <b>" . error_get_last()['message'] . "</b></p>";
+		echo "<p class='thumbnailError'>Unable to create thumbnail for '$src': <b>" . error_get_last()['message'] . "</b></p>";
 		return(false);
 	}
 }
 
+// Did creation of last thumbnail work?
+// If not, don't try to create any more since they likely won't work either.
+$last_thumbnail_worked = true;
+
 // Similar to make_thumb() but using a video for the input file.
 function make_thumb_from_video($src, $dest, $desired_width, $attempts)
 {
-	if (! exec_works()) {
-// echo "Can't make video thumbnail - exec_works=false";
+	global $last_thumbnail_worked;
+	if (! $last_thumbnail_worked) {
+		return(false);
+	}
+
+	if (! can_make_video_thumbnails()) {
 		return(false);
 	}
 
 	if (! file_exists($src)) {
-		echo "<br><p style='color: red'>Unable to make thumbnail: '$src' does not exist!</p>";
+		echo "<br><p class='thumbnailError'>Unable to make thumbnail: '$src' does not exist!</p>";
+		return(false);
+	}
+	if (filesize($src) === 0) {
+		echo "<br><p class='thumbnailError'>Unable to make thumbnail: '$src' is empty!  Removed it.</p>";
+		unlink($src);
 		return(false);
 	}
 
@@ -156,6 +193,11 @@ function make_thumb_from_video($src, $dest, $desired_width, $attempts)
 	$command = "ffmpeg -loglevel warning -ss 00:00:$sec -i '$src' -filter:v scale='$desired_width:-1' -frames:v 1 '$dest' 2>&1";
 	exec($command, $output);
 	if (file_exists($dest)) {
+		if (filesize($dest) === 0) {
+			echo "<br><p class='thumbnailError'>Unable to make thumbnail for '$src': thumbnail was empty!  Using full-size image for thumbnail.</p>";
+			unlink($dest);
+			return(false);
+		}
 		return(true);
 	}
 
@@ -164,6 +206,7 @@ function make_thumb_from_video($src, $dest, $desired_width, $attempts)
 		echo "<br>Failed to make thumbnail for $src after $attempts attempts.<br>";
 		echo "Last command: $command";
 		echo "<br>Output from command: <b>" . $output[0] . "</b>";
+		$last_thumbnail_worked = false;
 		return(false);
 	}
 
