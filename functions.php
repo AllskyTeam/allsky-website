@@ -35,7 +35,7 @@ function can_make_video_thumbnails() {
 		return(false);
 	} else {
 		// See if ffmpeg exists.
-		exec("which ffmpeg", $ret, $retvalue);
+		exec("which ffmpeg 2> /dev/null", $ret, $retvalue);
 		if ($retvalue == 0) {
 			return(true);
 		} else {
