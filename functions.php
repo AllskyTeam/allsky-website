@@ -265,7 +265,7 @@ function display_thumbnails($dir, $file_prefix, $title)
 			if ($file_prefix == "allsky") {
 				if (! make_thumb_from_video("$dir/$file", $thumbnail, $thumbnailSizeX, 1)) {
 					// We can't use the video file as a thumbnail
-					$thumbnail = "NoThumbnail.png";
+					$thumbnail = "../NoThumbnail.png";
 				}
 			} else {
 				if (! make_thumb("$dir/$file", $thumbnail, $thumbnailSizeX)) {
