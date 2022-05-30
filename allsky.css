@@ -260,3 +260,7 @@ img.current {
 	color: white;
 	border: 3px solid white;
 }
+
+.thumbnailError {
+	color: red;
+}
