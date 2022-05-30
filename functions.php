@@ -26,22 +26,29 @@ if ($isarm && ALLSKY_CONFIG == "XX_ALLSKY_CONFIG" . "_XX") {
 /*
  * Does the exec() function work?  It's needed to make thumbnails from video files.
 */
+$yes_no = null;
 function can_make_video_thumbnails() {
+    global $yes_no;
+    if ($yes_no !== null) return($yes_no);
+
     $disabled = explode(',', ini_get('disable_functions'));
-    $exec_disabled = in_array('exec', $disabled);
+    // On some servers the disabled array contains leading spaces, so check both ways.
+    $exec_disabled = in_array('exec', $disabled) || in_array(' exec', $disabled);
 
 	if ($exec_disabled) {
 		echo "<script>console.log('exec() disabled');</script>";
-		return(false);
+		$yes_no = false;
 	} else {
 		// See if ffmpeg exists.
-		exec("which ffmpeg 2> /dev/null", $ret, $retvalue);
+		@exec("which ffmpeg 2> /dev/null", $ret, $retvalue);
 		if ($retvalue == 0) {
-			return(true);
+			$yes_no = true;
 		} else {
 			echo "<script>console.log('ffmpeg not found');</script>";
+	    	$yes_no = false;
 		}
 	}
+	return($yes_no);
 }
 
 /*
