@@ -26,6 +26,8 @@
 	<script src="ng-lodash.min.js"></script>
 	<script src="config.js"></script>
 	<script src="controller.js"></script>
+	<?php if (file_exists("config.override.js") === true) echo '<script src="config.override.js"></script>'; ?>
+	<?php if (file_exists("controller.override.js") === true) echo '<script src="controller.override.js"></script>'; ?>
 </head>
 <body>
 	<div class="header">
