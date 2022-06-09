@@ -502,7 +502,7 @@ function AppCtrl($scope, $timeout, $http, _) {
 				var total = _.sumBy(data, function (row) {
 					return parseInt(row[field]);
 				});
-				return Math.round(total / 7);
+				return Math.round(total / data.length);	// return the average
 			}
 
 			function getDay(number) {
