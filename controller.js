@@ -445,18 +445,18 @@ function AppCtrl($scope, $timeout, $http, _) {
 		$('#starmap_container').fadeToggle();
 	};
 
-	$scope.getScale = function (index) {
+	$scope.getScale = function (index) {	// based mostly on https://auroraforecast.is/kp-index/
 		var scale = {
-			0: "Low",
-			1: "Low",
-			2: "Low",
-			3: "Active",
-			4: "High",
-			5: "Extreme",
-			6: "Extreme",
-			7: "Extreme",
-			8: "Extreme",
-			9: "Extreme",
+			0: "Very Quiet",
+			1: "Quiet",
+			2: "Quiet",
+			3: "Unsettled",
+			4: "Active",
+			5: "Minor storm",
+			6: "Moderate storm",
+			7: "Strong storm",
+			8: "Severe storm",
+			9: "Extreme storm",
 			100: "WARNING"
 		};
 		return scale[index];
