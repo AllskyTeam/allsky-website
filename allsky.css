@@ -207,19 +207,24 @@ img.current {
 	margin: 0 3px;
 }
 
-.forecast .Low {
+.forecast .Very_Quite,
+.forecast .Quiet {
 	color: green;
 }
 
+.forecast .Unsettled,
 .forecast .Active {
 	color: yellow;
 }
 
-.forecast .High {
+.forecast .Minor_Storm,
+.forecast .Moderate_Storm {
 	color: darkorange;
 }
 
-.forecast .Extreme {
+.forecast .Strong_Storm,
+.forecast .Severe_Storm,
+.forecast .Extreme_Storm {
 	color: red;
 }
 
@@ -237,6 +242,10 @@ img.current {
 
 .virtualsky_help {
 	color: black;
+}
+
+.thumbnailError {
+	color: red;
 }
 
 /* Messages on the home page */
@@ -259,8 +268,4 @@ img.current {
 .notice-msg {
 	color: white;
 	border: 3px solid white;
-}
-
-.thumbnailError {
-	color: red;
 }
