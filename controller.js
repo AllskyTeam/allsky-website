@@ -447,16 +447,16 @@ function AppCtrl($scope, $timeout, $http, _) {
 
 	$scope.getScale = function (index) {	// based mostly on https://auroraforecast.is/kp-index/
 		var scale = {
-			0: "Very Quiet",
+			0: "Very_Quiet",
 			1: "Quiet",
 			2: "Quiet",
 			3: "Unsettled",
 			4: "Active",
-			5: "Minor storm",
-			6: "Moderate storm",
-			7: "Strong storm",
-			8: "Severe storm",
-			9: "Extreme storm",
+			5: "Minor_storm",
+			6: "Moderate_storm",
+			7: "Strong_storm",
+			8: "Severe_storm",
+			9: "Extreme_storm",
 			100: "WARNING"
 		};
 		return scale[index];
