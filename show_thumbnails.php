@@ -1,4 +1,5 @@
 <?php
+	$configFilePrefix = "../";
 	include 'functions.php'; disableBuffering();	 // must be first line
 
 	if (! isset($dir) || ! isset($prefix) || ! isset($title)) {
