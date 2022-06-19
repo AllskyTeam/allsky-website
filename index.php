@@ -28,6 +28,7 @@
 		}
 		// Get home page options
 		$homePage = v("homePage", null, $settings_array);
+			$onPi = v("onPi", true);
 			// TODO: replace double quotes with &quot; in any variable that can be in an HTML attribute,
 			// which is many of them.
 			$backgroundImage = v("backgroundImage", "", $homePage);
