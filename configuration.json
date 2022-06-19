@@ -1,104 +1,13 @@
 {
 	"comment": "See https://github.com/thomasjacquin/allsky/wiki/allsky-website-Settings for a description of these settings.",
 
-	"homePage": {
-		"comment": "These settings impact the look and feel of the Website home page.",
-		"title": "XX_NEED_TO_UPDATE_XX",
-		"og_description": "XX_NEED_TO_UPDATE_XX",
-		"showOverlayIconComment": "Once you have modified the settings so the overlay fits, set 'showOverlayIcon' to true.",
-		"showOverlayIcon": false,
-		"backgroundImage": {
-			"url": "",
-			"style": ""
-		},
-		"loadingImage": "loading.jpg",
-		"imageBorder": false,
-		"includeGoogleAnalytics": false,
-		"includeLinkToMakeOwn": true,
-		"localLink": {
-			"prelink": "",
-			"message": "",
-			"url": "",
-			"title": "",
-			"style": ""
-		},
-		"og_type": "website",
-		"og_url": "http://www.thomasjacquin/allsky/",
-		"og_image": "image.jpg",
-		"favicon": "allsky-favicon.png",
-		"sidebar": [
-			{
-				"url": "videos",
-				"title": "Archived Timelapes",
-				"icon": "fa-play-circle"
-			},
-			{
-				"url": "keograms",
-				"title": "Archived Keograms",
-				"icon": "fa-barcode"
-			},
-			{
-				"url": "startrails",
-				"title": "Archived Startrails",
-				"icon": "fa-circle-notch"
-			},
-			{ "comment": "Add sidebar items above." }
-		],
-		"popoutIcons": [
-			{
-				"label": "Location",
-				"icon": "fa-map-marker-alt",
-				"variable": "location",
-				"value": ""
-			},
-			{
-				"label": "Latitude",
-				"icon": "fa-map-marker",
-				"variable": "latitude",
-				"value": ""
-			},
-			{
-				"label": "Longitude",
-				"icon": "fa-map-marker",
-				"variable": "longitude",
-				"value": ""
-			},
-			{
-				"label": "Camera",
-				"icon": "fa-camera-retro",
-				"variable": "camera",
-				"value": ""
-			},
-			{
-				"label": "Lens",
-				"icon": "fa-dot-circle",
-				"variable": "lens",
-				"value": ""
-			},
-			{
-				"label": "Computer",
-				"icon": "fa-microchip",
-				"variable": "computer",
-				"value": ""
-			},
-			{
-				"label": "Owner",
-				"icon": "fa-user",
-				"variable": "owner",
-				"value": ""
-			},
-			{ "comment": "Add popout items above." }
-		]
-	},
-
 	"config": {
 		"comment": "These settings impact what appears in the popout and the constellation overlay",
 		"imageNameComment": "If your Allsky Website is on a remote server, 'imageName' should be 'image.jpg'.",
 		"imageName": "/current/tmp/image.jpg",
 		"location": "XX_NEED_TO_UPDATE_XX",
-		"latitude_longitude_comment": "latitude and longitude must be decimal numbers with OUT the trailing N, S, E, and W.",
-		"latitude": 0,
-		"longitude": 0,
+		"latitude": "XX_NEED_TO_UPDATE_XX",
+		"longitude": "XX_NEED_TO_UPDATE_XX",
 		"camera": "XX_NEED_TO_UPDATE_XX",
 		"lens": "XX_NEED_TO_UPDATE_XX",
 		"computer": "XX_NEED_TO_UPDATE_XX",
@@ -139,5 +48,48 @@
 		"live": true,
 		"lang": "en",
 		"id": "starmap"
+	},
+
+	"homePage": {
+		"comment": "These settings impact the look and feel of the Website home page.",
+		"title": "XX_NEED_TO_UPDATE_XX",
+		"og_description": "XX_NEED_TO_UPDATE_XX",
+		"showOverlayIconComment": "Once you have modified the settings so the overlay fits, set 'showOverlayIcon' to true.",
+		"showOverlayIcon": false,
+		"backgroundImage": {
+			"url": "",
+			"style": ""
+		},
+		"loadingImage": "loading.jpg",
+		"imageBorder": false,
+		"includeGoogleAnalytics": false,
+		"includeLinkToMakeOwn": true,
+		"personalLink": {
+			"prelink": "",
+			"message": "",
+			"url": "",
+			"title": "",
+			"style": ""
+		},
+		"og_type": "website",
+		"og_url": "http://www.thomasjacquin/allsky/",
+		"og_image": "image.jpg",
+		"favicon": "allsky-favicon.png",
+		"sidebar": [
+			{ "url": "videos",  "title": "Archived Timelapes",  "icon": "fa-play-circle" },
+			{ "url": "keograms",  "title": "Archived Keograms",  "icon": "fa-barcode" },
+			{ "url": "startrails",  "title": "Archived Startrails",  "icon": "fa-circle-notch" },
+			{ "comment": "Add sidebar items above." }
+		],
+		"popoutIcons": [
+			{ "label": "Location",  "icon": "fa-map-marker-alt",  "variable": "location",  "value": "" },
+			{ "label": "Latitude",  "icon": "fa-map-marker",  "variable": "latitude",  "value": "" },
+			{ "label": "Longitude",  "icon": "fa-map-marker",  "variable": "longitude",  "value": "" },
+			{ "label": "Camera",  "icon": "fa-camera-retro",  "variable": "camera",  "value": "" },
+			{ "label": "Lens",  "icon": "fa-dot-circle",  "variable": "lens",  "value": "" },
+			{ "label": "Computer",  "icon": "fa-microchip",  "variable": "computer",  "value": "" },
+			{ "label": "Owner",  "icon": "fa-user",  "variable": "owner",  "value": "" },
+			{ "comment": "Add popout items above." }
+		]
 	}
 }
