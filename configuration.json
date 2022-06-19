@@ -52,6 +52,7 @@
 
 	"homePage": {
 		"comment": "These settings impact the look and feel of the Website home page.",
+		"onPi": true,
 		"title": "XX_NEED_TO_UPDATE_XX",
 		"og_description": "XX_NEED_TO_UPDATE_XX",
 		"showOverlayIconComment": "Once you have modified the settings so the overlay fits, set 'showOverlayIcon' to true.",
