@@ -2,33 +2,13 @@
 <html prefix="og: http://ogp.me/ns#" ng-app="allsky" ng-controller="AppCtrl" lang="en">
 <head>
 	<?php
-		// Read the configuration file.
+		// This gets the settings.
 		// Some settings impact this page, some impact the constellation overlay.
-		$configuration_file = "configuration.json";
-		if (! file_exists($configuration_file)) {
-			echo "<p style='color: red; font-size: 200%'>";
-			echo "ERROR: Missing configuration file '$configuration_file'.  Cannot continue.";
-			echo "</p>";
-			exit;
-		}
-		$settings_str = file_get_contents($configuration_file, true);
-		$settings_array = json_decode($settings_str, true);
-		if ($settings_array == null) {
-			echo "<p style='color: red; font-size: 200%'>";
-			echo "ERROR: Bad configuration file '<span style='color: black'>$configuration_file</span>'.  Cannot continue.";
-			echo "<br>Check for missing quotes or commas at the end of every line (except the last one).";
-			echo "</p>";
-			echo "<pre>$settings_str</pre>";
-			exit;
-		} else {
-		}
-		function v($var, $default, $a) {
-			if (isset($a[$var])) return($a[$var]);
-			else return($default);
-		}
+		include_once('functions.php');		// Sets $settings_array
+
 		// Get home page options
 		$homePage = v("homePage", null, $settings_array);
-			$onPi = v("onPi", true);
+			$onPi = v("onPi", true, $homePage);
 			// TODO: replace double quotes with &quot; in any variable that can be in an HTML attribute,
 			// which is many of them.
 			$backgroundImage = v("backgroundImage", "", $homePage);
@@ -170,6 +150,7 @@ if (count($popoutIcons) > 0) {
 			$url = v("url", "", $side);
 			if ($url === "") continue;
 
+			$url = "$url?onPi=$onPi";
 			$title = v("title", "", $side);
 			$icon = v("icon", "", $side);
 			echo "\t\t<li><a href=" . '"' . $url . '"' .  "title=" . '"' . "$title" . '"' . "><i class=" . '"' . "fa fa-2x fa-fw $icon" . '"' . "></i></a></li>\n";
