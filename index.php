@@ -53,18 +53,18 @@
 			$showOverlayIcon = v("showOverlayIcon", false, $homePage);
 			$sidebar = v("sidebar", null, $homePage);
 			$popoutIcons = v("popoutIcons", null, $homePage);
-			$localLink = v("localLink", null, $homePage);
-			if ($localLink != null) {
-				$localLink_url = v("url", "", $localLink);
-				if ($localLink_url == "") {
-					$localLink = null;
+			$personalLink = v("personalLink", null, $homePage);
+			if ($personalLink != null) {
+				$personalLink_url = v("url", "", $personalLink);
+				if ($personalLink_url == "") {
+					$personalLink = null;
 				} else {
-					$localLink_prelink = v("prelink", "", $localLink);
-					$localLink_message = v("message", "", $localLink);
-					$localLink_title = v("title", "", $localLink);
-					$localLink_style = v("style", "", $localLink);
-					if ($localLink_style !== "")
-						$localLink_style = "style='$localLink_style'";
+					$personalLink_prelink = v("prelink", "", $personalLink);
+					$personalLink_message = v("message", "", $personalLink);
+					$personalLink_title = v("title", "", $personalLink);
+					$personalLink_style = v("style", "", $personalLink);
+					if ($personalLink_style !== "")
+						$personalLink_style = "style='$personalLink_style'";
 				}
 			}
 
@@ -126,10 +126,10 @@
 		</div>
 		<div style="clear:both;"></div>
 <?php	// display an optional link to the user's website
-	if ($localLink != null) {
-		echo "\t\t<div class='localLink'>";
-		if ($localLink_prelink !== "") echo "$localLink_prelink";
-		echo '<a href="' . $localLink_url . '" title="' . $localLink_title . '" target="_blank" ' . $localLink_style . '>' . $localLink_message . '</a>';
+	if ($personalLink != null) {
+		echo "\t\t<div class='personalLink'>";
+		if ($personalLink_prelink !== "") echo "$personalLink_prelink";
+		echo '<a href="' . $personalLink_url . '" title="' . $personalLink_title . '" target="_blank" ' . $personalLink_style . '>' . $personalLink_message . '</a>';
 		echo "</div>";
 	}
 ?>
@@ -141,6 +141,8 @@ if (count($popoutIcons) > 0) {
 		echo "\t\t<ul>\n";
 				foreach ($popoutIcons as $popout) {
 					$label = v("label", "", $popout);
+					if ($label === "") continue;
+
 					$icon = v("icon", "", $popout);
 					$js_variable = v("variable", "", $popout);
 					$value = v("value", "", $popout);
@@ -165,6 +167,8 @@ if (count($popoutIcons) > 0) {
 	if (count($sidebar) > 0) {
 		foreach ($sidebar as $side) {
 			$url = v("url", "", $side);
+			if ($url === "") continue;
+
 			$title = v("title", "", $side);
 			$icon = v("icon", "", $side);
 			echo "\t\t<li><a href=" . '"' . $url . '"' .  "title=" . '"' . "$title" . '"' . "><i class=" . '"' . "fa fa-2x fa-fw $icon" . '"' . "></i></a></li>\n";
