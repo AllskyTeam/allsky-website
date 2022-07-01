@@ -82,6 +82,7 @@
 			{ "url": "startrails",  "title": "Archived Startrails",  "icon": "fa-circle-notch" },
 			{ "comment": "Add sidebar items above." }
 		],
+		"sidebarStyle": "",
 		"popoutIcons": [
 			{ "label": "Location",  "icon": "fa-map-marker-alt",  "variable": "location",  "value": "" },
 			{ "label": "Latitude",  "icon": "fa-map-marker",  "variable": "latitude",  "value": "" },
