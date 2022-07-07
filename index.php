@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html prefix="og: http://ogp.me/ns#" ng-app="allsky" ng-controller="AppCtrl" lang="en">
 <head>
+	<meta charset="utf-8">
 	<?php
 		// This gets the settings.
 		// Some settings impact this page, some impact the constellation overlay.
@@ -34,8 +35,8 @@
 			$showOverlayIcon = v("showOverlayIcon", false, $homePage);
 			$sidebar = v("sidebar", null, $homePage);
 			$sidebarStyle = v("sidebarStyle", null, $homePage);
-			if ($sidebarStyle !== "") $sidebarStyle = "style='$sidebarStyle'";
 			$popoutIcons = v("popoutIcons", null, $homePage);
+			$personalLink_style = "";
 			$personalLink = v("personalLink", null, $homePage);
 			if ($personalLink != null) {
 				$personalLink_url = v("url", "", $personalLink);
@@ -46,8 +47,6 @@
 					$personalLink_message = v("message", "", $personalLink);
 					$personalLink_title = v("title", "", $personalLink);
 					$personalLink_style = v("style", "", $personalLink);
-					if ($personalLink_style !== "")
-						$personalLink_style = "style='$personalLink_style'";
 				}
 			}
 
@@ -72,6 +71,7 @@
 	?>
 
 	<title><?php echo $title ?></title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta property="og:title" content="All Sky Camera" />
 	<meta property="og:description" content="<?php echo $og_description ?>" />
 	<meta property="og:type" content="<?php echo $og_type ?>" />
@@ -92,13 +92,33 @@
 		integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS"
 		crossorigin="anonymous"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
-	<script src="moment.js" type="text/javascript"></script>
-	<script src="virtualsky/stuquery.js" type="text/javascript"></script>
-	<script src="virtualsky/virtualsky.js" type="text/javascript"></script>
+	<script src="moment.js"></script>
+	<script src="virtualsky/stuquery.js"></script>
+	<script src="virtualsky/virtualsky.js"></script>
 	<script src="ng-lodash.min.js"></script>
 	<script src="controller.js"></script>
+
+	<style>
+		.clear { clear: both; }
+		.camera-info {
+			margin-top: 5px;
+			font-size: 1.9em;
+		}
+		<?php
+			if ($backgroundImage !== null) {
+				echo "		.backgroundImage { background-image: url('$backgroundImage_url');";
+				if ($backgroundImage_style !== "")
+					echo " $backgroundImage_style";
+				echo " }";
+			}
+			if ($sidebarStyle !== null)
+				echo "		#sidebar { $sidebarStyle }";
+			if ($personalLink_style !== "")		// adds to what's in custom.css
+				echo "		.personalLink { $personalLink_style }";
+		?>
+	</style>
 </head>
-<body id="body" <?php if ($backgroundImage !== null) echo "style=" . '"background-image: url(' . "'$backgroundImage_url'); $backgroundImage_style" . '"'; ?>>
+<body id="body" <?php if ($backgroundImage !== null) echo "class='.backgroundImage'"; ?>>
 	<div class="header">
 		<div class=title><?php echo $title; ?></div>
 		<div ng-show="auroraForecast === true && forecast" class="forecast pull-right">
@@ -107,12 +127,12 @@
 				<span ng-class="getScale(val)" title="{{val}}/9">{{getScale(val)}}</span>
 			</span>
 		</div>
-		<div style="clear:both;"></div>
+		<div class="clear"></div>
 <?php	// display an optional link to the user's website
 	if ($personalLink != null) {
 		echo "\t\t<div class='personalLink'>";
 		if ($personalLink_prelink !== "") echo "$personalLink_prelink";
-		echo '<a href="' . $personalLink_url . '" title="' . $personalLink_title . '" target="_blank" ' . $personalLink_style . '>' . $personalLink_message . '</a>';
+		echo "<a href='$personalLink_url' title='$personalLink_title' target='_blank'>$personalLink_message</a>";
 		echo "</div>";
 	}
 ?>
@@ -142,7 +162,7 @@ if (count($popoutIcons) > 0) {
 ?>
 	<span class="notification" compile="notification"></span>
 
-	<ul id="sidebar" class="animated slideInLeft" <?php echo $sidebarStyle ?>>
+	<ul id="sidebar" class="animated slideInLeft">
 <?php	// The link to the overlay is always first and the camera info is always last.
 	if ($showOverlayIcon) {
 		echo "\t\t<li><i class='fa fa-2x fa-fw allsky-constellation' id='overlayBtn' title='Show constellations overlay' ng-click='toggleOverlay()' ng-class=" . '"' ."{'active': showOverlay}" . '"' . "></i></li>\n";
@@ -155,10 +175,10 @@ if (count($popoutIcons) > 0) {
 			$url = "$url?onPi=$onPi";
 			$title = v("title", "", $side);
 			$icon = v("icon", "", $side);
-			echo "\t\t<li><a href=" . '"' . $url . '"' .  "title=" . '"' . "$title" . '"' . "><i class=" . '"' . "fa fa-2x fa-fw $icon" . '"' . "></i></a></li>\n";
+			echo "\t\t<li><a href='$url' title='$title'><i class='fa fa-2x fa-fw $icon'></i></a></li>\n";
 		}
 		if (count($popoutIcons) > 0) {
-			echo "\t\t<li><i class='fa fa-2x fa-fw fa-camera' title='Information about the camera' ng-click='toggleInfo()' ng-class=" . '"' . "{'active': showInfo}" . '"' . " style='margin-top: 5px; font-size: 1.9em'></i></li>\n";
+			echo "\t\t<li><i class='fa fa-2x fa-fw fa-camera camera-info' title='Information about the camera' ng-click='toggleInfo()' ng-class=" . '"' . "{'active': showInfo}" . '"' . "></i></li>\n";
 		}
 	}
 ?>
@@ -173,12 +193,16 @@ if (count($popoutIcons) > 0) {
 		</div>
 	</div>
 	
-<?php if ($includeLinkToMakeOwn) { ?>
-	<div class="diy"><a href="http://thomasjacquin.com/make-your-own-allsky-camera"><i class="fa fa-gear"></i> Make Your Own</a></div>
-<?php } ?>
+<?php
+	if ($includeLinkToMakeOwn) {
+		echo "<div class='diy'>";
+		echo "<a href='http://thomasjacquin.com/make-your-own-allsky-camera'><i class='fa fa-gear'></i> Make Your Own</a>";
+		echo "</div>";
+	}
 
-<?php if ($includeGoogleAnalytics && file_exists("analyticsTracking.js")) { ?>
-	<script src="analyticsTracking.js"></script>
-<?php } ?>
+	if ($includeGoogleAnalytics && file_exists("analyticsTracking.js")) {
+		echo "<script src='analyticsTracking.js'></script>";
+	}
+?>
 </body>
 </html>
