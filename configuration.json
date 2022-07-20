@@ -78,6 +78,7 @@
 		"favicon": "allsky-favicon.png",
 		"sidebar": [
 			{ "url": "videos",  "title": "Archived Timelapes",  "icon": "fa-play-circle" },
+			{ "no_url": "/current/tmp/mini-timelapse.mp4",  "title": "Mini-timelapse",  "icon": "icon-mini-timelapse" },
 			{ "url": "keograms",  "title": "Archived Keograms",  "icon": "fa-barcode" },
 			{ "url": "startrails",  "title": "Archived Startrails",  "icon": "fa-circle-notch" },
 			{ "comment": "Add sidebar items above." }
