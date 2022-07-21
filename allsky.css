@@ -27,6 +27,11 @@ body {
 	height: 35px;
 }
 
+.personalLink {
+	text-align: center;
+	font-size: 150%;
+}
+
 .info {
 	padding: 8px;
 	position: fixed;
@@ -53,7 +58,6 @@ body {
 	position: fixed;
 	left: 0;
 	top: 150px;
-	padding: 0;
 	padding: 5px;
 	border-top-right-radius: 5px;
 	border-bottom-right-radius: 5px;
@@ -85,6 +89,9 @@ body {
 
 #imageContainer {
 	text-align: center;
+}
+.imageContainer {
+	border: 1px solid #5a5a5a;
 }
 
 img.current {
@@ -199,19 +206,24 @@ img.current {
 	margin: 0 3px;
 }
 
-.forecast .Low {
+.forecast .Very_Quite,
+.forecast .Quiet {
 	color: green;
 }
 
+.forecast .Unsettled,
 .forecast .Active {
 	color: yellow;
 }
 
-.forecast .High {
+.forecast .Minor_Storm,
+.forecast .Moderate_Storm {
 	color: darkorange;
 }
 
-.forecast .Extreme {
+.forecast .Strong_Storm,
+.forecast .Severe_Storm,
+.forecast .Extreme_Storm {
 	color: red;
 }
 
@@ -227,6 +239,32 @@ img.current {
 	margin-top: 30px;
 }
 
+.virtualsky_help {
+	color: black;
+}
+
 .thumbnailError {
 	color: red;
+}
+
+/* Messages on the home page */
+.msg {
+	background-color: #333;
+	text-align: center;
+	font-size: 145%;
+	font-weight: bold;
+	margin: 20px 0 20px 0;
+	padding: 20px 0 20px 0;
+}
+.error-msg {
+	color: red;
+	border: 3px dashed red;
+}
+.warning-msg {
+	color: yellow;
+	border: 3px dashed yellow;
+}
+.notice-msg {
+	color: white;
+	border: 3px solid white;
 }
