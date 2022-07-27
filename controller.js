@@ -1,11 +1,13 @@
 var app = angular.module('allsky', ['ngLodash']);
 
-var overlayBuilt = false;	// has the overlay been built yet?
+var overlayBuilt = false;				// has the overlay been built yet?
 
 var virtualSkyData = null;
+var sunData = "data.json";				// contains sunrise/sunset times and related data
+var configData = "configuration.json"	// contains web configuration data
 
 $(window).resize(function () {
-	if (overlayBuilt) {			// only rebuild if already built once
+	if (overlayBuilt) {					// only rebuild if already built once
 		buildOverlay();
 	}
 });
@@ -14,8 +16,13 @@ function buildOverlay(){
 	if (overlayBuilt) {
 		S.virtualsky(virtualSkyData);
 	} else {
+		// The index.php file already included the configuration file and set "config",
+		// so I didn't thing we'd need to do it again here, but it doesn't work if we don't.
+		// virtualSkyData = config;
+
 		$.ajax({
-			url: "configuration.json" + '?_ts=' + new Date().getTime(),
+			// No need for ?_ts=   since $.ajax adds one
+			url: configData,
 			cache: false
 		}).done(
 			function (data) {
@@ -25,8 +32,9 @@ function buildOverlay(){
 				virtualSkyData.width = window.innerWidth < config.overlayWidth ? window.innerWidth : config.overlayWidth;
 				virtualSkyData.height = config.overlayHeight;
 				S.virtualsky(virtualSkyData);
-				$("#starmap").css("margin-top", config.overlayOffsetTop + "px");
-				$("#starmap").css("margin-left", config.overlayOffsetLeft + "px");
+				$("#starmap")
+					.css("margin-top", config.overlayOffsetTop + "px")
+					.css("margin-left", config.overlayOffsetLeft + "px");
 				overlayBuilt = true;
 			}
 		);
@@ -57,7 +65,7 @@ function compile($compile) {
 }
 
 var configNotSet = false;	// Has the config.js file been updated by the user?
-var needToUpdate = "XX_NEED_TO_UPDATE_XX";	// must match what's in configuration.json
+var needToUpdate = "XX_NEED_TO_UPDATE_XX";	// must match what's in configData
 
 function AppCtrl($scope, $timeout, $http, _) {
 	$scope.imageURL = config.loadingImage;
@@ -73,8 +81,36 @@ function AppCtrl($scope, $timeout, $http, _) {
 		configNotSet = true;
 	}
 	$scope.location = config.location;
-	$scope.latitude = config.latitude;
-	$scope.longitude = config.longitude;
+	// virtualsky.js expects decimal numbers for latitude and longitude
+	var len, direction;
+	if (typeof config.latitude === "string") {
+		len = config.latitude.length;
+		direction = config.latitude.substr(length-1, 1).toUpperCase();
+		if (direction == "N")
+			$scope.latitude = config.latitude.substr(1, length-2) * 1;
+		else if (direction == "S")
+			$scope.latitude = config.latitude.substr(1, length-2) * -1;
+		else
+			$scope.latitude = config.latitude * 1;
+		config.latitude = $scope.latitude;
+	} else {
+		$scope.latitude = config.latitude;
+	}
+
+	if (typeof config.longitude === "string") {
+		len = config.longitude.length;
+		direction = config.longitude.substr(length-1, 1).toUpperCase();
+		if (direction == "E")
+				$scope.longitude = config.longitude.substr(1, length-2) * 1;
+		else if (direction == "W")
+			$scope.longitude = config.longitude.substr(1, length-2) * -1;
+		else
+			$scope.longitude = config.longitude * 1;
+		config.longitude = $scope.longitude;
+	} else {
+		$scope.longitude = config.longitude;
+	}
+
 	$scope.camera = config.camera;
 	$scope.lens = config.lens;
 	$scope.computer = config.computer;
@@ -104,8 +140,8 @@ function AppCtrl($scope, $timeout, $http, _) {
 		return document[prop];
 	}
 
-	// If the data.json file wasn't found, or for some reason "sunset" isn't in it,
-	// the routine that reads data.json will set "dataMissingMessage" so display it.
+	// If the "sunData" file wasn't found, or for some reason "sunset" isn't in it,
+	// the routine that reads "sunData" will set "dataMissingMessage" so display it.
 	var dataMissingMessage = "";
 
 	function formatMessage(msg, msgType) {
@@ -147,7 +183,7 @@ function AppCtrl($scope, $timeout, $http, _) {
 		var imageClass= "";
 		if (! isHidden()) {
 			if (configNotSet) {
-				$scope.notification = formatMessage("Please update the 'configuration.json' file.<br>Replace the '" + needToUpdate + "' entries and check all other entries.<br>Refresh your browser when done.", msgType="error");
+				$scope.notification = formatMessage("Please update the '" + configData + "' file.<br>Replace the '" + needToUpdate + "' entries and check all other entries.<br>Refresh your browser when done.", msgType="error");
 			} else if (dataMissingMessage !== "") {
 				$scope.notification = formatMessage(dataMissingMessage, msgType = dataFileIsOld ? "warning": "error");
 			} else {
@@ -178,7 +214,7 @@ function AppCtrl($scope, $timeout, $http, _) {
 //console.log("DEBUG: sunset daysOld=" + daysOld);
 				if (daysOld > oldDataLimit) {
 					var oldMsg = "WARNING: sunset is " + daysOld + " days old.";
-					$scope.notification = formatMessage(oldMsg + "<br>Check Allsky log file if 'postData.sh' has been running successfully at the end of nighttime.", msgType="warning");
+					$scope.notification = formatMessage(oldMsg + "<br>See the 'Troubleshooting -&gt; Website` Wiki page for how to resolve this.", msgType="warning");
 				}
 			}
 
@@ -198,7 +234,7 @@ function AppCtrl($scope, $timeout, $http, _) {
 			}
 
 			// The sunrise and sunset times change every day, and the user may have changed
-			// streamDaytime, so re-read the data.json file when something changes.
+			// streamDaytime, so re-read the "sunData" file when something changes.
 			if (is_nighttime) {
 				// Only add to the console log once per message type
 				if (lastType !== "nighttime") {
@@ -288,7 +324,8 @@ function AppCtrl($scope, $timeout, $http, _) {
 				console.log("  afterSunsetTime = " + afterSunsetTime);
 			}
 
-			var img = $("<img />").attr('src', url + '?_ts=' + new Date().getTime()).addClass(imageClass)
+			// Is there a way to specify not to cache this without using "?_ts" ?
+			var img = $("<img title='allsky image' />").attr('src', url + '?_ts=' + new Date().getTime()).addClass(imageClass)
 				.on('load', function() {
 					if (!this.complete || typeof this.naturalWidth === "undefined" || this.naturalWidth === 0) {
 						alert('broken image!');
@@ -302,22 +339,22 @@ function AppCtrl($scope, $timeout, $http, _) {
 
 			// Don't re-read after the 1st image of this period since we read it right before the image.
 			if (rereadSunriseSunset && numImagesRead > 1) {
-				// console.log("XXX Re-reading data.json");
+				// console.log("XXX Re-reading " + sunData);
 				$scope.getSunRiseSet();
 			} else if (rereadSunriseSunset) {
-				// console.log("XXX Not rereading data.json, numImagesRead=" + numImagesRead);
+				// console.log("XXX Not rereading " + sunData, numImagesRead=" + numImagesRead);
 			} else {
 				// console.log("XXX rereadSunriseSunset=" + rereadSunriseSunset);
 			}
 		}
 	};
 
-	// Set a default sunrise if we can't get it from data.json.
+	// Set a default sunrise if we can't get it from "sunData".
 	var usingDefaultSunrise = false;
 	function getDefaultSunrise(today) {
 		return(moment(new Date(today.getFullYear(), today.getMonth(), today.getDate(), 6, 0, 0)));
 	}
-	// Set a default sunset if we can't get it from data.json.
+	// Set a default sunset if we can't get it from "sunData".
 	var usingDefaultSunset = false;
 	function getDefaultSunset(today) {
 		return(moment(new Date(today.getFullYear(), today.getMonth(), today.getDate(), 18, 0, 0)));
@@ -336,8 +373,9 @@ function AppCtrl($scope, $timeout, $http, _) {
 	$scope.getSunRiseSet = function () {
 		dataFileIsOld = false;
 		now = new Date();
-		console.log("Read data.json at " + moment(now).format("MM-DD h:mm:ss a") + ":");
-		var url = "data.json" + '?_ts=' + now.getTime();
+		var url = sunData;
+		url += '?_ts=' + now.getTime();
+		console.log("Read " + sunData + " at " + moment(now).format("MM-DD h:mm:ss a") + ":");
 		$http.get(url, {
 			cache: false
 		}).then(
@@ -349,7 +387,7 @@ function AppCtrl($scope, $timeout, $http, _) {
 					// Older versions of allsky/scripts/postData.sh didn't include sunrise.
 					$scope.sunrise = getDefaultSunrise(now);
 					usingDefaultSunrise = true;
-					console.log("  ********** WARNING: 'sunrise' not defined in data.json");
+					console.log("  ********** WARNING: 'sunrise' not defined in " + sunData);
 				}
 				if (data.data.sunset) {
 					$scope.sunset = moment(data.data.sunset);
@@ -358,14 +396,14 @@ function AppCtrl($scope, $timeout, $http, _) {
 				} else if (! usingDefaultSunset) {
 					$scope.sunset = getDefaultSunset(now);
 					usingDefaultSunset = true;
-					dataMissingMessage = "ERROR: 'sunset' not defined in 'data.json', using " + $scope.sunset.format("h:mm a") + ".<br>Run 'allsky/scripts/postData.sh'.<br>Refresh your browser when done.";
-					console.log("  ********** WARNING: 'sunset' not defined in data.json");
+					dataMissingMessage = "ERROR: 'sunset' not defined in '" + sunData + "', using " + $scope.sunset.format("h:mm a") + ".<br>Run 'allsky/scripts/postData.sh'.<br>Refresh your browser when done.";
+					console.log("  ********** ERROR: 'sunset' not defined in " + sunData);
 				}
 				if (data.data.streamDaytime) {
 					$scope.streamDaytime = data.data.streamDaytime === "true";
 				} else {
 					$scope.streamDaytime = true;
-					console.log("  ********** WARNING: 'streamDaytime' not defined in data.json");
+					console.log("  ********** WARNING: 'streamDaytime' not defined in " + sunData);
 				}
 
 				// Get when the file was last modified so we can warn if it's old
@@ -387,16 +425,16 @@ function AppCtrl($scope, $timeout, $http, _) {
 				if (typeof x === "object") {	// success - "x" is a Date object
 					lastModifiedSunriseSunsetFile = moment(x);
 					var duration = moment.duration(moment(now).diff(lastModifiedSunriseSunsetFile));
-// console.log("DEBUG: data.json is " + duration.days() + " days old");
+// console.log("DEBUG: " + sunData + " is " + duration.days() + " days old");
 					if (duration.days() > oldDataLimit) {
 						dataFileIsOld = true;
-						var msg = "WARNING: data.json is " + duration.days() + " days old.";
+						var msg = "WARNING: " + sunData + " is " + duration.days() + " days old.";
 						console.log(msg);
 						dataMissingMessage = msg + "<br>Check Allsky log file if 'postData.sh' has been running successfully at the end of nighttime.";
 					}
 
 				} else {
-					console.log("fetchHeader(" + url + ") returned " + x);
+					console.log("fetchHeader(" + sunData + ") returned " + x);
 				}
 
 				writeSunriseSunsetToConsole();
@@ -410,8 +448,8 @@ function AppCtrl($scope, $timeout, $http, _) {
 				usingDefaultSunset = true;
 				$scope.streamDaytime = true;
 
-				dataMissingMessage = "ERROR: 'data.json' file not found, using " + $scope.sunset.format("h:mm a") + " for sunset.<br>Set 'POST_END_OF_NIGHT_DATA=true' in config.sh then run 'allsky/scripts/postData.sh'.<br>Refresh your browser when done.";
-				console.log("  *** Unable to read file");
+				dataMissingMessage = "ERROR: '" + sunData + " file not found, using " + $scope.sunset.format("h:mm a") + " for sunset.<br>Set 'POST_END_OF_NIGHT_DATA=true' in config.sh then run 'allsky/scripts/postData.sh'.<br>Refresh your browser when done.";
+				console.log("  *** Unable to read '" + sunData + "' file");
 				writeSunriseSunsetToConsole();
 
 				$scope.getImage()
@@ -435,11 +473,11 @@ function AppCtrl($scope, $timeout, $http, _) {
 	$scope.toggleOverlay = function () {
 		$scope.showOverlay = !$scope.showOverlay;
 
-	if (! overlayBuilt && $scope.showOverlay) {
-		console.log("@@@@ Building overlay...");
-		// The new 0.7.7 version of VirtualSky doesn't show the overlay unless buildOverlay() is called here.
-		buildOverlay();
-	}
+		if (! overlayBuilt && $scope.showOverlay) {
+			console.log("@@@@ Building overlay...");
+			// Version 0.7.7 of VirtualSky doesn't show the overlay unless buildOverlay() is called.
+			buildOverlay();
+		}
 
 		$('.options').fadeToggle();
 		$('#starmap_container').fadeToggle();
@@ -447,8 +485,8 @@ function AppCtrl($scope, $timeout, $http, _) {
 
 	$scope.getScale = function (index) {	// based mostly on https://auroraforecast.is/kp-index/
 		var scale = {
-			0: "Very_Quiet",
-			1: "Quiet",
+			0: "Extremely_Quiet",
+			1: "Very_Quiet",
 			2: "Quiet",
 			3: "Unsettled",
 			4: "Active",
