@@ -64,7 +64,7 @@ function compile($compile) {
 	};
 }
 
-var configNotSet = false;	// Has the config.js file been updated by the user?
+var configNotSet = false;	// Has the configuration file been updated by the user?
 var needToUpdate = "XX_NEED_TO_UPDATE_XX";	// must match what's in configData
 
 function AppCtrl($scope, $timeout, $http, _) {
@@ -77,8 +77,10 @@ function AppCtrl($scope, $timeout, $http, _) {
 	}
 	$scope.notification = "";
 	if (config.title == needToUpdate) {
-		// Assume if the title is set, everything else is too.
+		// Assume if the title isn't set, nothing else is either.
 		configNotSet = true;
+		$scope.notification = formatMessage("Please update the '" + configData + "' file.<br>Replace the '" + needToUpdate + "' entries and check all other entries.<br>Refresh your browser when done.", msgType="error");
+		return;
 	}
 	$scope.location = config.location;
 	// virtualsky.js expects decimal numbers for latitude and longitude
@@ -133,11 +135,11 @@ function AppCtrl($scope, $timeout, $http, _) {
 		// otherwise it's not supported
 		return null;
 	}
+	var hiddenProperty = getHiddenProp();
 
 	function isHidden() {
-		var prop = getHiddenProp();
-		if (!prop) return false;
-		return document[prop];
+		if (! hiddenProperty) return false;
+		return document[hiddenProperty];
 	}
 
 	// If the "sunData" file wasn't found, or for some reason "sunset" isn't in it,
@@ -155,9 +157,7 @@ function AppCtrl($scope, $timeout, $http, _) {
 
 	// The defaultInterval should ideally be based on the time between day and night images - why
 	// check every 5 seconds if new images only appear once a minute?
-	var defaultInterval = (5 * 1000);		// Time to wait between normal images.
-	if (config.intervalSeconds) defaultInterval = config.intervalSeconds * 1000;
-
+	var defaultInterval = (config.intervalSeconds * 1000);		// Time to wait between normal images.
 	var intervalTimer = defaultInterval;		// Amount of time we're currently waiting
 
 	// If we're not taking pictures during the day, we don't need to check for updated images as often.
@@ -166,7 +166,7 @@ function AppCtrl($scope, $timeout, $http, _) {
 	// there's no need to check until nightfall.
 	// However, in case the image DOES change, check every minute.  Seems like a good compromise.
 	// Also, in both cases, if we wait too long, when the user returns to the web page after
-	// it being hidden, they'll have to wait a long time for the page to update.
+	// it's been hidden, they'll have to wait a long time for the page to update.
 	var auroraIntervalTimer = (60 * 1000);			// seconds
 	var auroraIntervalTimerShortened = (15 * 1000);	// seconds
 	var nonAuroraIntervalTimer = (60 * 1000);		// seconds
@@ -178,11 +178,15 @@ function AppCtrl($scope, $timeout, $http, _) {
 	var lastType = "";
 	var loggedTimes = false;
 	var numImagesRead = 0;
+	var numCalls = 0;
 	$scope.getImage = function () {
 		var url= "";
 		var imageClass= "";
-		if (! isHidden()) {
+		// Go through the loop occassionally even when hidden so we re-read the sunData file
+		// if needed.
+		if (! isHidden() || ++numCalls % 5 == 0) {
 			if (configNotSet) {
+// xxxxxxxxx test deleting the "if" portion
 				$scope.notification = formatMessage("Please update the '" + configData + "' file.<br>Replace the '" + needToUpdate + "' entries and check all other entries.<br>Refresh your browser when done.", msgType="error");
 			} else if (dataMissingMessage !== "") {
 				$scope.notification = formatMessage(dataMissingMessage, msgType = dataFileIsOld ? "warning": "error");
@@ -324,8 +328,10 @@ function AppCtrl($scope, $timeout, $http, _) {
 				console.log("  afterSunsetTime = " + afterSunsetTime);
 			}
 
-			// Is there a way to specify not to cache this without using "?_ts" ?
-			var img = $("<img title='allsky image' />").attr('src', url + '?_ts=' + new Date().getTime()).addClass(imageClass)
+// TODO: Is there a way to specify not to cache this without using "?_ts" ?
+			var img = $("<img title='allsky image' />")
+				.attr('src', url + '?_ts=' + new Date().getTime())
+				.addClass(imageClass)
 				.on('load', function() {
 					if (!this.complete || typeof this.naturalWidth === "undefined" || this.naturalWidth === 0) {
 						alert('broken image!');
@@ -339,14 +345,9 @@ function AppCtrl($scope, $timeout, $http, _) {
 
 			// Don't re-read after the 1st image of this period since we read it right before the image.
 			if (rereadSunriseSunset && numImagesRead > 1) {
-				// console.log("XXX Re-reading " + sunData);
 				$scope.getSunRiseSet();
-			} else if (rereadSunriseSunset) {
-				// console.log("XXX Not rereading " + sunData, numImagesRead=" + numImagesRead);
-			} else {
-				// console.log("XXX rereadSunriseSunset=" + rereadSunriseSunset);
 			}
-		}
+		} // if (! isHidden()))
 	};
 
 	// Set a default sunrise if we can't get it from "sunData".
@@ -374,6 +375,7 @@ function AppCtrl($scope, $timeout, $http, _) {
 		dataFileIsOld = false;
 		now = new Date();
 		var url = sunData;
+// TODO: is ?_ts needed if we are not cache'ing ?
 		url += '?_ts=' + now.getTime();
 		console.log("Read " + sunData + " at " + moment(now).format("MM-DD h:mm:ss a") + ":");
 		$http.get(url, {
@@ -384,6 +386,7 @@ function AppCtrl($scope, $timeout, $http, _) {
 					$scope.sunrise = moment(data.data.sunrise);
 					usingDefaultSunrise = false;
 				} else if (! usingDefaultSunrise) {
+// TODO: Is this needed with the new Allsky Website, given that it only works with the new Allsky?
 					// Older versions of allsky/scripts/postData.sh didn't include sunrise.
 					$scope.sunrise = getDefaultSunrise(now);
 					usingDefaultSunrise = true;
@@ -394,6 +397,7 @@ function AppCtrl($scope, $timeout, $http, _) {
 					usingDefaultSunset = false;
 					dataMissingMessage = "";
 				} else if (! usingDefaultSunset) {
+// TODO: Is this needed with the new Allsky Website, given that it only works with the new Allsky?
 					$scope.sunset = getDefaultSunset(now);
 					usingDefaultSunset = true;
 					dataMissingMessage = "ERROR: 'sunset' not defined in '" + sunData + "', using " + $scope.sunset.format("h:mm a") + ".<br>Run 'allsky/scripts/postData.sh'.<br>Refresh your browser when done.";
@@ -402,6 +406,7 @@ function AppCtrl($scope, $timeout, $http, _) {
 				if (data.data.streamDaytime) {
 					$scope.streamDaytime = data.data.streamDaytime === "true";
 				} else {
+// TODO: Is this needed with the new Allsky Website, given that it only works with the new Allsky?
 					$scope.streamDaytime = true;
 					console.log("  ********** WARNING: 'streamDaytime' not defined in " + sunData);
 				}
