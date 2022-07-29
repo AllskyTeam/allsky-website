@@ -83,34 +83,63 @@ function AppCtrl($scope, $timeout, $http, _) {
 		return;
 	}
 	$scope.location = config.location;
-	// virtualsky.js expects decimal numbers for latitude and longitude
+
+	// Allow latitude and longitude to have or not have N, S, E, W,
+	// but in the popout, always use the letters for consistency.
+	// virtualsky.js expects decimal numbers so we need both.
 	var len, direction;
+	var convertToString = false;
 	if (typeof config.latitude === "string") {
+		$scope.s_latitude = config.latitude;	// string version
+
 		len = config.latitude.length;
-		direction = config.latitude.substr(length-1, 1).toUpperCase();
+		direction = config.latitude.substr(len-1, 1).toUpperCase();
 		if (direction == "N")
-			$scope.latitude = config.latitude.substr(1, length-2) * 1;
+			$scope.latitude = config.latitude.substr(0, len-2) * 1;
 		else if (direction == "S")
-			$scope.latitude = config.latitude.substr(1, length-2) * -1;
-		else
+			$scope.latitude = config.latitude.substr(0, len-2) * -1;
+		else {
+			// a number with quotes around it which is treated as a string
 			$scope.latitude = config.latitude * 1;
-		config.latitude = $scope.latitude;
+			convertToString = true;
+		}
 	} else {
 		$scope.latitude = config.latitude;
+		convertToString = true;
 	}
 
-	if (typeof config.longitude === "string") {
-		len = config.longitude.length;
-		direction = config.longitude.substr(length-1, 1).toUpperCase();
-		if (direction == "E")
-				$scope.longitude = config.longitude.substr(1, length-2) * 1;
-		else if (direction == "W")
-			$scope.longitude = config.longitude.substr(1, length-2) * -1;
+	if (convertToString) {
+		if (config.latitude >= 0)
+			$scope.s_latitude = config.latitude + "N";
 		else
+			$scope.s_latitude = -config.latitude + "S";
+	}
+
+	convertToString = false;
+	if (typeof config.longitude === "string") {
+		$scope.s_longitude = config.longitude;
+
+		len = config.longitude.length;
+		direction = config.longitude.substr(len-1, 1).toUpperCase();
+		if (direction == "E")
+			$scope.longitude = config.longitude.substr(0, len-2) * 1;
+		else if (direction == "W")
+			$scope.longitude = config.longitude.substr(0, len-2) * -1;
+		else {
+			// a number with quotes around it which is treated as a string
 			$scope.longitude = config.longitude * 1;
-		config.longitude = $scope.longitude;
+			convertToString = true;
+		}
 	} else {
 		$scope.longitude = config.longitude;
+		convertToString = true;
+	}
+
+	if (convertToString) {
+		if (config.longitude >= 0)
+			$scope.s_longitude = config.longitude + "E";
+		else
+			$scope.s_longitude = -config.longitude + "W";
 	}
 
 	$scope.camera = config.camera;
