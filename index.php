@@ -10,6 +10,7 @@
 		// Get home page options
 		$homePage = v("homePage", null, $settings_array);
 			$onPi = v("onPi", true, $homePage);
+				if ($onPi == "") $onPi = 0;		// boolean
 			// TODO: replace double quotes with &quot; in any variable that can be in an HTML attribute,
 			// which is many of them.
 			$backgroundImage = v("backgroundImage", "", $homePage);
@@ -30,9 +31,12 @@
 			$ext = pathinfo($favicon, PATHINFO_EXTENSION); if ($ext === "jpg") $ext = "jpeg";
 			$faviconType = "image/$ext";
 			$includeGoogleAnalytics = v("includeGoogleAnalytics", "", $homePage);
+				if ($includeGoogleAnalytics == "") $includeGoogleAnalytics = 0;		// boolean
 			$imageBorder = v("imageBorder", false, $homePage);
 			$includeLinkToMakeOwn = v("includeLinkToMakeOwn", true, $homePage);
+				if ($includeLinkToMakeOwn == "") $includeLinkToMakeOwn = 0;		// boolean
 			$showOverlayIcon = v("showOverlayIcon", false, $homePage);
+				if ($showOverlayIcon == "") $showOverlayIcon = 0;		// boolean
 			$sidebar = v("sidebar", null, $homePage);
 			$sidebarStyle = v("sidebarStyle", null, $homePage);
 			$popoutIcons = v("popoutIcons", null, $homePage);
@@ -139,10 +143,11 @@
 
 	</div>
 <?php
-if (count($popoutIcons) > 0) {
-	echo "\t<div class='info animated slideInRight' ng-show='showInfo==true'>\n";
-		echo "\t\t<ul>\n";
+	if (count($popoutIcons) > 0) {
+		echo "\t<div class='info animated slideInRight' ng-show='showInfo==true'>\n";
+			echo "\t\t<ul>\n";
 				foreach ($popoutIcons as $popout) {
+					// Skip items with empty labels.
 					$label = v("label", "", $popout);
 					if ($label === "") continue;
 
@@ -151,14 +156,14 @@ if (count($popoutIcons) > 0) {
 					$value = v("value", "", $popout);
 					echo "\t\t\t<li><i class='fa fa-fw $icon'></i>&nbsp; $label:&nbsp; <span>";
 					if ($js_variable != "")
-						echo "{{" . $js_variable . "}}";
+						echo "{{ $js_variable }}";
 					else
 						echo "$value";
 					echo "</span></li>\n";
 				}
-		echo "\t\t</ul>\n";
-	echo "\t</div>\n";
-}
+			echo "\t\t</ul>\n";
+		echo "\t</div>\n";
+	}
 ?>
 	<span class="notification" compile="notification"></span>
 
@@ -170,6 +175,9 @@ if (count($popoutIcons) > 0) {
 	if (count($sidebar) > 0) {
 		foreach ($sidebar as $side) {
 			$url = v("url", "", $side);
+			$js_variable = v("variable", "", $side);
+			if ($js_variable !== "")
+				$url = "{{ $js_variable }}";
 			if ($url === "") continue;
 
 			$url = "$url?onPi=$onPi";
