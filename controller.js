@@ -35,6 +35,8 @@ function buildOverlay(){
 				$("#starmap")
 					.css("margin-top", config.overlayOffsetTop + "px")
 					.css("margin-left", config.overlayOffsetLeft + "px");
+				if (config.imageHeight)
+					$("#starmap_container").css("height", data.config.imageHeight + "px")
 				overlayBuilt = true;
 			}
 		);
