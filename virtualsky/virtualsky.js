@@ -866,7 +866,8 @@ function VirtualSky(input){
 			'stars':'rgb(255,255,255)',
 			'sun':'rgb(255,215,0)',
 			'moon':'rgb(150,150,150)',
-			'cardinal':'rgba(163,228,255, 1)',
+			'cardinal':'rgba(255,0,0, 1)',
+			'xxxcardinal':'rgba(163,228,255, 1)',
 			'constellation':"rgba(180,180,255,0.8)",
 			'constellationboundary':"rgba(255,255,100,0.6)",
 			'showers':"rgba(100,255,100,0.8)",
@@ -1088,6 +1089,7 @@ VirtualSky.prototype.init = function(d){
 	if(is(d.lang,s) && d.lang.length==2) this.language = d.lang;
 	if(is(d.fontfamily,s)) this.fntfam = d.fontfamily.replace(/%20/g,' ');
 	if(is(d.fontsize,s)) this.fntsze = d.fontsize;
+	if(is(d.cardinalpoints_fontsize,s)) this.cardinalpoints_fntsze = d.cardinalpoints_fontsize;		// ALLSKY ADDED
 	if(is(d.lang,s)) this.setlang = d.lang;
 	if(is(d.callback,o)){
 		if(is(d.callback.geo,f)) this.callback.geo = d.callback.geo;
@@ -1098,6 +1100,18 @@ VirtualSky.prototype.init = function(d){
 		if(is(d.callback.contextmenu,f)) this.callback.contextmenu = d.callback.contextmenu;
 		if(is(d.callback.draw,f)) this.callback.draw = d.callback.draw;
 	}
+
+	// ALLSKY ADDED: Replace default colors with ones the user specified.
+	var c = d.colours.normal;
+	for(key in c) {
+//x console.log(">> key=" + key + ", value=" + c[key]);
+		this.colours.normal[key] = c[key];
+	}
+	c = d.colours.negative;
+	for(key in c) {
+		this.colours.negative[key] = c[key];
+	}
+
 	return this;
 };
 
@@ -1173,7 +1187,6 @@ VirtualSky.prototype.htmlDecode = function(input){
 	e.innerHTML = input;
 	return e.childNodes[0].nodeValue;
 };
-var nnum=0;
 VirtualSky.prototype.getPhrase = function(key,key2){
 	if(key===undefined) return undefined;
 	if(key==="constellations"){
@@ -1197,6 +1210,13 @@ VirtualSky.prototype.resize = function(w,h){
 			this.canvas.css({'width':0,'height':0});
 			w = this.container.outerWidth();
 			h = this.container.outerHeight();
+			// ALLSKY ADDED useWidth, useHeight, and wasDiff to tell us what size the overlay
+			// should be.  Resizes weren't working, so controller.js determines the sizes
+			// and passes them to us via these gloval variables.
+			w = useWidth;
+			h = useHeight;
+			if (! wasDiff) return;		// There was no difference.
+// console.log("new w=" + w + ", h=" + h + ", this.wide=" + this.wide + ", this.tall=" + this.tall);
 			this.canvas.css({'width':w+'px','height':h+'px'});
 		}
 	}else{
@@ -1216,6 +1236,7 @@ VirtualSky.prototype.setWH = function(w,h){
 	this.c.width = w;
 	this.c.height = h;
 	this.wide = w;
+// console.log(">>>> setWH(" + w + ", " + h + ")");
 	this.tall = h;
 	this.changeFOV();
 	// DEPRECATED // Bug fix for IE 8 which sets a width of zero to a div within the <canvas>
@@ -1285,6 +1306,7 @@ VirtualSky.prototype.loadJSON = function(file,callback,complete,error){
 		error: error || function(){}
 	};
 	if(dt=="json") config.jsonp = 'onJSONPLoad';
+	if(dt=="json") config.cache = true;	// ALLSKY added
 	if(dt=="script") config.cache = true;	// Use a cached version
 	S(document).ajax(this.base+file,config);
 	return this;
@@ -1389,7 +1411,7 @@ VirtualSky.prototype.createSky = function(){
 	// If the Javascript function has been passed a width/height
 	// those take precedence over the CSS-set values
 	if(this.wide > 0) this.container.css({'width':this.wide+'px'});
-	this.wide = this.container.width();
+	else this.wide = this.container.width();
 	if(this.tall > 0) this.container.css({'height':this.tall+'px'});
 	this.tall = this.container.height()-0;
 
@@ -2285,7 +2307,7 @@ VirtualSky.prototype.Transform = function(p, rot, indeg){
 	else return [a,b];
 };
 // Convert from B1875 to J2000
-// Using B = 1900.0 + (JD − 2415020.31352) / 365.242198781 and p73 Practical Astronomy With A Calculator
+// Using B = 1900.0 + (JD âˆ’ 2415020.31352) / 365.242198781 and p73 Practical Astronomy With A Calculator
 VirtualSky.prototype.fk1tofk5 = function(a,b){
 	// Convert from B1875 -> J2000
 	return this.Transform([a,b], [0.9995358730015703, -0.02793693620138929, -0.012147682028606801, 0.027936935758478665, 0.9996096732234282, -0.00016976035344812515, 0.012147683047201562, -0.00016968744936278707, 0.9999261997781408]);
@@ -2349,7 +2371,7 @@ VirtualSky.prototype.invokeDrawCb = function(visible){
 
 // ALLSKY ADDED "whofrom" argument to aid debugging.  It says who called drawImmediate().
 VirtualSky.prototype.drawImmediate = function(proj, whofrom){
-//if (typeof whofrom !== "undefined") console.log("drawImmediate() called by " + whofrom);
+// console.log("drawImmediate() called by " + whofrom);
 	// Don't bother drawing anything if there is no physical area to draw on
 	if(this.pendingRefresh !== undefined){
 		window.clearTimeout(this.pendingRefresh);
@@ -2455,6 +2477,7 @@ VirtualSky.prototype.drawImmediate = function(proj, whofrom){
 		d.find('.'+this.id+'_credit a').css({display:'block',width:Math.ceil(metric_credit)+'px',height:fontsize+'px'});
 		this.positionCredit();
 	}
+
 	if(this.showhelp){
 		var helpstr = '?';
 		if(d.find('.'+this.id+'_help').length == 0)
@@ -2489,7 +2512,9 @@ VirtualSky.prototype.drawImmediate = function(proj, whofrom){
 			e.data.me.toggleHelp();
 		});
 	}
-	if(this.container.find('.'+this.id+'_clock').length == 0){
+
+// ALLSKY ADDED "this.showdate"
+	if(this.showdate && this.container.find('.'+this.id+'_clock').length == 0){
 		this.container.append('<div class="'+this.id+'_clock" title="'+this.getPhrase('datechange')+'">'+clockstring+'</div>');
 		off = S('#'+this.idinner).position();
 		this.container.find('.'+this.id+'_clock').css({
@@ -2540,7 +2565,8 @@ VirtualSky.prototype.drawImmediate = function(proj, whofrom){
 		});
 	}
 
-	if(S('.'+this.id+'_position').length == 0){
+// ALLSKY ADDED "this.showposition"
+	if(this.showposition && S('.'+this.id+'_position').length == 0){
 		this.container.append('<div class="'+this.id+'_position" title="'+this.getPhrase('positionchange')+'">'+positionstring+'</div>');
 		S('.'+this.id+'_position').on('click',{sky:this},function(e){
 			var s = e.data.sky;
@@ -3239,7 +3265,15 @@ VirtualSky.prototype.drawCardinalPoints = function(){
 	var c = this.ctx;
 	c.beginPath();
 	c.fillStyle = this.col.cardinal;
-	var fontsize = this.fontsize();
+
+	// ALLSKY CHANGED: use new cardinalpoints_fontsize if set, otherwise fontsize().
+	var saved_fontsize = this.fontsize();
+	var fontsize = this.cardinalpoints_fntsze ? parseInt(this.cardinalpoints_fntsze) : saved_fontsize;
+	// This is a hack.  fillText() uses the stored original fontsize, so we have to
+	// temporarily replace it, draw the points, then replace it.
+	if (fontsize != saved_fontsize)
+		this.ctx.font = fontsize+"px Helvetica";
+
 	for(i = 0 ; i < azs.length ; i++){
 		if(c.measureText){
 			m = c.measureText(d[i]);
@@ -3261,6 +3295,9 @@ VirtualSky.prototype.drawCardinalPoints = function(){
 		if(x > 0) c.fillText(d[i],x,y);
 	}
 	c.fill();
+
+	if (fontsize != saved_fontsize)
+		this.ctx.font = saved_fontsize+"px Helvetica";
 
 	return this;
 };
