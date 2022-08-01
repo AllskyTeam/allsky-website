@@ -6,9 +6,42 @@ var virtualSkyData = null;
 var sunData = "data.json";				// contains sunrise/sunset times and related data
 var configData = "configuration.json"	// contains web configuration data
 
+// This returns the height INCLUDING the border:      $("#imageContainer").css('height')
+// This returns the height NOT including the border:  $("#imageContainer").height()
+
+// These two are used by virtualsky.js to set the overlay width and height,
+// if there was a difference.
+var useWidth = 0, useHeight = 0;
+var wasDiff = true;
+
+var imageAspectRatio;
+
 $(window).resize(function () {
 	if (overlayBuilt) {					// only rebuild if already built once
-		buildOverlay();
+		var newW = $("#imageContainer").width();
+		var newH = $("#imageContainer").height()
+//		console.log("#imageContainer newW=" + newW + ", newH=" + newH);
+
+		var diffW = newW - useWidth;
+		// Scale the height based on the aspect ratio of the image.
+		var diffH = Math.round(((newH - useHeight) * imageAspectRatio), 0);
+
+		if (diffW == 0 && diffH == 0) {
+			wasDiff = false;
+//			console.log(">>> No change in image size.");
+			return;
+		}
+
+		wasDiff = true;
+
+//		console.log("== diffW= " + diffW + ", diffH= " + diffH);
+		useWidth  += diffW;
+		useHeight += diffH;
+
+		// This does not change the SIZE of the overlay; it changes how much is viewable.
+// console.log("=== Resizing #starmap_container to w=" + useWidth + ", h=" + useHeight);
+		$("#starmap_container").css("width", useWidth + "px").css("height", useHeight + "px");
+		$("#starmap_inner").css("width", useWidth + "px").css("height", useHeight + "px");
 	}
 });
 
@@ -28,16 +61,35 @@ function buildOverlay(){
 			function (data) {
 				virtualSkyData = data.config;
 
-				// This is to scale the overlay when the window is resized.
-				virtualSkyData.width = window.innerWidth < config.overlayWidth ? window.innerWidth : config.overlayWidth;
-				virtualSkyData.height = config.overlayHeight;
-				S.virtualsky(virtualSkyData);
-				$("#starmap")
-					.css("margin-top", config.overlayOffsetTop + "px")
-					.css("margin-left", config.overlayOffsetLeft + "px");
-				if (config.imageHeight)
-					$("#starmap_container").css("height", data.config.imageHeight + "px")
+				// These variables have different names in virtualsky.js and our config file.
+				virtualSkyData.width = data.config.overlayWidth;
+				virtualSkyData.height = data.config.overlayHeight;
+
+				S.virtualsky(virtualSkyData);		// Creates overlay
 				overlayBuilt = true;
+
+				// Offset of overlay
+				$("#starmap")
+					.css("margin-top", data.config.overlayOffsetTop + "px")
+					.css("margin-left", data.config.overlayOffsetLeft + "px");
+
+				useWidth = $("#imageContainer").width();
+				useHeight = $("#imageContainer").height();
+				imageAspectRatio = useWidth / useHeight;
+
+				// #starmap_container determines how much of the constellation overlay shows.
+				// Think of it as a window into the overlay.
+				// It should be at most the height of the image.
+				if (useHeight > data.config.imageHeight)
+					useHeight = data.config.imageHeight;
+
+// console.log("=== Initial #starmap_container, w=" + useWidth + ", h=" + useHeight);
+				$("#starmap_container")
+					.css("width", useWidth + "px")
+					.css("height", useHeight + "px");
+				$("#starmap_inner")
+					.css("width", useWidth + "px")
+					.css("height", useHeight + "px");
 			}
 		);
 	}
@@ -74,7 +126,7 @@ function AppCtrl($scope, $timeout, $http, _) {
 	$scope.showInfo = false;
 	$scope.showOverlay = config.showOverlayAtStartup;
 	if ($scope.showOverlay) {
-		console.log("@@ Building overlay...");
+		console.log("@@ Building overlay at startup for showOverlay...");
 		buildOverlay();
 	}
 	$scope.notification = "";
@@ -510,7 +562,7 @@ function AppCtrl($scope, $timeout, $http, _) {
 		$scope.showOverlay = !$scope.showOverlay;
 
 		if (! overlayBuilt && $scope.showOverlay) {
-			console.log("@@@@ Building overlay...");
+			console.log("@@@@ Building overlay from toggle...");
 			// Version 0.7.7 of VirtualSky doesn't show the overlay unless buildOverlay() is called.
 			buildOverlay();
 		}
