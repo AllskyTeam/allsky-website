@@ -866,8 +866,7 @@ function VirtualSky(input){
 			'stars':'rgb(255,255,255)',
 			'sun':'rgb(255,215,0)',
 			'moon':'rgb(150,150,150)',
-			'cardinal':'rgba(255,0,0, 1)',
-			'xxxcardinal':'rgba(163,228,255, 1)',
+			'cardinal':'rgba(163,228,255, 1)',
 			'constellation':"rgba(180,180,255,0.8)",
 			'constellationboundary':"rgba(255,255,100,0.6)",
 			'showers':"rgba(100,255,100,0.8)",
@@ -2307,7 +2306,7 @@ VirtualSky.prototype.Transform = function(p, rot, indeg){
 	else return [a,b];
 };
 // Convert from B1875 to J2000
-// Using B = 1900.0 + (JD âˆ’ 2415020.31352) / 365.242198781 and p73 Practical Astronomy With A Calculator
+// Using B = 1900.0 + (JD - 2415020.31352) / 365.242198781 and p73 Practical Astronomy With A Calculator
 VirtualSky.prototype.fk1tofk5 = function(a,b){
 	// Convert from B1875 -> J2000
 	return this.Transform([a,b], [0.9995358730015703, -0.02793693620138929, -0.012147682028606801, 0.027936935758478665, 0.9996096732234282, -0.00016976035344812515, 0.012147683047201562, -0.00016968744936278707, 0.9999261997781408]);
