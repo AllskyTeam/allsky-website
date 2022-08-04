@@ -1,0 +1,14 @@
+version: "3.7"
+
+services:
+
+    app:
+        build:
+            context: .
+            dockerfile: docker/Dockerfile
+        ports:
+            - 80
+        volumes:
+            - type: bind
+              source: ${PWD}
+              target: /var/www/html
