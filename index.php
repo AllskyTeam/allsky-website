@@ -154,7 +154,7 @@
 					$icon = v("icon", "", $popout);
 					$js_variable = v("variable", "", $popout);
 					$value = v("value", "", $popout);
-					echo "\t\t\t<li><i class='fa fa-fw $icon'></i>&nbsp; $label:&nbsp; <span>";
+					echo "\t\t\t<li><i class='$icon'></i>&nbsp; $label:&nbsp; <span>";
 					if ($js_variable != "")
 						echo "{{ $js_variable }}";
 					else
@@ -183,7 +183,7 @@
 			$url = "$url?onPi=$onPi";
 			$title = v("title", "", $side);
 			$icon = v("icon", "", $side);
-			echo "\t\t<li><a href='$url' title='$title'><i class='fa fa-2x fa-fw $icon'></i></a></li>\n";
+			echo "\t\t<li><a href='$url' title='$title'><i class='$icon'></i></a></li>\n";
 		}
 		if (count($popoutIcons) > 0) {
 			echo "\t\t<li><i class='fa fa-2x fa-fw fa-camera camera-info' title='Information about the camera' ng-click='toggleInfo()' ng-class=" . '"' . "{'active': showInfo}" . '"' . "></i></li>\n";
