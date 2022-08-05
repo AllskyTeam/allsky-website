@@ -64,7 +64,7 @@
 				if ($val === true || $val === false || $val === null || is_numeric($val))
 					echo var_export($val, true) . ",\n";
 				else
-					echo '"' . $val . '",' . "\n";
+					echo '"' . str_replace('"', '\"', $val) . '",' . "\n";
 			}
 			// Add additional variable(s) from $homePage that are needed in controller.js.
 			echo "\t\ttitle: " . '"' . $title . '",' . "\n";
