@@ -121,9 +121,14 @@ function get_variable($file, $searchfor, $default)
 
 		// Format: [stuff]$searchfor=$value   or   [stuff]$searchfor="$value"
 		// Need to delete  [stuff]$searchfor=  and optional double quotes
-		$last = $matches[0][$num_matches - 1];	// get the last one
-		$last = explode( '=', $last)[1];	// get everything after equal sign
-		$last = str_replace($double_quote, "", $last);
+		$last = $matches[0][$num_matches - 1];		// get the last one
+		$both = explode( '=', $last);
+		if (isset($both[1])) {
+			$last = $both[1];						// everything after equal sign
+			$last = str_replace($double_quote, "", $last);
+		} else {
+			return($default);		// nothing after "="
+		}
 		return($last);
 	} else {
 		return($default);
@@ -231,6 +236,7 @@ function make_thumb_from_video($src, $dest, $desired_width, $attempts)
 	else
 		$sec = "00";
 	$command = "ffmpeg -loglevel warning -ss 00:00:$sec -i '$src' -filter:v scale='$desired_width:-1' -frames:v 1 '$dest' 2>&1";
+	$output = $array();
 	exec($command, $output);
 	if (file_exists($dest)) {
 		if (filesize($dest) === 0) {
@@ -289,8 +295,8 @@ function display_thumbnails($dir, $file_prefix, $title)
 	
 	$thumb_dir = "$dir/thumbnails";
 	if (! is_dir($thumb_dir)) {
-		if (! mkdir($thum_dir, 0775))
-			echo "<p>Unable to make '$thum_dir' directory. You will need to create it manually.</p>";
+		if (! mkdir($thumb_dir, 0775))
+			echo "<p>Unable to make '$thumb_dir' directory. You will need to create it manually.</p>";
 			print_r(error_get_last());
 	}
 
