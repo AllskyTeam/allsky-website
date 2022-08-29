@@ -91,7 +91,7 @@
 	<link rel="stylesheet" type="text/css" href="allsky.css">
 	<link rel="stylesheet" type="text/css" href="allsky-font.css">
 
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"
 		integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS"
 		crossorigin="anonymous"></script>
@@ -104,10 +104,6 @@
 
 	<style>
 		.clear { clear: both; }
-		.camera-info {
-			margin-top: 5px;
-			font-size: 1.9em;
-		}
 		<?php
 			if ($backgroundImage !== null) {
 				echo "		.backgroundImage { background-image: url('$backgroundImage_url');";
@@ -186,7 +182,7 @@
 			echo "\t\t<li><a href='$url' title='$title'><i class='$icon'></i></a></li>\n";
 		}
 		if (count($popoutIcons) > 0) {
-			echo "\t\t<li><i class='fa fa-2x fa-fw fa-camera camera-info' title='Information about the camera' ng-click='toggleInfo()' ng-class=" . '"' . "{'active': showInfo}" . '"' . "></i></li>\n";
+			echo "\t\t<li><i class='fa fa-2x fa-fw fa-camera' title='Information about the camera' ng-click='toggleInfo()' ng-class=" . '"' . "{'active': showInfo}" . '"' . "></i></li>\n";
 		}
 	}
 ?>
