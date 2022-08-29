@@ -1101,14 +1101,21 @@ VirtualSky.prototype.init = function(d){
 	}
 
 	// ALLSKY ADDED: Replace default colors with ones the user specified.
-	var c = d.colours.normal;
-	for(key in c) {
+	if (d.colours) {
+		var c = d.colours.normal;
+		if (c) {
+			for(key in c) {
 //x console.log(">> key=" + key + ", value=" + c[key]);
-		this.colours.normal[key] = c[key];
-	}
-	c = d.colours.negative;
-	for(key in c) {
-		this.colours.negative[key] = c[key];
+				this.colours.normal[key] = c[key];
+			}
+		}
+	
+		c = d.colours.negative;
+		if (c) {
+			for(key in c) {
+				this.colours.negative[key] = c[key];
+			}
+		}
 	}
 
 	return this;
@@ -1207,11 +1214,13 @@ VirtualSky.prototype.resize = function(w,h){
 		}else{
 			// We have to zap the width of the canvas to let it take the width of the container
 			this.canvas.css({'width':0,'height':0});
-			w = this.container.outerWidth();
-			h = this.container.outerHeight();
 			// ALLSKY ADDED useWidth, useHeight, and wasDiff to tell us what size the overlay
 			// should be.  Resizes weren't working, so controller.js determines the sizes
 			// and passes them to us via these gloval variables.
+			// this.container == "#starmap".  The outerWidth never changes so it doesn't work.
+//x			w = this.container.outerWidth();
+//x			h = this.container.outerHeight();
+
 			w = useWidth;
 			h = useHeight;
 			if (! wasDiff) return;		// There was no difference.
