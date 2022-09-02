@@ -186,7 +186,7 @@
 			echo "\t\t<li><a href='$url' title='$title'><i class='$icon'></i></a></li>\n";
 		}
 		if (count($popoutIcons) > 0) {
-			echo "\t\t<li><i class='fa fa-2x fa-fw fa-camera' title='Information about the camera' ng-click='toggleInfo()' ng-class=" . '"' . "{'active': showInfo}" . '"' . "></i></li>\n";
+			echo "\t\t<li><i class='fa fa-2x fa-fw fa-info-circle' title='Information about the camera and other settings' ng-click='toggleInfo()' ng-class=" . '"' . "{'active': showInfo}" . '"' . "></i></li>\n";
 		}
 	}
 ?>
