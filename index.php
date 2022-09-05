@@ -2,6 +2,7 @@
 <html prefix="og: http://ogp.me/ns#" ng-app="allsky" ng-controller="AppCtrl" lang="en">
 <head>
 	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<?php
 		// This gets the settings.
 		// Some settings impact this page, some impact the constellation overlay.
@@ -147,14 +148,15 @@
 		echo "\t<div class='info animated slideInRight' ng-show='showInfo==true'>\n";
 			echo "\t\t<ul>\n";
 				foreach ($popoutIcons as $popout) {
-					// Skip items with empty labels.
-					$label = v("label", "", $popout);
-					if ($label === "") continue;
+					$display = v("display", false, $popout);
+					if (! $display) continue;
 
+					$label = v("label", "", $popout);
 					$icon = v("icon", "", $popout);
 					$js_variable = v("variable", "", $popout);
 					$value = v("value", "", $popout);
-					echo "\t\t\t<li><i class='$icon'></i>&nbsp; $label:&nbsp; <span>";
+					if ($style != "") $style = "style='$style'";
+					echo "\t\t\t<li><i class='$icon' $style></i>&nbsp; $label:&nbsp; <span>";
 					if ($js_variable != "")
 						echo "{{ $js_variable }}";
 					else
@@ -168,25 +170,29 @@
 	<span class="notification" compile="notification"></span>
 
 	<ul id="sidebar" class="animated slideInLeft">
-<?php	// The link to the overlay is always first and the camera info is always last.
-	if ($showOverlayIcon) {
-		echo "\t\t<li><i class='fa fa-2x fa-fw allsky-constellation' id='overlayBtn' title='Show constellations overlay' ng-click='toggleOverlay()' ng-class=" . '"' ."{'active': showOverlay}" . '"' . "></i></li>\n";
-	}
+<?php
 	if (count($sidebar) > 0) {
 		foreach ($sidebar as $side) {
+			$display = v("display", false, $side);
+			if (! $display) continue;
+
 			$url = v("url", "", $side);
 			$js_variable = v("variable", "", $side);
 			if ($js_variable !== "")
 				$url = "{{ $js_variable }}";
-			if ($url === "") continue;
 
-			$url = "$url?onPi=$onPi";
+			if ($url !== "")
+				$url = "$url?onPi=$onPi";
 			$title = v("title", "", $side);
 			$icon = v("icon", "", $side);
-			echo "\t\t<li><a href='$url' title='$title'><i class='$icon'></i></a></li>\n";
-		}
-		if (count($popoutIcons) > 0) {
-			echo "\t\t<li><i class='fa fa-2x fa-fw fa-info-circle' title='Information about the camera and other settings' ng-click='toggleInfo()' ng-class=" . '"' . "{'active': showInfo}" . '"' . "></i></li>\n";
+			$style = v("style", "", $side);
+			$other = v("other", "", $side);
+			if ($style != "") $style = "style='$style'";
+			if ($url === "") {
+				echo "\t\t<li><i class='$icon' title='$title' $other $style></i></li>\n";
+			} else {
+				echo "\t\t<li><a href='$url' title='$title' $other><i class='$icon' $style></i></a></li>\n";
+			}
 		}
 	}
 ?>
