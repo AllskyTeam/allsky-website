@@ -53,6 +53,7 @@ img.current {
 }
 
 .info {
+	font-size: 90%;
 	padding: 8px;
 	position: fixed;
 	top: 150px;
@@ -67,7 +68,7 @@ img.current {
 
 .info ul {
 	list-style: none;
-	padding-left: 10px;
+	padding-left: 2px;
 	margin-bottom: 0;
 }
 
