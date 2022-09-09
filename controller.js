@@ -462,7 +462,7 @@ function AppCtrl($scope, $timeout, $http, _) {
 		var url = sunData;
 // TODO: is ?_ts needed if we are not cache'ing ?
 		url += '?_ts=' + now.getTime();
-		console.log("Read " + sunData + " at " + moment(now).format("MM-DD h:mm:ss a") + ":");
+		console.log("Read " + sunData + " on " + moment(now).format("MM-DD h:mm:ss a") + ":");
 		$http.get(url, {
 			cache: false
 		}).then(
