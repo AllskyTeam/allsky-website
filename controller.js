@@ -202,6 +202,8 @@ function AppCtrl($scope, $timeout, $http, _) {
 	$scope.owner = config.owner;
 	$scope.auroraForecast = config.auroraForecast;
 	$scope.imageName = config.imageName;
+	$scope.AllskyVersion = config.AllskyVersion;
+	$scope.AllskyWebsiteVersion = config.AllskyWebsiteVersion;
 
 	function getHiddenProp() {
 		var prefixes = ['webkit', 'moz', 'ms', 'o'];
@@ -300,8 +302,8 @@ function AppCtrl($scope, $timeout, $http, _) {
 			if (! dataFileIsOld) {
 //console.log("DEBUG: sunset daysOld=" + daysOld);
 				if (daysOld > oldDataLimit) {
-					var oldMsg = "WARNING: sunset is " + daysOld + " days old.";
-					$scope.notification = formatMessage(oldMsg + "<br>See the 'Troubleshooting -&gt; Website` Wiki page for how to resolve this.", msgType="warning");
+					var oldMsg = "WARNING: sunset data is " + daysOld + " days old.";
+					$scope.notification = formatMessage(oldMsg + "<br>See the  'Troubleshooting &gt; Website'  Wiki page for how to resolve this.", msgType="warning");
 				}
 			}
 
