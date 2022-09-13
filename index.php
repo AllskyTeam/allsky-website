@@ -62,16 +62,19 @@
 			echo "<script>config = {\n";
 			foreach ($config as $var => $val) {	// ok to have comma after last entry
 				echo "\t\t$var: ";
-				if ($val === true || $val === false || $val === null || is_numeric($val))
+				if ($val === true || $val === false || $val === null || is_numeric($val)) {
 					echo var_export($val, true) . ",\n";
-				else
+				} else if (is_array($val)) {
+					echo '"[array]",' . "\n";
+				} else {
 					echo '"' . str_replace('"', '\"', $val) . '",' . "\n";
+				}
 			}
 			// Add additional variable(s) from $homePage that are needed in controller.js.
 			echo "\t\ttitle: " . '"' . $title . '",' . "\n";
 			echo "\t\tloadingImage: " . '"' . $loadingImage . '"';
 
-			echo "\t}";
+			echo "\n\t}";
 			echo "\n\t</script>\n";
 	?>
 
@@ -155,6 +158,7 @@
 					$icon = v("icon", "", $popout);
 					$js_variable = v("variable", "", $popout);
 					$value = v("value", "", $popout);
+					$style = v("style", "", $popout);
 					if ($style != "") $style = "style='$style'";
 					echo "\t\t\t<li><i class='$icon' $style></i>&nbsp; $label:&nbsp; <span>";
 					if ($js_variable != "")
