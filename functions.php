@@ -2,7 +2,7 @@
 
 // On Pi's, this placeholder gets replaced with ${ALLSKY_CONFIG}.
 // On other machines it won't and references to it will silently fail.
-define('ALLSKY_CONFIG',  'XX_ALLSKY_CONFIG_XX');
+define('ALLSKY_CONFIG', getenv('ALLSKY_CONFIG', true) ?: 'XX_ALLSKY_CONFIG_XX');
 
 function v($var, $default, $a) {
 	if (isset($a[$var])) return($a[$var]);
