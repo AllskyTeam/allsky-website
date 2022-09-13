@@ -3,22 +3,55 @@
 // On Pi's, this placeholder gets replaced with ${ALLSKY_CONFIG}.
 // On other machines it won't and references to it will silently fail.
 define('ALLSKY_CONFIG',  getenv('ALLSKY_CONFIG', true) ?: 'XX_ALLSKY_CONFIG_XX');
-// The issue is how to determine if we're on a Pi without using
-// the exec() function which is often disabled on remote machines.
-// And we can't do @exec() to see if it works because that can
-// display a message in the user's browser window.
-// Checking if exec() is disabled doesn't always work, for example on a user's NAS
-// the function isn't disabled, but the website isn't on a Pi.
 
-// If on a Pi, check that the placholder was replaced.
-$isarm = preg_match("/(arm|aarch)/",php_uname());
-if ($isarm && ALLSKY_CONFIG == "XX_ALLSKY_CONFIG" . "_XX") {
+function v($var, $default, $a) {
+	if (isset($a[$var])) return($a[$var]);
+	else return($default);
+}
+
+$configurationFileName = "configuration.json";
+if (isset($_GET['onPi'])) {
+	$onPi = $_GET['onPi'];
+} else {
+	// Read the configuration file.
+	// Some settings impact this page, some impact the constellation overlay.
+	if (! isset($configFilePrefix))
+		$configFilePrefix = "";
+	$configuration_file = $configFilePrefix . $configurationFileName;
+	if (! file_exists($configuration_file)) {
+		echo "<p style='color: red; font-size: 200%'>";
+		echo "ERROR: Missing configuration file '$configuration_file'.  Cannot continue.";
+		echo "</p>";
+		exit;
+	}
+	$settings_str = file_get_contents($configuration_file, true);
+	$settings_array = json_decode($settings_str, true);
+	if ($settings_array == null) {
+		echo "<p style='color: red; font-size: 200%'>";
+		echo "ERROR: Bad configuration file '<span style='color: black'>$configurationFileName</span>'.  Cannot continue.";
+		echo "<br>Check for missing quotes or commas at the end of every line (except the last one).";
+		echo "</p>";
+		echo "<pre>$settings_str</pre>";
+		exit;
+	}
+	$onPi = v("onPi", true, $settings_array['homePage']);
+}
+
+// If on a Pi, check that the placeholder was replaced.
+if ($onPi && ALLSKY_CONFIG == "XX_ALLSKY_CONFIG" . "_XX") {
 	// This file hasn't been updated yet after installation.
 	echo "<div style='font-size: 200%;'>";
 	echo "<span style='color: red'>";
-	echo "Please run the following from the 'allsky' directory before using the Website:";
+	echo "If this Website is running on a Pi, please run the following:";
 	echo "</span>";
-	echo "<br><br><code>   website/install.sh --update</code>";
+	echo "<br><code>";
+	echo "&nbsp; &nbsp; &nbsp; &nbsp; cd ~/allsky";
+	echo "<br>&nbsp; &nbsp; &nbsp; &nbsp; website/install.sh --update";
+	echo "</code>";
+
+	echo "<span style='color: red'>";
+	echo "<br><br>If instead, this Website is being run on a remote server, change the <b>onPi</b> variable in the '$configurationFileName' configuration file to <b>false</b>.";
+	echo "</span>";
 	echo "</div>";
 	exit;
 }
@@ -88,9 +121,14 @@ function get_variable($file, $searchfor, $default)
 
 		// Format: [stuff]$searchfor=$value   or   [stuff]$searchfor="$value"
 		// Need to delete  [stuff]$searchfor=  and optional double quotes
-		$last = $matches[0][$num_matches - 1];	// get the last one
-		$last = explode( '=', $last)[1];	// get everything after equal sign
-		$last = str_replace($double_quote, "", $last);
+		$last = $matches[0][$num_matches - 1];		// get the last one
+		$both = explode( '=', $last);
+		if (isset($both[1])) {
+			$last = $both[1];						// everything after equal sign
+			$last = str_replace($double_quote, "", $last);
+		} else {
+			return($default);		// nothing after "="
+		}
 		return($last);
 	} else {
 		return($default);
@@ -198,6 +236,7 @@ function make_thumb_from_video($src, $dest, $desired_width, $attempts)
 	else
 		$sec = "00";
 	$command = "ffmpeg -loglevel warning -ss 00:00:$sec -i '$src' -filter:v scale='$desired_width:-1' -frames:v 1 '$dest' 2>&1";
+	$output = $array();
 	exec($command, $output);
 	if (file_exists($dest)) {
 		if (filesize($dest) === 0) {
@@ -256,8 +295,8 @@ function display_thumbnails($dir, $file_prefix, $title)
 	
 	$thumb_dir = "$dir/thumbnails";
 	if (! is_dir($thumb_dir)) {
-		if (! mkdir($thum_dir, 0775))
-			echo "<p>Unable to make '$thum_dir' directory. You will need to create it manually.</p>";
+		if (! mkdir($thumb_dir, 0775))
+			echo "<p>Unable to make '$thumb_dir' directory. You will need to create it manually.</p>";
 			print_r(error_get_last());
 	}
 
