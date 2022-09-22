@@ -236,7 +236,7 @@ function make_thumb_from_video($src, $dest, $desired_width, $attempts)
 	else
 		$sec = "00";
 	$command = "ffmpeg -loglevel warning -ss 00:00:$sec -i '$src' -filter:v scale='$desired_width:-1' -frames:v 1 '$dest' 2>&1";
-	$output = $array();
+	$output = array();
 	exec($command, $output);
 	if (file_exists($dest)) {
 		if (filesize($dest) === 0) {
