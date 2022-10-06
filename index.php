@@ -38,8 +38,8 @@
 				if ($includeLinkToMakeOwn == "") $includeLinkToMakeOwn = 0;		// boolean
 			$showOverlayIcon = v("showOverlayIcon", false, $homePage);
 				if ($showOverlayIcon == "") $showOverlayIcon = 0;		// boolean
-			$sidebar = v("sidebar", null, $homePage);
-			$sidebarStyle = v("sidebarStyle", null, $homePage);
+			$leftSidebar = v("leftSidebar", null, $homePage);
+			$leftSidebarStyle = v("leftSidebarStyle", null, $homePage);
 			$popoutIcons = v("popoutIcons", null, $homePage);
 			$personalLink_style = "";
 			$personalLink = v("personalLink", null, $homePage);
@@ -119,8 +119,8 @@
 					echo " $backgroundImage_style";
 				echo " }";
 			}
-			if ($sidebarStyle !== null)
-				echo "		#sidebar { $sidebarStyle }";
+			if ($leftSidebarStyle !== null)
+				echo "		#leftSidebar { $leftSidebarStyle }";
 			if ($personalLink_style !== "")		// adds to what's in custom.css
 				echo "		.personalLink { $personalLink_style }";
 		?>
@@ -173,10 +173,10 @@
 ?>
 	<span class="notification" compile="notification"></span>
 
-	<ul id="sidebar" class="animated slideInLeft">
+	<ul id="leftSidebar" class="animated slideInLeft">
 <?php
-	if (count($sidebar) > 0) {
-		foreach ($sidebar as $side) {
+	if (count($leftSidebar) > 0) {
+		foreach ($leftSidebar as $side) {
 			$display = v("display", false, $side);
 			if (! $display) continue;
 
