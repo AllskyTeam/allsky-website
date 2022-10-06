@@ -76,7 +76,7 @@ img.current {
 	margin-right: 3px;
 }
 
-#sidebar {
+#leftSidebar {
 	position: fixed;
 	left: 0;
 	top: 150px;
@@ -89,19 +89,19 @@ img.current {
 	z-index: 2;
 }
 
-#sidebar li {
+#leftSidebar li {
 	list-style: none;
 	padding: 2px 0
 }
 
-#sidebar li i {
+#leftSidebar li i {
 	cursor: pointer;
 	color: #888;
 	margin: 2px 0;
 }
 
-#sidebar li i:hover,
-#sidebar li i.active {
+#leftSidebar li i:hover,
+#leftSidebar li i.active {
 	color: orange;
 }
 
