@@ -89,7 +89,7 @@
 		},{
 			"name":"J",
 			"radius": 69173,	// km
-			"interval": 10,
+			"interval": 1.5,	// ALLSKY: was 10, but caused Jupiter to not be displayed.  Got 1.5 via trial and error.
 			"colour": "rgb(255,150,150)",
 			"magnitude": function(d){ return -9.25 + 5*log10(d.r*d.R) + 0.014 * d.FV; },
 			"elements":[
