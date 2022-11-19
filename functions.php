@@ -10,32 +10,28 @@ function v($var, $default, $a) {
 }
 
 $configurationFileName = "configuration.json";
-if (isset($_GET['onPi'])) {
-	$onPi = $_GET['onPi'];
-} else {
-	// Read the configuration file.
-	// Some settings impact this page, some impact the constellation overlay.
-	if (! isset($configFilePrefix))
-		$configFilePrefix = "";
-	$configuration_file = $configFilePrefix . $configurationFileName;
-	if (! file_exists($configuration_file)) {
-		echo "<p style='color: red; font-size: 200%'>";
-		echo "ERROR: Missing configuration file '$configuration_file'.  Cannot continue.";
-		echo "</p>";
-		exit;
-	}
-	$settings_str = file_get_contents($configuration_file, true);
-	$settings_array = json_decode($settings_str, true);
-	if ($settings_array == null) {
-		echo "<p style='color: red; font-size: 200%'>";
-		echo "ERROR: Bad configuration file '<span style='color: black'>$configurationFileName</span>'.  Cannot continue.";
-		echo "<br>Check for missing quotes or commas at the end of every line (except the last one).";
-		echo "</p>";
-		echo "<pre>$settings_str</pre>";
-		exit;
-	}
-	$onPi = v("onPi", true, $settings_array['homePage']);
+// Read the configuration file.
+// Some settings impact this page, some impact the constellation overlay.
+if (! isset($configFilePrefix))
+	$configFilePrefix = "";
+$configuration_file = $configFilePrefix . $configurationFileName;
+if (! file_exists($configuration_file)) {
+	echo "<p style='color: red; font-size: 200%'>";
+	echo "ERROR: Missing configuration file '$configuration_file'.  Cannot continue.";
+	echo "</p>";
+	exit;
 }
+$settings_str = file_get_contents($configuration_file, true);
+$settings_array = json_decode($settings_str, true);
+if ($settings_array == null) {
+	echo "<p style='color: red; font-size: 200%'>";
+	echo "ERROR: Bad configuration file '<span style='color: black'>$configurationFileName</span>'.  Cannot continue.";
+	echo "<br>Check for missing quotes or commas at the end of every line (except the last one).";
+	echo "</p>";
+	echo "<pre>$settings_str</pre>";
+	exit;
+}
+$onPi = v("onPi", true, $settings_array['homePage']);
 
 // If on a Pi, check that the placeholder was replaced.
 if ($onPi && ALLSKY_CONFIG == "XX_ALLSKY_CONFIG" . "_XX") {
