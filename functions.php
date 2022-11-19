@@ -10,8 +10,8 @@ define('ALLSKY_CONFIG',  'XX_ALLSKY_CONFIG_XX');
 // A true boolean value returns 1.  We want to return 0 if false.
 // Ditto for $default.
 function v($var, $default, $a) {
-	$value = $a[$var];
-	if (isset($value)) {
+	if (isset($a[$var])) {
+		$value = $a[$var];
 		if (gettype($value) === "boolean" && $value == "")
 			return(0);
 		else
