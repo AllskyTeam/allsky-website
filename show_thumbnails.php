@@ -1,12 +1,15 @@
 <?php
 	$configFilePrefix = "../";
-	include 'functions.php'; disableBuffering();	 // must be first line
+	include_once('functions.php'); disableBuffering();	 // must be first line
+	// Settings are now in $settings_array.
 
 	if (! isset($dir) || ! isset($prefix) || ! isset($title)) {
 		echo "<p>INTERNAL ERROR: incomplete arguments given to view thumbnails.</p>";
 		echo "dir, prefix, and/or title missing.";
 		exit;
 	}
+	$homePage = v("homePage", null, $settings_array);
+	$includeGoogleAnalytics = v("includeGoogleAnalyticsx", false, $homePage);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -17,9 +20,10 @@
 		<title><?php echo $title; ?></title>
 
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<?php if (file_exists("../analyticsTracking.js") && filesize("../analyticsTracking.js") > 50) { ?>
-		<script src="../analyticsTracking.js"></script>
-<?php } ?>
+<?php	if ($includeGoogleAnalytics && file_exists("../analyticsTracking.js")) {
+			echo "<script src='../analyticsTracking.js'></script>";
+		}
+?>
 		<script defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
 		<link href="../allsky.css" rel="stylesheet">
 	</head>
