@@ -4,9 +4,23 @@
 // On other machines it won't and references to it will silently fail.
 define('ALLSKY_CONFIG',  'XX_ALLSKY_CONFIG_XX');
 
+// Look for $var in the $a array and return its value.
+// If not found, return $default.
+// If the value is a boolean and is false, an empty string is returned (not a 0).
+// A true boolean value returns 1.  We want to return 0 if false.
+// Ditto for $default.
 function v($var, $default, $a) {
-	if (isset($a[$var])) return($a[$var]);
-	else return($default);
+	$value = $a[$var];
+	if (isset($value)) {
+		if (gettype($value) === "boolean" && $value == "")
+			return(0);
+		else
+			return($value);
+	} else if (gettype($default) === "boolean" && $default == "") {
+		return(0);
+	}else {
+		return($default);
+	}
 }
 
 $configurationFileName = "configuration.json";
