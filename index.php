@@ -10,8 +10,6 @@
 
 		// Get home page options
 		$homePage = v("homePage", null, $settings_array);
-			$onPi = v("onPi", true, $homePage);
-				if ($onPi == "") $onPi = 0;		// boolean
 			// TODO: replace double quotes with &quot; in any variable that can be in an HTML attribute,
 			// which is many of them.
 			$backgroundImage = v("backgroundImage", "", $homePage);
@@ -184,9 +182,6 @@
 			$js_variable = v("variable", "", $side);
 			if ($js_variable !== "")
 				$url = "{{ $js_variable }}";
-
-			if ($url !== "")
-				$url = "$url?onPi=$onPi";
 			$title = v("title", "", $side);
 			$icon = v("icon", "", $side);
 			$style = v("style", "", $side);
