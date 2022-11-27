@@ -1,12 +1,3 @@
-/* The default "loading.jpg" file is 960px x 720px.
-   That is likely NOT the same size as your images.
-   Most monitors support an image width of 960 pixels, so you likely won't need to change that.
-
-   However, you'll most likely want to change 720 to match the height of the image displayed on
-   your screen with black borders around all four sides.
-   Change it in the "configuration.json" file in the WebUI's "Editor" page.
-   Look for "imageHeight".    DO NOT CHANGE IT IN THIS FILE.
-*/
 body {
 	color:white;
 	font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
@@ -22,7 +13,6 @@ img.current {
 #starmap_container {
 	position: absolute;
 	overflow: hidden;
-	height: 720px;		/* This value can be changed via the WebUI */
 }
 
 
@@ -110,7 +100,7 @@ img.current {
 }
 
 #imageContainer {
-	text-align: center;
+	margin: auto;
 }
 .imageContainer {
 	border: 1px solid #5a5a5a;
