@@ -57,6 +57,7 @@
 		// To avoid changing too much code, the "config" javascript variable is created
 		// here to replace the old config.js file that contained that variable.
 		$config = v("config", null, $settings_array);
+		$imageWidth = v("imageWidth", null, $config);
 			echo "<script>config = {\n";
 			foreach ($config as $var => $val) {	// ok to have comma after last entry
 				echo "\t\t$var: ";
@@ -69,6 +70,7 @@
 				}
 			}
 			// Add additional variable(s) from $homePage that are needed in controller.js.
+			echo "\t\timageBorder: $imageBorder,\n";
 			echo "\t\ttitle: " . '"' . $title . '",' . "\n";
 			echo "\t\tloadingImage: " . '"' . $loadingImage . '"';
 
@@ -197,7 +199,7 @@
 ?>
 	</ul>
 
-	<div id="imageContainer" <?php if ($imageBorder) echo "class='imageContainer'"; ?>>
+	<div id="imageContainer" <?php if ($imageBorder) echo "class='imageContainer'"; ?> style="max-width: <?php echo $imageWidth ?>px">
 		<div id="starmap_container" ng-show="showOverlay==true">
 			<div id="starmap"></div>
 		</div>
