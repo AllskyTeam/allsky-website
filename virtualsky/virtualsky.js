@@ -1212,20 +1212,23 @@ VirtualSky.prototype.resize = function(w,h){
 			h = window.innerHeight;
 			this.canvas.css({'width':w+'px','height':h+'px'});
 		}else{
+			// ALLSKY CHANGED:
+			// This resizing never worked, so it's now done in controller.js.
+			// Perhaps someone better at javascript / css can get this working.
+			// The global "wasDiff" is set in controller.js and tells us if the last window resize
+			// changed the size of the overlay or its containers.
+			// Because controller.js does the resize of the overlay, do NOT do it below.
+			// However, we still want text and other things resized.
+			if (! wasDiff) return;		// There was no difference.
+
 			// We have to zap the width of the canvas to let it take the width of the container
 			this.canvas.css({'width':0,'height':0});
-			// ALLSKY ADDED useWidth, useHeight, and wasDiff to tell us what size the overlay
-			// should be.  Resizes weren't working, so controller.js determines the sizes
-			// and passes them to us via these gloval variables.
 			// this.container == "#starmap".  The outerWidth never changes so it doesn't work.
-//x			w = this.container.outerWidth();
-//x			h = this.container.outerHeight();
-
-			w = useWidth;
-			h = useHeight;
-			if (! wasDiff) return;		// There was no difference.
-// console.log("new w=" + w + ", h=" + h + ", this.wide=" + this.wide + ", this.tall=" + this.tall);
-			this.canvas.css({'width':w+'px','height':h+'px'});
+/*
+			w = this.container.outerWidth();
+			h = this.container.outerHeight();
+ 			this.canvas.css({'width':w+'px','height':h+'px'});
+*/
 		}
 	}else{
 		// Set the container size
