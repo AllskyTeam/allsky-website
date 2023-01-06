@@ -1,10 +1,30 @@
 <!DOCTYPE html>
-<html prefix="og: http://ogp.me/ns#" ng-app="allsky" ng-controller="AppCtrl" lang="en">
+<html lang="en">
 <head>
 <?php
-	// This gets the settings.
+	$vSDir = "viewSettings";
+	$settingsScript = "allskySettings.php";
+	$fullMode = false;
+	if (file_exists("$vSDir/$settingsScript")) {
+		$fullMode = true;
+	}
+
+	// This gets the web page settings.
 	include_once('functions.php');		// Sets $settings_array
-	function doBool($b) { if ($b == true) return("Yes"); else return("No"); }
+
+	function getSettingsFile() { global $vSDir; return "$vSDir/settings.json"; }
+	if ($fullMode) {
+		// Define simplified functions from the WebUI's includes/functions.php file.
+		function getOptionsFile() { global $vSDir; return "$vSDir/options.json"; }
+		function getVariableOrDefault($a, $v, $d) { return v($v, $d, $a); }
+		function check_if_configured($page, $calledFrom) { return true; }
+		function CSRFToken() { return true; }
+
+		$formReadonly = true;
+		include_once("$vSDir/$settingsScript");
+	} else {
+		function doBool($b) { if ($b == true) return("Yes"); else return("No"); }
+	}
 
 	// Get home page options
 	$homePage = v("homePage", null, $settings_array);
@@ -25,25 +45,43 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
 	<link rel="shortcut icon" type="<?php echo $faviconType ?>" href="<?php echo $favicon ?>">
-	<link rel="stylesheet" type="text/css" href="allsky.css">
-
+<?php
+	if ($fullMode) {
+		echo "<link rel='stylesheet' type='text/css' href='$vSDir/bootstrap.min.css'>";
+		echo "<link rel='stylesheet' type='text/css' href='$vSDir/custom.css'>";
+	} else {
+		echo "<link rel='stylesheet' type='text/css' href='allsky.css'>";
+	}
+?>
 
 	<style>
-		.clear { clear: both; }
-		.title { box-sizing: border-box; }
-		.errorMsg { color: red; font-size: 200%; }
-		.tableHeader { background-color: silver; color: black; }
-		<?php
-			if ($backgroundImage !== null) {
-				echo "		.backgroundImage { background-image: url('$backgroundImage_url');";
-				if ($backgroundImage_style !== "")
-					echo " $backgroundImage_style";
-				echo " }";
-			}
-		?>
+<?php
+		if ($fullMode) {
+			echo "body { background-color: white; color: black; }";
+		} else {
+			echo ".clear { clear: both; }";
+			echo ".title { box-sizing: border-box; }";
+			echo ".errorMsg { color: red; font-size: 200%; }";
+			echo ".tableHeader { background-color: silver; color: black; }";
+		}
+		if ($backgroundImage !== null) {
+			echo "		.backgroundImage { background-image: url('$backgroundImage_url');";
+			if ($backgroundImage_style !== "")
+				echo " $backgroundImage_style";
+			echo " }";
+		}
+?>
 	</style>
 </head>
 <body id="body" <?php if ($backgroundImage !== null) echo "class='.backgroundImage'"; ?>>
+<?php
+	if ($fullMode) {
+		DisplayAllskyConfig();
+		echo "</body>";
+		echo "</html>";
+		exit;
+	}
+?>
 	<div class="header">
 		<div class=title><?php echo $title; ?></div>
 		<div class="clear"></div>
@@ -51,7 +89,7 @@
 	<h1 align="center">Image Settings</h1>
 	<br>
 	<?php
-		$settings_file_name = "settings.json";
+		$settings_file_name = getSettingsFile();
 		if (! file_exists($settings_file_name)) {
 			echo "<p class='errorMsg'>";
 			echo "ERROR: Image settings file '$settings_file_name' not found!  Cannot continue.";
@@ -164,3 +202,4 @@
 	</tbody>
 </body>
 </html>
+
