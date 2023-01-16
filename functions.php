@@ -2,7 +2,7 @@
 
 // On Pi's, this placeholder gets replaced with ${ALLSKY_CONFIG}.
 // On other machines it won't and references to it will silently fail.
-define('ALLSKY_CONFIG',  'XX_ALLSKY_CONFIG_XX');
+define('ALLSKY_CONFIG', getenv('ALLSKY_CONFIG', true) ?: 'XX_ALLSKY_CONFIG_XX');
 // The issue is how to determine if we're on a Pi without using
 // the exec() function which is often disabled on remote machines.
 // And we can't do @exec() to see if it works because that can

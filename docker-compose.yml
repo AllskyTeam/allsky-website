@@ -1,0 +1,14 @@
+version: "3.7"
+
+services:
+
+    app:
+        build:
+            context: .
+            dockerfile: docker/Dockerfile
+        volumes:
+            - type: bind
+              source: .
+              target: /var/www/html
+        ports:
+            - 80/tcp
