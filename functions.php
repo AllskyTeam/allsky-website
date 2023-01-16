@@ -2,7 +2,7 @@
 
 // On Pi's, this placeholder gets replaced with ${ALLSKY_CONFIG}.
 // On other machines it won't and references to it will silently fail.
-define('ALLSKY_CONFIG',  'XX_ALLSKY_CONFIG_XX');
+define('ALLSKY_CONFIG', getenv('ALLSKY_CONFIG', true) ?: 'XX_ALLSKY_CONFIG_XX');
 
 // Look for $var in the $a array and return its value.
 // If not found, return $default.
