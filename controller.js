@@ -377,7 +377,7 @@ function AppCtrl($scope, $timeout, $http, _) {
 //console.log("DEBUG: sunset daysOld=" + daysOld);
 				if (daysOld > oldDataLimit) {
 					var oldMsg = "WARNING: sunset data is " + daysOld + " days old.";
-					$scope.notification = formatMessage(oldMsg + "<br>See the  'Troubleshooting &gt; Website'  Wiki page for how to resolve this.", msgType="warning");
+					$scope.notification = formatMessage(oldMsg + "<br>See the 'Troubleshooting &gt; Allsky Website' documentation page for how to resolve this.", msgType="warning");
 				}
 			}
 
@@ -612,7 +612,7 @@ function AppCtrl($scope, $timeout, $http, _) {
 				usingDefaultSunset = true;
 				$scope.streamDaytime = true;
 
-				dataMissingMessage = "ERROR: '" + sunData + " file not found, using " + $scope.sunset.format("h:mm a") + " for sunset.<br>Set 'POST_END_OF_NIGHT_DATA=true' in config.sh then run 'allsky/scripts/postData.sh'.<br>Refresh your browser when done.";
+				dataMissingMessage = "ERROR: '" + sunData + " file not found, using " + $scope.sunset.format("h:mm a") + " for sunset.<br>Run 'allsky/scripts/postData.sh'.<br>Refresh your browser when done.";
 				console.log("  *** Unable to read '" + sunData + "' file");
 				writeSunriseSunsetToConsole();
 
