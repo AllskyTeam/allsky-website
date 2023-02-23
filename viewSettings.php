@@ -75,6 +75,10 @@
 			echo " }";
 		}
 ?>
+		.panel-primary>.panel-heading {
+			color: white;
+			padding: 5px 0 5px 5px;
+		}
 	</style>
 </head>
 <body id="body" <?php if ($backgroundImage !== null) echo "class='.backgroundImage'"; ?>>
@@ -206,4 +210,3 @@
 	</tbody>
 </body>
 </html>
-
