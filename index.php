@@ -160,7 +160,7 @@
 <body id="body" <?php if ($backgroundImage !== null) echo "class='.backgroundImage'"; ?>>
 	<div class="header">
 		<div class=title><?php echo $title; ?></div>
-		<div ng-show="auroraForecast === true && forecast" class="forecast pull-right">
+		<div ng-show="auroraForecast === true && forecast" class="forecast float-end">
 			<span>Aurora activity: </span>
 			<span class="forecast-day" ng-repeat="(key,val) in forecast">{{key}}:
 				<span ng-class="getScale(val)" title="{{val}}/9">{{getScale(val)}}</span>
@@ -242,7 +242,7 @@
 <?php
 	if ($includeLinkToMakeOwn) {
 		echo "<div class='diy'>";
-		echo "<a href='http://thomasjacquin.com/make-your-own-allsky-camera'><i class='fa fa-gear'></i> Make Your Own</a>";
+		echo "<i class='fa fa-tools'></i><a href='http://thomasjacquin.com/make-your-own-allsky-camera' title='A guide to build you own allsky camera' target='_blank'>Build your own</a>";
 		echo "</div>";
 	}
 

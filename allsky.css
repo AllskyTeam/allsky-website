@@ -95,10 +95,6 @@ img.current {
 	color: orange;
 }
 
-.notification {
-	margin-left: 10px;
-}
-
 #imageContainer {
 	margin: auto;
 }
@@ -114,16 +110,25 @@ img.current {
 	position: fixed;
 	bottom: 10px;
 	right: 10px;
+	opacity: 0.5;
+}
+
+.diy:hover {
+	opacity: 1;
 }
 
 .diy a {
 	color: white;
 }
 
+.diy i {
+	margin-right: 5px;
+}
+
 .noImages {
 	text-align: center;
 	font-size: 200%;
-	color: yellow;
+	color: #ffc107;
 	border: 2px solid gray;
 	margin: 4px;
 }
@@ -214,7 +219,7 @@ img.current {
 
 .forecast .Unsettled,
 .forecast .Active {
-	color: yellow;
+	color: #ffc107;
 }
 
 .forecast .Minor_Storm,
@@ -225,11 +230,11 @@ img.current {
 .forecast .Strong_Storm,
 .forecast .Severe_Storm,
 .forecast .Extreme_Storm {
-	color: red;
+	color: #dc3545;
 }
 
 .forecast .WARNING {	/* for Aurora activity */
-	color: yellow;
+	color: #ffc107;
 	font-weight: bold;
 	font-size: 125%;
 }
@@ -245,28 +250,35 @@ img.current {
 }
 
 .thumbnailError {
-	color: red;
+	color: #dc3545;
 }
 
 /* Messages on the home page */
 .msg {
-	background-color: #333;
+	background-color: #222;
 	text-align: center;
 	font-size: 145%;
 	font-weight: bold;
-	margin: 20px 0 20px 0;
+	margin: 10px 0 20px 0;
 	padding: 20px 0 20px 0;
+	border-radius: 10px;
 }
 .error-msg {
-	color: red;
-	border: 3px dashed red;
+	color: #dc3545;
+	border: 3px dashed #dc3545;
 }
 .warning-msg {
-	color: yellow;
-	border: 3px dashed yellow;
+	color: #ffc107;
+	border: 3px dashed #ffc107;
 }
 .notice-msg {
 	color: white;
 	border: 3px solid white;
+}
+
+@media screen and (max-width: 480px) {
+	.msg {
+		font-size: 100%;
+	}
 }
 
