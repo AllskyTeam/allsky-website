@@ -313,7 +313,7 @@ function display_thumbnails($dir, $file_prefix, $title)
 	echo "<table class='imagesHeader'><tr><td class='headerButton'>$back_button</td> <td class='headerTitle'>$title</td></tr></table>";
 	echo "<div class='archived-files'>\n";
 
-	$thumbnailSizeX = get_variable(ALLSKY_CONFIG .'/config.sh', 'THUMBNAILSIZE_X=', '100');
+	$thumbnailSizeX = get_variable(ALLSKY_CONFIG .'/config.sh', 'THUMBNAIL_SIZE_X=', '100');
 	foreach ($files as $file) {
 		// The thumbnail should be a .jpg.
 		$thumbnail = preg_replace($ext, ".jpg", "$dir/thumbnails/$file");
