@@ -20,6 +20,7 @@ var icWidth = 0;
 var icHeight = 0;
 var icImageAspectRatio = 0;
 var overlayAspectRatio = 0;
+var myLatitude = 0, myLongitude = 0;
 
 $(window).resize(function () {
 	if (overlayBuilt) {					// only rebuild if already built once
@@ -92,6 +93,8 @@ function buildOverlay(){
 				// It's a shame - there's no reason to re-read the file.
 
 				virtualSkyData = c;
+				virtualSkyData.latitude = myLatitude;
+				virtualSkyData.longitude = myLongitude;
 
 				// These variables have different names in virtualsky.js and our config file.
 				virtualSkyData.width = c.overlayWidth;
@@ -195,7 +198,83 @@ function compile($compile) {
 var configNotSet = false;	// Has the configuration file been updated by the user?
 var needToUpdate = "XX_NEED_TO_UPDATE_XX";	// must match what's in configData
 
+function convertLatitude(sc, lat) {			// sc == scope
+	var convertToString = false;
+	var len, direction;
+
+	if (typeof lat === "string") {
+		sc.s_latitude = lat;	// string version
+
+		len = lat.length;
+		direction = lat.substr(len-1, 1).toUpperCase();
+		if (direction == "N")
+			sc.latitude = lat.substr(0, len-2) * 1;
+		else if (direction == "S")
+			sc.latitude = lat.substr(0, len-2) * -1;
+		else {
+			// a number with quotes around it which is treated as a string
+			sc.latitude = lat * 1;
+			convertToString = true;
+		}
+	} else {
+		sc.latitude = lat;
+		convertToString = true;
+	}
+
+	if (convertToString) {
+		if (lat >= 0)
+			sc.s_latitude = lat + "N";
+		else
+			sc.s_latitude = -lat + "S";
+	}
+
+	return sc.latitude;
+}
+
+function convertLongitude(sc, lon) {
+	var convertToString = false;
+	var len, direction;
+
+	if (typeof lon === "string") {
+		sc.s_longitude = lon;
+
+		len = config.longitude.length;
+		direction = lon.substr(len-1, 1).toUpperCase();
+		if (direction == "E")
+			sc.longitude = lon.substr(0, len-2) * 1;
+		else if (direction == "W")
+			sc.longitude = lon.substr(0, len-2) * -1;
+		else {
+			// a number with quotes around it which is treated as a string
+			sc.longitude = lon * 1;
+			convertToString = true;
+		}
+	} else {
+		sc.longitude = lon;
+		convertToString = true;
+	}
+
+	if (convertToString) {
+		if (config.longitude >= 0)
+			sc.s_longitude = lon + "E";
+		else
+			sc.s_longitude = -lon + "W";
+	}
+
+	return sc.longitude;
+}
+
 function AppCtrl($scope, $timeout, $http, _) {
+
+	// Allow latitude and longitude to have or not have N, S, E, W,
+	// but in the popout, always use the letters for consistency.
+	// virtualsky.js expects decimal numbers so we need both.
+	// Need to convert them before building the overlay.
+	$scope.latitude = convertLatitude($scope, config.latitude);
+	myLatitude = $scope.latitude;
+	$scope.longitude = convertLongitude($scope, config.longitude);
+	myLongitude = $scope.longitude;
+
 	$scope.imageURL = config.loadingImage;
 	$scope.showInfo = false;
 	$scope.showOverlay = config.showOverlayAtStartup;
@@ -211,65 +290,6 @@ function AppCtrl($scope, $timeout, $http, _) {
 		return;
 	}
 	$scope.location = config.location;
-
-	// Allow latitude and longitude to have or not have N, S, E, W,
-	// but in the popout, always use the letters for consistency.
-	// virtualsky.js expects decimal numbers so we need both.
-	var len, direction;
-	var convertToString = false;
-	if (typeof config.latitude === "string") {
-		$scope.s_latitude = config.latitude;	// string version
-
-		len = config.latitude.length;
-		direction = config.latitude.substr(len-1, 1).toUpperCase();
-		if (direction == "N")
-			$scope.latitude = config.latitude.substr(0, len-2) * 1;
-		else if (direction == "S")
-			$scope.latitude = config.latitude.substr(0, len-2) * -1;
-		else {
-			// a number with quotes around it which is treated as a string
-			$scope.latitude = config.latitude * 1;
-			convertToString = true;
-		}
-	} else {
-		$scope.latitude = config.latitude;
-		convertToString = true;
-	}
-
-	if (convertToString) {
-		if (config.latitude >= 0)
-			$scope.s_latitude = config.latitude + "N";
-		else
-			$scope.s_latitude = -config.latitude + "S";
-	}
-
-	convertToString = false;
-	if (typeof config.longitude === "string") {
-		$scope.s_longitude = config.longitude;
-
-		len = config.longitude.length;
-		direction = config.longitude.substr(len-1, 1).toUpperCase();
-		if (direction == "E")
-			$scope.longitude = config.longitude.substr(0, len-2) * 1;
-		else if (direction == "W")
-			$scope.longitude = config.longitude.substr(0, len-2) * -1;
-		else {
-			// a number with quotes around it which is treated as a string
-			$scope.longitude = config.longitude * 1;
-			convertToString = true;
-		}
-	} else {
-		$scope.longitude = config.longitude;
-		convertToString = true;
-	}
-
-	if (convertToString) {
-		if (config.longitude >= 0)
-			$scope.s_longitude = config.longitude + "E";
-		else
-			$scope.s_longitude = -config.longitude + "W";
-	}
-
 	$scope.camera = config.camera;
 	$scope.lens = config.lens;
 	$scope.computer = config.computer;
