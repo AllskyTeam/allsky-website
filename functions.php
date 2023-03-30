@@ -344,4 +344,39 @@ function display_thumbnails($dir, $file_prefix, $title)
 	echo "<div class='archived-files-end'></div>";	// clears "float" from archived-files
 	echo "<div class='archived-files'><hr></div>";
 }
+
+// Read and decode a json file, returning the decoded results or null.
+// On error, display the specified error message
+function get_decoded_json_file($file, $associative, $errorMsg) {
+	if (! file_exists($file)) {
+		echo "<div style='color: red; font-size: 200%;'>";
+		echo "$errorMsg:";
+		echo "<br>File '$file' missing!";
+		echo "</div>";
+		return null;
+	}
+
+	$str = file_get_contents($file, true);
+	if ($str === "") {
+		echo "<div style='color: red; font-size: 200%;'>";
+		echo "$errorMsg:";
+		echo "<br>File '$file' is empty!";
+		echo "</div>";
+		return null;
+	}
+
+	$str_array = json_decode($str, $associative);
+	if ($str_array == null) {
+		echo "<div style='color: red; font-size: 200%;'>";
+		echo "$errorMsg:";
+		echo "<br>" . json_last_error_msg();
+		$cmd = "json_pp < $file 2>&1";
+		exec($cmd, $output);
+		echo "<br>" . implode("<br>", $output);
+		echo "</div>";
+		return null;
+	}
+	return $str_array;
+}
+
 ?>
