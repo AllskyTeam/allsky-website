@@ -1,4 +1,4 @@
-# Allsky Website ![v2023-05-01](https://img.shields.io/badge/Version-2023.05.01+-green.svg) 
+# Allsky Website ![v2023-05-01](https://img.shields.io/badge/Version-2023.05.01-green.svg) 
 The "allsky-website" package allows you to display your images on a website, either on your Pi or on another machine. It can optionally add an overlay of constellations and other objects, as well as optional Aurora data from NOAA.
 
 ## Update
