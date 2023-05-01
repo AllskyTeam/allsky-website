@@ -1,43 +1,175 @@
-var usingNewVirtualSky = typeof S != "undefined" && typeof S.virtualsky == "function";
-console.log("usingNewVirtualSky=" + usingNewVirtualSky);
-
 var app = angular.module('allsky', ['ngLodash']);
 
+var overlayBuilt = false;				// has the overlay been built yet?
+
+var virtualSkyData = null;
+var sunData = "data.json";				// contains sunrise/sunset times and related data
+var configData = "configuration.json"	// contains web configuration data
+
+// This returns the height INCLUDING the border:      $("#imageContainer").css('height')
+// This returns the height NOT including the border:  $("#imageContainer").height()
+
+// These two are used by virtualsky.js to set the overlay width and height,
+// if there was a difference.
+var overlayWidth = 0, overlayHeight = 0;
+var overlayWidthMax = 0, overlayHeightMax = 0;
+var starmapWidth = 0, starmapHeight = 0;
+var wasDiff = true;
+var last_s_iW = 0, last_s_iH = 0;
+var icWidth = 0;
+var icHeight = 0;
+var icImageAspectRatio = 0;
+var overlayAspectRatio = 0;
+var myLatitude = 0, myLongitude = 0;
+
 $(window).resize(function () {
-	buildOverlay();
+	if (overlayBuilt) {					// only rebuild if already built once
+		var newW = $("#imageContainer").width();
+		var newH = $("#imageContainer").height()
+//		console.log("#imageContainer newW=" + newW + ", newH=" + newH);
+
+		$("#starmap_container").css("width", newW + "px").css("height", newH + "px");
+
+		var diffW = newW - icWidth;
+		// Scale the height based on the aspect ratio of the image.
+//		console.log("newW=" + newW + ", icWidth=" + icWidth);
+//x		var diffH = (newH - icHeight) * overlayAspectRatio;
+		var diffH = (newH - icHeight);
+		icWidth = newW;
+		icHeight = newH;
+
+		if (diffW == 0 && diffH == 0) {
+			wasDiff = false;
+//			console.log(">>> No change in image size.");
+			return;
+		}
+
+		wasDiff = true;
+
+		// TODO: probably also need to adjust #stamap's margin-left and margin-right.
+
+		// This holds the starmap button, so needs to resize
+		starmapWidth += diffW;
+		starmapHeight += diffH;
+		$("#starmap").css("width", starmapWidth + "px").css("height", starmapHeight + "px");
+
+		// Shrinking the window makes the overlay shrink too fast for some reason.
+		// Got the fudge factor by trial and error.
+		if (diffW < 0) {
+			var fudge = 0.95;
+			diffW *= fudge;
+// console.log("diffH=" + diffH + ", overlayAspectRatio=" + overlayAspectRatio);
+			diffH = (diffH / overlayAspectRatio) * fudge;
+		}
+
+//		console.log("== diffW= " + diffW + ", diffH= " + diffH);
+		overlayWidth  += diffW;
+			if (overlayWidth > overlayWidthMax) overlayWidth = overlayWidthMax;
+		overlayHeight += diffH;
+			if (overlayHeight > overlayHeightMax) overlayHeight = overlayHeightMax;
+//		console.log("== setting overlayWidth= " + overlayWidth + ", overlayHeight= " + overlayHeight);
+		$("#starmap_inner")
+			.css("width", overlayWidth + "px")
+			.css("height", overlayHeight + "px");
+	}
 });
 
 function buildOverlay(){
-	var planetarium;
-	$.ajax({
-		url: "virtualsky.json" + '?_ts=' + new Date().getTime(),
-		cache: false
-	}).done(
-		function (data) {
-			// This is to scale the overlay when the window is resized
-			// Newer versions support both width and height.
-			var width;
-			if (config.overlayWidth) {
-				width = config.overlayWidth;
-			} else {
-				width = config.overlaySize;
+	if (overlayBuilt) {
+		S.virtualsky(virtualSkyData);
+	} else {
+		$.ajax({
+			// No need for ?_ts=   since $.ajax adds one
+			url: configData,
+			cache: false
+		}).done(
+			function (data) {
+				var c = data.config;
+				// "config" was defined in index.php to include ALL the variables we need,
+				// including ones not in the "config" section of the configuration file.
+				// However, "array" types like "colour" aren't handled in index.php.
+
+				// TODO: I tried not doing the ajax call, but the overlay wouldn't show.
+				// It's a shame - there's no reason to re-read the file.
+
+				virtualSkyData = c;
+				virtualSkyData.latitude = myLatitude;
+				virtualSkyData.longitude = myLongitude;
+
+				// These variables have different names in virtualsky.js and our config file.
+				virtualSkyData.width = c.overlayWidth;
+				virtualSkyData.height = c.overlayHeight;
+
+				S.virtualsky(virtualSkyData);		// Creates overlay
+				overlayBuilt = true;
+
+				// Offset of overlay
+				$("#starmap")
+					.css("margin-top", c.overlayOffsetTop + "px")
+					.css("margin-left", c.overlayOffsetLeft + "px");
+
+				// max-width of #imageContainer set in index.php based on width user specified (imageWidth)
+				icWidth = $("#imageContainer").width();
+				icHeight = $("#imageContainer").height();
+				icImageAspectRatio = icWidth / icHeight;
+
+				$("#starmap_container").css("width", icWidth + "px").css("height", icHeight + "px");
+
+				overlayWidth =  c.overlayWidth;
+				overlayHeight =  c.overlayHeight;
+				overlayAspectRatio = overlayWidth / overlayHeight;
+// console.log("overlay aspect ratio=" + overlayAspectRatio);
+
+				overlayHeightMax = overlayHeight;		// never go larger than what user specified
+				overlayWidthMax = overlayWidth;
+
+				starmapWidth = $("#starmap").width();
+				starmapHeight = $("#starmap").height();
+
+				// TODO: this assumes the border is 1px on each side.
+				var imageWidth = c.imageWidth - (config.imageBorder ? 2 : 0);
+				if (icWidth < imageWidth) {
+					// The actual image on the screen is smaller than the imageWidth requested by the user.
+					// Determine the percent smaller, then make the overlay that percent smaller.
+console.log("icWidth=" + icWidth + ", imageWidth=" + imageWidth);
+					var percentSmaller = icWidth / c.imageWidth;
+
+					// #starmap holds the starmap button, so needs to resize it as well.
+					var w = starmapWidth * percentSmaller;
+					var h = w / overlayAspectRatio;
+					$("#starmap")
+						.css("width", Math.round(w, 0) + "px")
+						.css("height", Math.round(h, 0) + "px");
+					starmapWidth = w;
+					starmapHeight = h;
+
+		// TODO: probably also need to adjust #stamap's margin-left and margin-right if
+
+					// percentSmaller makes the overlay TOO small, so change it.
+					percentSmaller *= 1.04;
+console.log("== Decreasing overlay by " + percentSmaller*100 + " percent" + " (overlayWidth was " + overlayWidth + ")");
+					overlayWidth = overlayWidth * percentSmaller;
+					overlayHeight = overlayWidth / overlayAspectRatio;
+					$("#starmap_inner")
+						.css("width", Math.round(overlayWidth, 0) + "px")
+						.css("height", Math.round(overlayHeight, 0) + "px");
+
+				}
+
+				// id="live_container" is where the image goes.
+				var image_w = c.imageWidth;
+				var image_h = Math.round((image_w / icImageAspectRatio), 0);
+// console.log("icHeight=" + icHeight + ", icWidth=" + icWidth);
+// console.log("overlayHeight=" + overlayHeight + ", overlayWidth=" + overlayWidth);
+// console.log("image_h=" + image_h + ", image_w=" + image_w);
+
+				// Keep track of the sizes.  virtualsky.js seems to change them,
+				// so we need to change them based on our last known sizes.
+				last_s_iW = $("#starmap_inner").width();
+				last_s_iH = $("#starmap_inner").height();
 			}
-			data.width = window.innerWidth < width ? window.innerWidth : width;
-			if (config.overlayHeight)
-				data.height = config.overlayHeight;
-			else
-				data.height = data.width;	// default is square
-			data.latitude = config.latitude;
-			data.longitude = config.longitude;
-			data.az = config.az;
-			if (usingNewVirtualSky)
-				planetarium = S.virtualsky(data);
-			else
-				planetarium = typeof $.virtualsky == "undefined" ? undefined : $.virtualsky(data);
-			$("#starmap").css("margin-top", config.overlayOffsetTop + "px");
-			$("#starmap").css("margin-left", config.overlayOffsetLeft + "px");
-		}
-	);
+		);
+	}
 };
 
 function compile($compile) {
@@ -63,40 +195,109 @@ function compile($compile) {
 	};
 }
 
-var configNotSet = false;	// Has the config.js file been updated by the user?
+var configNotSet = false;	// Has the configuration file been updated by the user?
+var needToUpdate = "XX_NEED_TO_UPDATE_XX";	// must match what's in configData
 
-function AppCtrl($scope, $timeout, $http, _) {
-	var overlayBuilt = false;	// has the overlay been built yet?
+function convertLatitude(sc, lat) {			// sc == scope
+	var convertToString = false;
+	var len, direction;
 
-	if (! usingNewVirtualSky) {
-		overlayBuilt = true;
-		buildOverlay();
+	if (typeof lat === "string") {
+		sc.s_latitude = lat;	// string version
+
+		len = lat.length;
+		direction = lat.substr(len-1, 1).toUpperCase();
+		if (direction == "N")
+			sc.latitude = lat.substr(0, len-2) * 1;
+		else if (direction == "S")
+			sc.latitude = lat.substr(0, len-2) * -1;
+		else {
+			// a number with quotes around it which is treated as a string
+			sc.latitude = lat * 1;
+			convertToString = true;
+		}
+	} else {
+		sc.latitude = lat;
+		convertToString = true;
 	}
 
-	$scope.imageURL = "loading.jpg";
+	if (convertToString) {
+		if (lat >= 0)
+			sc.s_latitude = lat + "N";
+		else
+			sc.s_latitude = -lat + "S";
+	}
+
+	return sc.latitude;
+}
+
+function convertLongitude(sc, lon) {
+	var convertToString = false;
+	var len, direction;
+
+	if (typeof lon === "string") {
+		sc.s_longitude = lon;
+
+		len = config.longitude.length;
+		direction = lon.substr(len-1, 1).toUpperCase();
+		if (direction == "E")
+			sc.longitude = lon.substr(0, len-2) * 1;
+		else if (direction == "W")
+			sc.longitude = lon.substr(0, len-2) * -1;
+		else {
+			// a number with quotes around it which is treated as a string
+			sc.longitude = lon * 1;
+			convertToString = true;
+		}
+	} else {
+		sc.longitude = lon;
+		convertToString = true;
+	}
+
+	if (convertToString) {
+		if (config.longitude >= 0)
+			sc.s_longitude = lon + "E";
+		else
+			sc.s_longitude = -lon + "W";
+	}
+
+	return sc.longitude;
+}
+
+function AppCtrl($scope, $timeout, $http, _) {
+
+	// Allow latitude and longitude to have or not have N, S, E, W,
+	// but in the popout, always use the letters for consistency.
+	// virtualsky.js expects decimal numbers so we need both.
+	// Need to convert them before building the overlay.
+	$scope.latitude = convertLatitude($scope, config.latitude);
+	myLatitude = $scope.latitude;
+	$scope.longitude = convertLongitude($scope, config.longitude);
+	myLongitude = $scope.longitude;
+
+	$scope.imageURL = config.loadingImage;
 	$scope.showInfo = false;
 	$scope.showOverlay = config.showOverlayAtStartup;
-	if ($scope.showOverlay && usingNewVirtualSky) {
-		overlayBuilt = true;
-		console.log("@@ Building overlay...");
+	if ($scope.showOverlay) {
+		console.log("@@ Building overlay at startup for showOverlay...");
 		buildOverlay();
 	}
 	$scope.notification = "";
-	$scope.title = config.title;
-	if ($scope.title == "XX_need_to_update_XX") {
-		// Could (or should?) check other variables for not being set.
-		// Or assume if the title is set, everything else is too.
+	if (config.title == needToUpdate) {
+		// Assume if the title isn't set, nothing else is either.
 		configNotSet = true;
+		$scope.notification = formatMessage("Please update the '" + configData + "' file.<br>Replace the '" + needToUpdate + "' entries and check all other entries.<br>Refresh your browser when done.", msgType="error");
+		return;
 	}
 	$scope.location = config.location;
-	$scope.latitude = config.latitude;
-	$scope.longitude = config.longitude;
 	$scope.camera = config.camera;
 	$scope.lens = config.lens;
 	$scope.computer = config.computer;
 	$scope.owner = config.owner;
 	$scope.auroraForecast = config.auroraForecast;
 	$scope.imageName = config.imageName;
+	$scope.AllskyVersion = config.AllskyVersion;
+	$scope.AllskyWebsiteVersion = config.AllskyWebsiteVersion;
 
 	function getHiddenProp() {
 		var prefixes = ['webkit', 'moz', 'ms', 'o'];
@@ -113,34 +314,19 @@ function AppCtrl($scope, $timeout, $http, _) {
 		// otherwise it's not supported
 		return null;
 	}
+	var hiddenProperty = getHiddenProp();
 
 	function isHidden() {
-		var prop = getHiddenProp();
-		if (!prop) return false;
-//return false; // xxxxxxxxx for testing, uncomment to make never hidden
-
-		return document[prop];
+		if (! hiddenProperty) return false;
+		return document[hiddenProperty];
 	}
 
-	// If the data.json file wasn't found, or for some reason "sunset" isn't in it,
-	// the routine that reads data.json will set "dataMissingMessage" so display it.
+	// If the "sunData" file wasn't found, or for some reason "sunset" isn't in it,
+	// the routine that reads "sunData" will set "dataMissingMessage" so display it.
 	var dataMissingMessage = "";
 
 	function formatMessage(msg, msgType) {
-		if (msgType === "error") {
-			textColor = "red";
-			borderColor = "red";
-			borderStyle = "dashed";
-		} else if (msgType === "warning") {
-			textColor = "yellow";
-			borderColor = "yellow";
-			borderStyle = "dashed";
-		} else {
-			textColor = "white";
-			borderColor = "white";
-			borderStyle = "solid";
-		}
-		return("<div style='background-color: #333; color: " + textColor + "; text-align: center; font-size: 145%; font-weight: bold; border: 3px " + borderStyle + " " + borderColor + "; margin: 20px 0 20px 0; padding: 20px 0 20px 0;'>" + msg + "</div>");
+		return("<div class='msg " + msgType + "-msg'>" + msg + "</div>");
 	}
 
 	// How old should the data file be, or the sunset time be, in order to warn the user?
@@ -150,9 +336,7 @@ function AppCtrl($scope, $timeout, $http, _) {
 
 	// The defaultInterval should ideally be based on the time between day and night images - why
 	// check every 5 seconds if new images only appear once a minute?
-	var defaultInterval = (5 * 1000);		// Time to wait between normal images.
-	if (config.intervalSeconds) defaultInterval = config.intervalSeconds * 1000;
-
+	var defaultInterval = (config.intervalSeconds * 1000);		// Time to wait between normal images.
 	var intervalTimer = defaultInterval;		// Amount of time we're currently waiting
 
 	// If we're not taking pictures during the day, we don't need to check for updated images as often.
@@ -161,7 +345,7 @@ function AppCtrl($scope, $timeout, $http, _) {
 	// there's no need to check until nightfall.
 	// However, in case the image DOES change, check every minute.  Seems like a good compromise.
 	// Also, in both cases, if we wait too long, when the user returns to the web page after
-	// it being hidden, they'll have to wait a long time for the page to update.
+	// it's been hidden, they'll have to wait a long time for the page to update.
 	var auroraIntervalTimer = (60 * 1000);			// seconds
 	var auroraIntervalTimerShortened = (15 * 1000);	// seconds
 	var nonAuroraIntervalTimer = (60 * 1000);		// seconds
@@ -173,12 +357,16 @@ function AppCtrl($scope, $timeout, $http, _) {
 	var lastType = "";
 	var loggedTimes = false;
 	var numImagesRead = 0;
+	var numCalls = 0;
 	$scope.getImage = function () {
 		var url= "";
 		var imageClass= "";
-		if (! isHidden()) {
+		// Go through the loop occassionally even when hidden so we re-read the sunData file
+		// if needed.
+		if (! isHidden() || ++numCalls % 5 == 0) {
 			if (configNotSet) {
-				$scope.notification = formatMessage("Please update the 'config.js' file.<br>Replace the 'XX_need_to_update_XX' entries and check all other entries.<br>Refresh your browser when done.", msgType="error");
+// xxxxxxxxx test deleting the "if" portion
+				$scope.notification = formatMessage("Please update the '" + configData + "' file.<br>Replace the '" + needToUpdate + "' entries and check all other entries.<br>Refresh your browser when done.", msgType="error");
 			} else if (dataMissingMessage !== "") {
 				$scope.notification = formatMessage(dataMissingMessage, msgType = dataFileIsOld ? "warning": "error");
 			} else {
@@ -208,8 +396,8 @@ function AppCtrl($scope, $timeout, $http, _) {
 			if (! dataFileIsOld) {
 //console.log("DEBUG: sunset daysOld=" + daysOld);
 				if (daysOld > oldDataLimit) {
-					var oldMsg = "WARNING: sunset is " + daysOld + " days old.";
-					$scope.notification = formatMessage(oldMsg + "<br>Check Allsky log file if 'postData.sh' has been running successfully at the end of nighttime.", msgType="warning");
+					var oldMsg = "WARNING: sunset data is " + daysOld + " days old.";
+					$scope.notification = formatMessage(oldMsg + "<br>See the 'Troubleshooting &gt; Allsky Website' documentation page for how to resolve this.", msgType="warning");
 				}
 			}
 
@@ -229,7 +417,7 @@ function AppCtrl($scope, $timeout, $http, _) {
 			}
 
 			// The sunrise and sunset times change every day, and the user may have changed
-			// streamDaytime, so re-read the data.json file when something changes.
+			// streamDaytime, so re-read the "sunData" file when something changes.
 			if (is_nighttime) {
 				// Only add to the console log once per message type
 				if (lastType !== "nighttime") {
@@ -314,13 +502,15 @@ function AppCtrl($scope, $timeout, $http, _) {
 				console.log("  m_now = " + m_now.format("YYYY-MM-DD HH:mm:ss"));
 				if (oldMsg !== "") console.log("    > " + oldMsg);
 
-				console.log("  Times:");
 				console.log("  m_now="+m_nowTime + ", m_sunrise="+m_sunriseTime + ", m_sunset="+m_sunsetTime);
 				console.log("  beforeSunriseTime = " + beforeSunriseTime);
 				console.log("  afterSunsetTime = " + afterSunsetTime);
 			}
 
-			var img = $("<img />").attr('src', url + '?_ts=' + new Date().getTime()).addClass(imageClass)
+// TODO: Is there a way to specify not to cache this without using "?_ts" ?
+			var img = $("<img title='allsky image' />")
+				.attr('src', url + '?_ts=' + new Date().getTime())
+				.addClass(imageClass)
 				.on('load', function() {
 					if (!this.complete || typeof this.naturalWidth === "undefined" || this.naturalWidth === 0) {
 						alert('broken image!');
@@ -334,22 +524,17 @@ function AppCtrl($scope, $timeout, $http, _) {
 
 			// Don't re-read after the 1st image of this period since we read it right before the image.
 			if (rereadSunriseSunset && numImagesRead > 1) {
-				// console.log("XXX Re-reading data.json");
 				$scope.getSunRiseSet();
-			} else if (rereadSunriseSunset) {
-				console.log("XXX Not rereading data.json, numImagesRead=" + numImagesRead);
-			} else {
-				// console.log("XXX rereadSunriseSunset=" + rereadSunriseSunset);
 			}
-		}
+		} // if (! isHidden()))
 	};
 
-	// Set a default sunrise if we can't get it from data.json.
+	// Set a default sunrise if we can't get it from "sunData".
 	var usingDefaultSunrise = false;
 	function getDefaultSunrise(today) {
 		return(moment(new Date(today.getFullYear(), today.getMonth(), today.getDate(), 6, 0, 0)));
 	}
-	// Set a default sunset if we can't get it from data.json.
+	// Set a default sunset if we can't get it from "sunData".
 	var usingDefaultSunset = false;
 	function getDefaultSunset(today) {
 		return(moment(new Date(today.getFullYear(), today.getMonth(), today.getDate(), 18, 0, 0)));
@@ -368,8 +553,10 @@ function AppCtrl($scope, $timeout, $http, _) {
 	$scope.getSunRiseSet = function () {
 		dataFileIsOld = false;
 		now = new Date();
-		console.log("Read data.json at " + moment(now).format("MM-DD h:mm:ss a") + ":");
-		var url = "data.json" + '?_ts=' + now.getTime();
+		var url = sunData;
+// TODO: is ?_ts needed if we are not cache'ing ?
+		url += '?_ts=' + now.getTime();
+		console.log("Read " + sunData + " on " + moment(now).format("MM-DD h:mm:ss a") + ":");
 		$http.get(url, {
 			cache: false
 		}).then(
@@ -378,26 +565,29 @@ function AppCtrl($scope, $timeout, $http, _) {
 					$scope.sunrise = moment(data.data.sunrise);
 					usingDefaultSunrise = false;
 				} else if (! usingDefaultSunrise) {
+// TODO: Is this needed with the new Allsky Website, given that it only works with the new Allsky?
 					// Older versions of allsky/scripts/postData.sh didn't include sunrise.
 					$scope.sunrise = getDefaultSunrise(now);
 					usingDefaultSunrise = true;
-					console.log("  ********** WARNING: 'sunrise' not defined in data.json");
+					console.log("  ********** WARNING: 'sunrise' not defined in " + sunData);
 				}
 				if (data.data.sunset) {
 					$scope.sunset = moment(data.data.sunset);
 					usingDefaultSunset = false;
 					dataMissingMessage = "";
 				} else if (! usingDefaultSunset) {
+// TODO: Is this needed with the new Allsky Website, given that it only works with the new Allsky?
 					$scope.sunset = getDefaultSunset(now);
 					usingDefaultSunset = true;
-					dataMissingMessage = "ERROR: 'sunset' not defined in 'data.json', using " + $scope.sunset.format("h:mm a") + ".<br>Run 'allsky/scripts/postData.sh'.<br>Refresh your browser when done.";
-					console.log("  ********** WARNING: 'sunset' not defined in data.json");
+					dataMissingMessage = "ERROR: 'sunset' not defined in '" + sunData + "', using " + $scope.sunset.format("h:mm a") + ".<br>Run 'allsky/scripts/postData.sh'.<br>Refresh your browser when done.";
+					console.log("  ********** ERROR: 'sunset' not defined in " + sunData);
 				}
 				if (data.data.streamDaytime) {
 					$scope.streamDaytime = data.data.streamDaytime === "true";
 				} else {
+// TODO: Is this needed with the new Allsky Website, given that it only works with the new Allsky?
 					$scope.streamDaytime = true;
-					console.log("  ********** WARNING: 'streamDaytime' not defined in data.json");
+					console.log("  ********** WARNING: 'streamDaytime' not defined in " + sunData);
 				}
 
 				// Get when the file was last modified so we can warn if it's old
@@ -419,16 +609,16 @@ function AppCtrl($scope, $timeout, $http, _) {
 				if (typeof x === "object") {	// success - "x" is a Date object
 					lastModifiedSunriseSunsetFile = moment(x);
 					var duration = moment.duration(moment(now).diff(lastModifiedSunriseSunsetFile));
-// console.log("DEBUG: data.json is " + duration.days() + " days old");
+// console.log("DEBUG: " + sunData + " is " + duration.days() + " days old");
 					if (duration.days() > oldDataLimit) {
 						dataFileIsOld = true;
-						var msg = "WARNING: data.json is " + duration.days() + " days old.";
+						var msg = "WARNING: " + sunData + " is " + duration.days() + " days old.";
 						console.log(msg);
 						dataMissingMessage = msg + "<br>Check Allsky log file if 'postData.sh' has been running successfully at the end of nighttime.";
 					}
 
 				} else {
-					console.log("fetchHeader(" + url + ") returned " + x);
+					console.log("fetchHeader(" + sunData + ") returned " + x);
 				}
 
 				writeSunriseSunsetToConsole();
@@ -442,8 +632,8 @@ function AppCtrl($scope, $timeout, $http, _) {
 				usingDefaultSunset = true;
 				$scope.streamDaytime = true;
 
-				dataMissingMessage = "ERROR: 'data.json' file not found, using " + $scope.sunset.format("h:mm a") + " for sunset.<br>Set 'POST_END_OF_NIGHT_DATA=true' in config.sh then run 'allsky/scripts/postData.sh'.<br>Refresh your browser when done.";
-				console.log("  *** Unable to read file");
+				dataMissingMessage = "ERROR: '" + sunData + " file not found, using " + $scope.sunset.format("h:mm a") + " for sunset.<br>Run 'allsky/scripts/postData.sh'.<br>Refresh your browser when done.";
+				console.log("  *** Unable to read '" + sunData + "' file");
 				writeSunriseSunsetToConsole();
 
 				$scope.getImage()
@@ -467,29 +657,28 @@ function AppCtrl($scope, $timeout, $http, _) {
 	$scope.toggleOverlay = function () {
 		$scope.showOverlay = !$scope.showOverlay;
 
-	if (usingNewVirtualSky && ! overlayBuilt && $scope.showOverlay) {
-		console.log("@@@@ Building overlay...");
-		overlayBuilt = true;
-		// The new 0.7.7 version of VirtualSky doesn't show the overlay unless buildOverlay() is called here.
-		buildOverlay();
-	}
+		if (! overlayBuilt && $scope.showOverlay) {
+			console.log("@@@@ Building overlay from toggle...");
+			// Version 0.7.7 of VirtualSky doesn't show the overlay unless buildOverlay() is called.
+			buildOverlay();
+		}
 
 		$('.options').fadeToggle();
 		$('#starmap_container').fadeToggle();
 	};
 
-	$scope.getScale = function (index) {
+	$scope.getScale = function (index) {	// based mostly on https://auroraforecast.is/kp-index/
 		var scale = {
-			0: "Low",
-			1: "Low",
-			2: "Low",
-			3: "Active",
-			4: "High",
-			5: "Extreme",
-			6: "Extreme",
-			7: "Extreme",
-			8: "Extreme",
-			9: "Extreme",
+			0: "Extremely_Quiet",
+			1: "Very_Quiet",
+			2: "Quiet",
+			3: "Unsettled",
+			4: "Active",
+			5: "Minor_storm",
+			6: "Moderate_storm",
+			7: "Strong_storm",
+			8: "Severe_storm",
+			9: "Extreme_storm",
 			100: "WARNING"
 		};
 		return scale[index];
@@ -502,7 +691,7 @@ function AppCtrl($scope, $timeout, $http, _) {
 				var total = _.sumBy(data, function (row) {
 					return parseInt(row[field]);
 				});
-				return Math.round(total / 7);
+				return Math.round(total / data.length);	// return average
 			}
 
 			function getDay(number) {
@@ -537,3 +726,4 @@ angular
 	.directive('compile', ['$compile', compile])
 	.controller("AppCtrl", ['$scope', '$timeout', '$http', 'lodash', AppCtrl])
 ;
+
