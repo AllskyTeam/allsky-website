@@ -81,9 +81,19 @@ function buildOverlay(){
 		$.ajax({
 			// No need for ?_ts=   since $.ajax adds one
 			url: configData,
-			cache: false
-		}).done(
-			function (data) {
+			cache: false,
+			dataType: 'json',
+			error: function(jqXHR, textStatus, errorThrown) {
+				// console.log("jqXHR=", jqXHR);
+				// console.log("textStatus=" + textStatus + ", errorThrown=" + errorThrown);
+				// TODO: Display the message on the screen.
+				if (jqXHR.status == 404) {
+					console.log(configData + " not found!");
+				} else {
+					console.log("Error reading '" + configData + "': " + errorThrown);
+				}
+			},
+			success: function (data) {
 				var c = data.config;
 				// "config" was defined in index.php to include ALL the variables we need,
 				// including ones not in the "config" section of the configuration file.
@@ -131,7 +141,7 @@ function buildOverlay(){
 				if (icWidth < imageWidth) {
 					// The actual image on the screen is smaller than the imageWidth requested by the user.
 					// Determine the percent smaller, then make the overlay that percent smaller.
-console.log("icWidth=" + icWidth + ", imageWidth=" + imageWidth);
+// console.log("icWidth=" + icWidth + ", imageWidth=" + imageWidth);
 					var percentSmaller = icWidth / c.imageWidth;
 
 					// #starmap holds the starmap button, so needs to resize it as well.
@@ -147,7 +157,7 @@ console.log("icWidth=" + icWidth + ", imageWidth=" + imageWidth);
 
 					// percentSmaller makes the overlay TOO small, so change it.
 					percentSmaller *= 1.04;
-console.log("== Decreasing overlay by " + percentSmaller*100 + " percent" + " (overlayWidth was " + overlayWidth + ")");
+// console.log("== Decreasing overlay by " + percentSmaller*100 + " percent" + " (overlayWidth was " + overlayWidth + ")");
 					overlayWidth = overlayWidth * percentSmaller;
 					overlayHeight = overlayWidth / overlayAspectRatio;
 					$("#starmap_inner")
@@ -168,7 +178,7 @@ console.log("== Decreasing overlay by " + percentSmaller*100 + " percent" + " (o
 				last_s_iW = $("#starmap_inner").width();
 				last_s_iH = $("#starmap_inner").height();
 			}
-		);
+		});
 	}
 };
 
@@ -726,4 +736,3 @@ angular
 	.directive('compile', ['$compile', compile])
 	.controller("AppCtrl", ['$scope', '$timeout', '$http', 'lodash', AppCtrl])
 ;
-
