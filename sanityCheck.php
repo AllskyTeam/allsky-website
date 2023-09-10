@@ -22,16 +22,16 @@
 	}
 
 
-	echo "<style>";
-		// shade of green that's easier to see.
-	echo ".success { color: #00c300; font-weight: bold; }";
-	echo ".failure { color: red; font-weight: bold; }";
-	echo "</style>";
-
-	if (isset($_GET["debug"]))
+	if (isset($_GET["debug"])) {
 		$debug = true;
-	else
+		echo "<style>";
+			// shade of green that's easier to see.
+		echo ".success { color: #00c300; font-weight: bold; }";
+		echo ".failure { color: red; font-weight: bold; }";
+		echo "</style>\n";
+	} else {
 		$debug = false;
+	}
 
 	$ok = true;
 	// The first 3 directories should have an "index.php" file and a "thumbnails" directory.
@@ -48,7 +48,7 @@
 	$numLinesOutput = 0;
 	foreach ($dirs as $dir => $type) {
 		if ($debug) {
-			if ($numLinesOutput++ > 0) echo "<br>";
+			if ($numLinesOutput++ > 0) echo "\n<br>";
 			echo "Checking <strong>$dir</strong> directory: ";
 		}
 		if (! is_dir($dir)) {
@@ -106,17 +106,13 @@
 
 	if ($debug) echo "<br><br>";	// So the status is more obvious.
 
+	// The status needs to be at the beginning of the line.
 	if ($ok) {
 		if ($debug) echo "<span class='success'>";
-		echo "SUCCESS";
+		echo "\nSUCCESS";
 	} else {
-		if ($debug)
-			echo "<span class='failure'>";
-		else
-			echo "<br>\n";
-		echo "FAILURE";
+		if ($debug) echo "<span class='failure'>";
+		echo "\nFAILURE";
 	}
 	if ($debug) echo "</span>";
-	echo "\n";
-	exit;
 ?>
