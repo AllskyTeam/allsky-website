@@ -1,32 +1,7 @@
 <?php
 	if (isset($_GET["check"])) {
-		// Check sanity of website and make necessary directories.
-		if (isset($_GET["debug"]))
-			$debug = true;
-		else
-			$debug = false;
-
-		$ok = true;
-		$dirs = array("videos", "keograms", "startrails");
-		foreach ($dirs as $dir) {
-			$thumb_dir = "$dir/thumbnails";
-			if ($debug) echo "\nChecking $thumb_dir.";
-			if (! is_dir($thumb_dir)) {
-				if ($debug) echo "  > Making";
-				if (! mkdir($thumb_dir, 0775, true)) {		// true == recursive
-					$ok = false;
-					$last_error = error_get_last();
-					echo "\nUnable to make '$thumb_dir' directory: " . $last_error["message"];
-				}
-			}
-		}
-
-		// TODO: add other checks here
-
-		if (! $ok) exit;
-
-		if ($debug) echo "\n";	// ends any lines already output
-		echo "SUCCESS\n";
+		// Perform sanity checks on this Website.
+		include_once('sanityCheck.php');
 		exit;
 	}
 ?><!DOCTYPE html>
